@@ -1,0 +1,590 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernprojekte für KMU – Batch 1 Deadline 14.10.</title>
+    
+    <!-- HTML Meta Tags -->
+<title>Lernprojekte für KMU – Batch 1 Deadline 14.10.</title>
+<meta name="description" content="">
+
+<!-- Facebook Meta Tags -->
+<meta property="og:url" content="https://6936.de/737">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lernprojekte für KMU – Batch 1 Deadline 14.10.">
+<meta property="og:description" content="Studierende entwickeln Ihre Projektidee
+Lernprojekte für KMU/NGO's – ohne Gewähr, mit Lerneffekt
+
+">
+<meta property="og:image" content="ws25-swp-batch1.png">
+
+<!-- Twitter Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:domain" content="6936.de">
+<meta property="twitter:url" content="https://6936.de/737">
+<meta name="twitter:title" content="Lernprojekte für KMU – Batch 1 Deadline 14.10.">
+<meta name="twitter:description" content="Studierende entwickeln Ihre Projektidee
+Lernprojekte für KMU/NGO's – ohne Gewähr, mit Lerneffekt
+
+">
+<meta name="twitter:image" content="ws25-swp-batch1.png">
+
+<!-- Meta Tags Generated via https://www.opengraph.xyz -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fafafa;
+        }
+
+a {color: white}
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1a2332 0%, #2d4a5c 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .deadline-badge {
+            display: inline-block;
+            background: #e63946;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #06a77d;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: #058f6a;
+            transform: translateY(-2px);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 60px 20px;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #1a2332;
+            text-align: center;
+        }
+
+        .intro {
+            background: white;
+        }
+
+        .intro-content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* Bubble Chart Section */
+        .bubble-section {
+            background: #1a2332;
+            color: white;
+        }
+
+        .bubble-section h2 {
+            color: white;
+        }
+
+        #bubble-chart {
+            max-width: 900px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .legend {
+            max-width: 900px;
+            margin: 30px auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Framework Section */
+        .framework {
+            background: white;
+        }
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .framework-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #06a77d;
+        }
+
+        .framework-card h3 {
+            color: #1a2332;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .framework-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .framework-card li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .framework-card li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #06a77d;
+        }
+
+        /* Process Section */
+        .process {
+            background: #f8f9fa;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: #06a77d;
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .step h3 {
+            color: #1a2332;
+            margin-bottom: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .form-iframe {
+            width: 100%;
+            height: 1748px;
+            border: none;
+            margin-top: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a2332;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            section h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="deadline-badge">⏰ Batch 1 Deadline: 14. Oktober 2025</div>
+            <h1>Studierende entwickeln Ihre Projektidee</h1>
+            <p>Lernprojekte für KMU/NGO's – ohne Gewähr, mit Lerneffekt</p>
+            <button class="cta-button" onclick="openModal()">Projekt einreichen</button>
+        </div>
+    </div>
+
+    <!-- Intro Section -->
+    <section class="intro">
+        <div class="container">
+            <h2>Was ist ein Lernprojekt?</h2>
+            <div class="intro-content">
+                <p>Studierende arbeiten an <strong>echten Projekten aus Ihrer Unternehmenspraxis</strong> – strukturiert in Sprints mit festen Mittwochs-Terminen (remote möglich). Das Ergebnis ist ergebnisoffen: Prototyp, Machbarkeitsanalyse, Risikoeinschätzung oder ein neuer Perspektivwechsel.</p>
+                <p style="margin-top: 20px;"><strong>Wichtig:</strong> Dies ist ein Lernformat nach Las-Vegas-Regel / Sandbox-Prinzip – ähnlich wie bei OpenSource-Projekten <strong>ohne Gewähr und ohne Haftung</strong>. Compliance und DSGVO werden nur am Rande betrachtet, der Umfang wird vertraglich fixiert.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bubble Chart Section -->
+    <section class="bubble-section">
+        <div class="container">
+            <h2>Wo starten Studierende ihre Lernreise?</h2>
+            <p>Stand Kick-Off Software Projekt Macromedia Hochschule <a href="https://www.linkedin.com/posts/joergoyen_softwareengineering-praxis-realworldskills-activity-7379149513363726336-1ktL?utm_source=share&utm_medium=member_desktop&rcm=ACoAAAAfhIcBvlwETbDFEuiKEuwO9a_qogfOrTU" target="_blank">1.10.1025</a></p>
+            <svg id="bubble-chart" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Bubbles -->
+                <circle cx="400" cy="250" r="90" fill="#3d5a80" stroke="#5890c9" stroke-width="3"/>
+                <text x="400" y="260" text-anchor="middle" fill="white" font-size="32" font-weight="bold">01</text>
+                
+                <circle cx="550" cy="270" r="85" fill="#6b4423" stroke="#d4a574" stroke-width="3"/>
+                <text x="550" y="280" text-anchor="middle" fill="white" font-size="32" font-weight="bold">02</text>
+                
+                <circle cx="520" cy="450" r="100" fill="#1a5040" stroke="#2a9d8f" stroke-width="3"/>
+                <text x="520" y="460" text-anchor="middle" fill="white" font-size="32" font-weight="bold">03</text>
+                
+                <circle cx="520" cy="130" r="95" fill="#6b3a4a" stroke="#d4909f" stroke-width="3"/>
+                <text x="520" y="140" text-anchor="middle" fill="white" font-size="32" font-weight="bold">04</text>
+                
+                <circle cx="360" cy="180" r="65" fill="#463d5c" stroke="#8a7fa0" stroke-width="3"/>
+                <text x="360" y="190" text-anchor="middle" fill="white" font-size="28" font-weight="bold">05</text>
+                
+                <circle cx="620" cy="180" r="50" fill="#7a3a5c" stroke="#c17a9f" stroke-width="3"/>
+                <text x="620" y="190" text-anchor="middle" fill="white" font-size="24" font-weight="bold">06</text>
+                
+                <circle cx="440" cy="390" r="42" fill="#2a5040" stroke="#4a9f8f" stroke-width="2"/>
+                <text x="440" y="398" text-anchor="middle" fill="white" font-size="20" font-weight="bold">07</text>
+                
+                <circle cx="680" cy="380" r="88" fill="#5a5023" stroke="#b4a574" stroke-width="3"/>
+                <text x="680" y="390" text-anchor="middle" fill="white" font-size="32" font-weight="bold">08</text>
+                
+                <circle cx="280" cy="360" r="85" fill="#2a4a5a" stroke="#5a8a9a" stroke-width="3"/>
+                <text x="280" y="370" text-anchor="middle" fill="white" font-size="32" font-weight="bold">09</text>
+                
+                <circle cx="720" cy="210" r="75" fill="#6b3a5a" stroke="#c17a9a" stroke-width="3"/>
+                <text x="720" y="220" text-anchor="middle" fill="white" font-size="30" font-weight="bold">10</text>
+                
+                <circle cx="320" cy="270" r="48" fill="#3a5a23" stroke="#7ab574" stroke-width="2"/>
+                <text x="320" y="278" text-anchor="middle" fill="white" font-size="22" font-weight="bold">11</text>
+                
+                <circle cx="420" cy="500" r="60" fill="#5a3a6b" stroke="#a07ab5" stroke-width="3"/>
+                <text x="420" y="510" text-anchor="middle" fill="white" font-size="26" font-weight="bold">12</text>
+                
+                <circle cx="680" cy="90" r="70" fill="#1a6060" stroke="#2aa0a0" stroke-width="3"/>
+                <text x="680" y="100" text-anchor="middle" fill="white" font-size="28" font-weight="bold">13</text>
+            </svg>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3d5a80;"></div>
+                    <span>01 — Design / UX: Figma / Penpot</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6b4423;"></div>
+                    <span>02 — Frontend: HTML5 / CSS, JavaScript</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1a5040;"></div>
+                    <span>03 — Backend: PHP / Python</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6b3a4a;"></div>
+                    <span>04 — Daten: SQL (DB) / JSON</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #463d5c;"></div>
+                    <span>05 — BPMN / Prozessmodellierung</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #7a3a5c;"></div>
+                    <span>06 — API: REST (Postman)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2a5040;"></div>
+                    <span>07 — PWA: Manifest + Service Worker</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #5a5023;"></div>
+                    <span>08 — Versionierung: GitHub</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2a4a5a;"></div>
+                    <span>09 — Projektmanagement: Jira</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6b3a5a;"></div>
+                    <span>10 — Deploy: Docker / AWS (Cloud)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3a5a23;"></div>
+                    <span>11 — Dokumentation: Markdown / Swagger</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #5a3a6b;"></div>
+                    <span>12 — Low-Code: optional, welche?</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1a6060;"></div>
+                    <span>13 — AI / Vibe Coding: falls genutzt</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Framework Section -->
+    <section class="framework">
+        <div class="container">
+            <h2>Rahmen & Leitplanken</h2>
+            <div class="framework-grid">
+                <div class="framework-card">
+                    <h3>⏰ Zeitstruktur</h3>
+                    <ul>
+                        <li>Mittwochs-Termine (remote)</li>
+                        <li>Mind. 3 Fixtermine: Briefing, Zwischenstand, Abschluss</li>
+                        <li>Max. 9 Termine gesamt</li>
+                        <li>Abschluss vor Weihnachten</li>
+                    </ul>
+                </div>
+                <div class="framework-card">
+                    <h3>🎯 Ergebnis</h3>
+                    <ul>
+                        <li>Prototyp / MVP</li>
+                        <li>Machbarkeitsanalyse</li>
+                        <li>Risikoeinschätzung</li>
+                        <li>Perspektivwechsel</li>
+                    </ul>
+                </div>
+                <div class="framework-card">
+                    <h3>🔒 Rechtliches</h3>
+                    <ul>
+                        <li>Las-Vegas-Regel / Sandbox</li>
+                        <li>Ohne Gewähr & Haftung</li>
+                        <li>Wie OpenSource-Projekt</li>
+                        <li>DSGVO/Compliance: Randbereiche</li>
+                    </ul>
+                </div>
+                <div class="framework-card">
+                    <h3>🚪 Flexibilität</h3>
+                    <ul>
+                        <li>Abbruchrecht je Sprint</li>
+                        <li>Bei fehlendem Lernfortschritt</li>
+                        <li>Gilt für beide Seiten</li>
+                        <li>Transparent kommuniziert</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process">
+        <div class="container">
+            <h2>Wie funktioniert's?</h2>
+            <div class="process-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Einreichen</h3>
+                    <p>Sie reichen Ihren Projekt­vorschlag bis 14.10. ein</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Shortlist</h3>
+                    <p>Wir entscheiden über Aufnahme in die Shortlist</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Briefing</h3>
+                    <p>Shortlist-Projekte bekommen Briefing-Termin (Mittwoch)</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Sprint</h3>
+                    <p>Studierende arbeiten in strukturierten Mittwochs-Terminen</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>Ergebnis</h3>
+                    <p>Abschluss-Präsentation vor Weihnachten</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <button class="cta-button" onclick="openModal()">Jetzt Projekt einreichen</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal mit Google Form -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h2 style="margin-bottom: 20px;">Projekt einreichen</h2>
+            <p style="margin-bottom: 10px; color: #666;">Reichen Sie Ihren Projektvorschlag ein. Wir melden uns nach dem 14. Oktober, ob Ihr Projekt auf der Shortlist ist.</p>
+            
+            <!-- Google Form eingebettet -->
+            <iframe 
+                class="form-iframe"
+                src="https://docs.google.com/forms/d/e/1FAIpQLSdloyE2DXlD409cCt65A0OrArknUQe6d9K_W1g5zBEI2SAPRg/viewform?embedded=true" 
+                frameborder="0" 
+                marginheight="0" 
+                marginwidth="0">
+                Loading…
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><strong>Lernprojekte</strong> – Studierende entwickeln lauffähige Software-Prototypen</p>
+            <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.8;">Batch 1 Deadline: 14. Oktober 2025 | <a href="impressum.html">Impressum</a></p>
+        </div>
+    </footer>
+
+    <script>
+        function openModal() {
+            document.getElementById('projectModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on outside click
+        document.getElementById('projectModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
