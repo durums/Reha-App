@@ -500,37 +500,14 @@ class RehaScheduleApp {
     }
 }
 
-// ==== API: Backend-URL anpassen ====
-const API = 'http://localhost:3000'; // später z.B. https://dein-service.onrender.com
-
-async function apiLogin(email, password) {
-  const res = await fetch(`${API}/api/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include', // Cookie empfangen/senden
-    body: JSON.stringify({ email, password })
-  });
-  if (!res.ok) throw new Error('Login fehlgeschlagen');
-  const { user } = await res.json();
-  localStorage.setItem('role', user.role);
-  localStorage.setItem('username', user.email);
-  return user;
-}
-
-async function apiLogout() {
-  await fetch(`${API}/api/logout`, { method: 'POST', credentials: 'include' });
-  localStorage.clear();
-  location.reload();
-}
-window.appLogout = apiLogout; // ersetzt dein altes appLogout
-
+// Initialize app when DOM is loaded
 let app;
-function initApp() {
-  if (!app) {
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing app...');
     app = new RehaScheduleApp();
+    // App global verfügbar machen für Service Worker
     window.app = app;
-  }
-}
+});
 
 // Register service worker for offline functionality
 if ('serviceWorker' in navigator) {
@@ -578,106 +555,3 @@ if ('serviceWorker' in navigator) {
 } else {
     console.log('ServiceWorker: Not supported in this browser');
 }
-
-// --- Role-based login + menu (angepasst, async & robust) ---
-document.addEventListener('DOMContentLoaded', async () => {
-  const loginModal = document.getElementById('loginModal');
-  const loginBtn   = document.getElementById('loginBtn');
-  const loginErr   = document.getElementById('loginErr');
-  const roleMenu   = document.getElementById('roleMenu');
-  const userInput  = document.getElementById('username'); // E-Mail
-  const passInput  = document.getElementById('password');
-  const roleSelect = document.getElementById('role');     // optional (falls im Modal vorhanden)
-
-  // Sanity-Check: wenn UI-Elemente fehlen, sauber aussteigen
-  if (!loginModal || !loginBtn || !roleMenu || !userInput || !passInput) {
-    console.warn('Login-UI nicht vollständig im DOM – Login-Feature übersprungen.');
-    return;
-  }
-
-  roleMenu.style.display = 'none';
-
-  // 1) Session beim Laden prüfen (Backend-Cookie)
-  try {
-    const meRes = await fetch(`${API}/api/me`, { credentials: 'include' });
-    if (meRes.ok) {
-      const { user } = await meRes.json();
-      localStorage.setItem('role', user.role);
-      localStorage.setItem('username', user.email);
-      hideLogin();
-      renderMenu(user.role);
-      return; // Fertig, kein showLogin() nötig
-    }
-  } catch {
-    // offline / keine Session -> weiter unten normal fortfahren
-  }
-
-  // 2) Falls bereits Rolle im localStorage (Fallback)
-  const currentRole = localStorage.getItem('role');
-  if (currentRole) {
-    hideLogin();
-    renderMenu(currentRole);
-  } else {
-    showLogin();
-  }
-
-  // 3) Login-Handler (Button + Enter im Passwortfeld)
-  loginBtn.addEventListener('click', handleLogin);
-  passInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleLogin();
-  });
-
-  async function handleLogin() {
-    const email = userInput.value.trim();  // "username" Feld als E-Mail nutzen
-    const password = passInput.value;
-    try {
-      const user = await apiLogin(email, password); // ruft dein Node-API
-      hideLogin();
-      renderMenu(user.role);
-      initApi();
-    } catch (e) {
-      console.warn(e);
-      if (loginErr) {
-        loginErr.style.display = 'block';
-        loginErr.textContent = 'Ungültige Zugangsdaten.';
-      }
-    }
-  }
-
-  // 4) Helpers
-  function showLogin() {
-    loginModal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => userInput.focus(), 50);
-  }
-
-  function hideLogin() {
-    loginModal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  function renderMenu(role) {
-    roleMenu.style.display = 'block';
-    let html = `<div class="menu-header">Angemeldet als: ${localStorage.getItem('username') || 'Gast'}</div>`;
-    if (role === 'patient') {
-      html += `
-        <ul class="menu-list">
-          <li><a href="#termine">Meine Termine</a></li>
-          <li><a href="#übungen">Übungen</a></li>
-          <li><a href="#nachrichten">Nachrichten</a></li>
-        </ul>`;
-    } else if (role === 'therapeut') {
-      html += `
-        <ul class="menu-list">
-          <li><a href="#patienten">Patientenliste</a></li>
-          <li><a href="#planen">Termine planen</a></li>
-          <li><a href="#berichte">Berichte</a></li>
-        </ul>`;
-    } else {
-      html += `<div>Unbekannte Rolle</div>`;
-    }
-    html += `<div style="margin-top:8px;"><button onclick="appLogout()">Logout</button></div>`;
-    roleMenu.innerHTML = html;
-  }
-});
-
