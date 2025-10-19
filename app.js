@@ -555,3 +555,79 @@ if ('serviceWorker' in navigator) {
 } else {
     console.log('ServiceWorker: Not supported in this browser');
 }
+
+// --- Role-based login + menu (einfügen in app.js) ---
+document.addEventListener('DOMContentLoaded', () => {
+  const loginModal = document.getElementById('loginModal');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginErr = document.getElementById('loginErr');
+  const roleMenu = document.getElementById('roleMenu');
+
+  // Falls bereits eingeloggt -> Menü rendern
+  const currentRole = localStorage.getItem('role');
+  if (currentRole) {
+    hideLogin();
+    renderMenu(currentRole);
+  } else {
+    showLogin();
+  }
+
+  loginBtn.addEventListener('click', () => {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
+
+    // Demo-validierung: im produktiven System durch Backend prüfen!
+    // Hier eine simple Demo-Regel: mind. 3 Zeichen Benutzername & Passwort 4+
+    if (username.length >= 3 && password.length >= 4) {
+      // markiere als eingeloggt
+      localStorage.setItem('username', username);
+      localStorage.setItem('role', role);
+      hideLogin();
+      renderMenu(role);
+    } else {
+      loginErr.style.display = 'block';
+      loginErr.textContent = 'Ungültige Zugangsdaten (Demo).';
+    }
+  });
+
+  // Logout-Funktion (wird vom Menü benutzt)
+  window.appLogout = function() {
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    location.reload(); // einfache Variante: Seite neu laden
+  };
+
+  function showLogin() {
+    loginModal.style.display = 'flex';
+  }
+  function hideLogin() {
+    loginModal.style.display = 'none';
+  }
+
+  function renderMenu(role) {
+    roleMenu.style.display = 'block';
+    let html = `<div class="menu-header">Angemeldet als: ${localStorage.getItem('username') || 'Gast'}</div>`;
+    if (role === 'patient') {
+      html += `
+        <ul class="menu-list">
+          <li><a href="#termine">Meine Termine</a></li>
+          <li><a href="#übungen">Übungen</a></li>
+          <li><a href="#nachrichten">Nachrichten</a></li>
+        </ul>
+      `;
+    } else if (role === 'therapeut') {
+      html += `
+        <ul class="menu-list">
+          <li><a href="#patienten">Patientenliste</a></li>
+          <li><a href="#planen">Termine planen</a></li>
+          <li><a href="#berichte">Berichte</a></li>
+        </ul>
+      `;
+    } else {
+      html += `<div>Unbekannte Rolle</div>`;
+    }
+    html += `<div style="margin-top:8px;"><button onclick="appLogout()">Logout</button></div>`;
+    roleMenu.innerHTML = html;
+  }
+});
