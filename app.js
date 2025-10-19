@@ -524,15 +524,13 @@ async function apiLogout() {
 }
 window.appLogout = apiLogout; // ersetzt dein altes appLogout
 
-
-// Initialize app when DOM is loaded
 let app;
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing app...');
+function initApp() {
+  if (!app) {
     app = new RehaScheduleApp();
-    // App global verfügbar machen für Service Worker
     window.app = app;
-});
+  }
+}
 
 // Register service worker for offline functionality
 if ('serviceWorker' in navigator) {
@@ -636,6 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const user = await apiLogin(email, password); // ruft dein Node-API
       hideLogin();
       renderMenu(user.role);
+      initApi();
     } catch (e) {
       console.warn(e);
       if (loginErr) {
@@ -682,44 +681,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-
-  // Logout-Funktion (wird vom Menü benutzt)
-  window.appLogout = function() {
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    location.reload(); // einfache Variante: Seite neu laden
-  };
-
-  function showLogin() {
-    loginModal.style.display = 'flex';
-  }
-  function hideLogin() {
-    loginModal.style.display = 'none';
-  }
-
-  function renderMenu(role) {
-    roleMenu.style.display = 'block';
-    let html = `<div class="menu-header">Angemeldet als: ${localStorage.getItem('username') || 'Gast'}</div>`;
-    if (role === 'patient') {
-      html += `
-        <ul class="menu-list">
-          <li><a href="#termine">Meine Termine</a></li>
-          <li><a href="#übungen">Übungen</a></li>
-          <li><a href="#nachrichten">Nachrichten</a></li>
-        </ul>
-      `;
-    } else if (role === 'therapeut') {
-      html += `
-        <ul class="menu-list">
-          <li><a href="#patienten">Patientenliste</a></li>
-          <li><a href="#planen">Termine planen</a></li>
-          <li><a href="#berichte">Berichte</a></li>
-        </ul>
-      `;
-    } else {
-      html += `<div>Unbekannte Rolle</div>`;
-    }
-    html += `<div style="margin-top:8px;"><button onclick="appLogout()">Logout</button></div>`;
-    roleMenu.innerHTML = html;
-  }
-});
