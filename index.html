@@ -24,12 +24,12 @@
     </div>
     <ul class="sidebar-menu">
       <li><a href="#trainingsplan" id="menu-trainingsplan">🏋️ Trainingsplan</a></li>
-      <li><a href="#fortschritt" id="menu-fortschritt">📊 Fortschritt</a></li>
+      <li><a href="#fortschritt"   id="menu-fortschritt">📊 Fortschritt</a></li>
       <li><a href="#tagesprogramm" id="menu-tagesprogramm">🗓️ Tagesprogramm</a></li>
-      <li><a href="#kalender" id="menu-kalender">📅 Kalender</a></li>
-      <li><a href="#feedback" id="menu-feedback">💬 Feedback</a></li>
-      <li><a href="#profil" id="menu-profil">👤 Profil</a></li>
-      <li><a href="#hilfe" id="menu-hilfe">❓ Hilfe</a></li>
+      <li><a href="#kalender"      id="menu-kalender">📅 Kalender</a></li>
+      <li><a href="#feedback"      id="menu-feedback">💬 Feedback</a></li>
+      <li><a href="#profil"        id="menu-profil">👤 Profil</a></li>
+      <li><a href="#hilfe"         id="menu-hilfe">❓ Hilfe</a></li>
     </ul>
   </div>
 
@@ -37,7 +37,7 @@
   <div class="card" id="auth-forms">
     <h2>Anmeldung</h2>
     <form id="login-form">
-      <input id="li-email" type="email" placeholder="E-Mail" required />
+      <input id="li-email"    type="email"    placeholder="E-Mail" required />
       <input id="li-password" type="password" placeholder="Passwort" required />
       <button type="submit">Anmelden</button>
     </form>
@@ -45,7 +45,7 @@
     <details style="margin-top:12px;">
       <summary>Konto erstellen</summary>
       <form id="signup-form" style="margin-top:8px;">
-        <input id="su-email" type="email" placeholder="E-Mail" required />
+        <input id="su-email"    type="email"    placeholder="E-Mail" required />
         <input id="su-password" type="password" placeholder="Passwort" required />
         <button type="submit">Konto erstellen</button>
       </form>
@@ -63,15 +63,15 @@
       <main id="content" class="main-content"></main>
     </div>
 
-    <div class="sync-status" id="syncStatus">Synchronisiere...</div>
+    <div class="sync-status" id="syncStatus">Synchronisiere…</div>
     <div class="edit-section" id="editSection">
       <div class="edit-area active" id="editArea">
-        <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
+        <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten…"></textarea>
         <button class="save-btn" id="saveBtn">Speichern</button>
         <div class="qr-section">
           <div class="qr-title">App teilen via QR-Code</div>
           <div class="qr-code" id="qrCode"></div>
-          <div class="qr-url" id="qrUrl"></div>
+          <div class="qr-url"  id="qrUrl"></div>
         </div>
       </div>
     </div>
@@ -80,105 +80,193 @@
     <div class="note-modal" id="noteModal">
       <div class="note-modal-content">
         <div class="note-modal-title" id="noteModalTitle">Notiz hinzufügen</div>
-        <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen..."></textarea>
+        <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen…"></textarea>
         <div class="note-modal-buttons">
-          <button class="note-save-btn" id="noteSaveBtn">Speichern</button>
+          <button class="note-save-btn"   id="noteSaveBtn">Speichern</button>
           <button class="note-cancel-btn" id="noteCancelBtn">Abbrechen</button>
         </div>
-        <button class="note-delete-btn" id="noteDeleteBtn" style="display: none;">Notiz löschen</button>
+        <button class="note-delete-btn" id="noteDeleteBtn" style="display:none;">Notiz löschen</button>
       </div>
     </div>
   </div>
 
   <script src="schedule-data.js"></script>
 
-  <!-- ... dein bisheriges HTML bleibt unverändert ... -->
+  <script type="module">
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<script type="module">
-  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getAuth, onAuthStateChanged,
-    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // --- Firebase Config ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
+      authDomain: "reha-app-3d609.firebaseapp.com",
+      projectId: "reha-app-3d609",
+      storageBucket: "reha-app-3d609.firebasestorage.app",
+      messagingSenderId: "805175943839",
+      appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
+    };
+    const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const auth  = getAuth(appFB);
+    const db    = getFirestore(appFB);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
-    authDomain: "reha-app-3d609.firebaseapp.com",
-    projectId: "reha-app-3d609",
-    storageBucket: "reha-app-3d609.firebasestorage.app",
-    messagingSenderId: "805175943839",
-    appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
-  };
-  const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const auth = getAuth(appFB);
-  const db = getFirestore(appFB);
+    const authForms = document.getElementById("auth-forms");
+    const appDiv    = document.getElementById("app");
+    const userInfo  = document.getElementById("user-info");
+    const signOutBtn= document.getElementById("sign-out");
+    const sidebar   = document.getElementById("sidebar");
+    const menuToggle= document.getElementById("menuToggle");
+    const closeSidebar = document.getElementById("closeSidebar");
 
-  const authForms = document.getElementById("auth-forms");
-  const appDiv = document.getElementById("app");
-  const userInfo = document.getElementById("user-info");
-  const signOutBtn = document.getElementById("sign-out");
-  const sidebar = document.getElementById("sidebar");
-  const menuToggle = document.getElementById("menuToggle");
-  const closeSidebar = document.getElementById("closeSidebar");
+    const showAuth = () => {
+      document.body.classList.add("center-auth");
+      authForms.style.display="block";
+      appDiv.style.display="none";
+    };
+    const showApp = () => {
+      document.body.classList.remove("center-auth");
+      authForms.style.display="none";
+      appDiv.style.display="block";
+    };
 
-  const showAuth = () => {
-    document.body.classList.add("center-auth");
-    authForms.style.display = "block";
-    appDiv.style.display = "none";
-  };
-  const showApp = () => {
-    document.body.classList.remove("center-auth");
-    authForms.style.display = "none";
-    appDiv.style.display = "block";
-  };
-
-  function loadAppJSOnce() {
-    if (document.getElementById("app-js-loaded")) return;
-    const s = document.createElement("script");
-    s.src = "app.js";
-    s.id = "app-js-loaded";
-    s.type = "module";
-    document.body.appendChild(s);
-  }
-
-  // Login / Registrierung / Logout unverändert ...
-  // ...
-
-  // --- Hash Router bleibt unverändert ---
-
-  // 🔒 Auth-Zustand
-  let didInitialLoad = false;
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      showApp();
-      setMenuToggleVisible(true);
-      loadAppJSOnce?.();
-
-      // 🔧 NEU: Aktuellen Nutzer global speichern
-      const name = user.displayName || user.email || ("UID:" + user.uid);
-      window.currentUserName = name;
-
-      userInfo.textContent = `Angemeldet: ${name}`;
-      signOutBtn.style.display = "inline-block";
-
-      if (!didInitialLoad) {
-        if (!location.hash) location.hash = "#tagesprogramm";
-        routeToHash();
-        didInitialLoad = true;
-      }
-    } else {
-      showAuth();
-      setMenuToggleVisible(false);
-      didInitialLoad = false;
-
-      // 🔧 NEU: Beim Abmelden User-Name löschen
-      window.currentUserName = null;
-
-      userInfo.textContent = "Nicht angemeldet";
-      signOutBtn.style.display = "none";
+    function loadAppJSOnce() {
+      if (document.getElementById("app-js-loaded")) return;
+      const s = document.createElement("script");
+      s.src = "app.js";
+      s.id  = "app-js-loaded";
+      s.type = "module";
+      document.body.appendChild(s);
     }
-  });
-</script>
+
+    // Login-Form
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("li-email").value.trim();
+      const pw    = document.getElementById("li-password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+      } catch (err) {
+        alert("Login fehlgeschlagen: " + err.message);
+      }
+    });
+
+    // Signup-Form
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("su-email").value.trim();
+      const pw    = document.getElementById("su-password").value;
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pw);
+        await setDoc(doc(db, "profiles", cred.user.uid), { email, createdAt: Date.now() });
+        alert("Registriert! Du kannst dich jetzt anmelden.");
+      } catch (err) {
+        alert("Registrierung fehlgeschlagen: " + err.message);
+      }
+    });
+
+    // Logout-Button
+    signOutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        alert("Abmelden fehlgeschlagen.");
+      }
+    });
+
+    // Sidebar-Toggle
+    const setMenuToggleVisible = (visible) => {
+      if (menuToggle) menuToggle.style.display = visible ? "block" : "none";
+    };
+    menuToggle?.addEventListener("click",  () => sidebar.classList.toggle("active"));
+    closeSidebar?.addEventListener("click", () => sidebar.classList.remove("active"));
+
+    // --- Views dynamisch laden ---
+    async function loadView(page) {
+      const mount   = document.getElementById("content");
+      const viewPath = `views/${page}.html`;
+      const cssPath  = `views/${page}.css`;
+      const jsPath   = `views/${page}.js`;
+
+      try {
+        // HTML laden
+        const res  = await fetch(viewPath);
+        if (!res.ok) throw new Error(`HTTP ${res.status} – ${viewPath}`);
+        const html = await res.text();
+
+        // Inhalt extrahieren
+        const parser = new DOMParser();
+        const doc    = parser.parseFromString(html, "text/html");
+        const newContent = doc.body.innerHTML;
+
+        // CSS einbinden (neue View)
+        document.querySelectorAll('link[data-view]').forEach(l => l.remove());
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = cssPath;
+        link.dataset.view = page;
+        document.head.appendChild(link);
+
+        // Inhalt einsetzen
+        mount.innerHTML = newContent;
+
+        // JS der View laden
+        document.getElementById("dynamic-view-script")?.remove();
+        const script = document.createElement("script");
+        script.src = jsPath;
+        script.id  = "dynamic-view-script";
+        script.defer = true;
+        document.body.appendChild(script);
+
+      } catch (e) {
+        mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+        console.error(e);
+      }
+    }
+
+    // --- Hash-Router ---
+    function routeToHash() {
+      let page = (location.hash || "#tagesprogramm").slice(1).trim();
+      if (!page) page = "tagesprogramm";
+      loadView(page);
+      sidebar?.classList.remove("active");
+      document.querySelectorAll(".sidebar-menu a").forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
+      });
+    }
+    window.addEventListener("hashchange", routeToHash);
+    if (location.hash) routeToHash();
+
+    // --- Auth-State ---
+    let didInitialLoad = false;
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        showApp();
+        setMenuToggleVisible(true);
+        loadAppJSOnce();
+
+        const name = user.displayName || user.email || ("UID:" + user.uid);
+        window.currentUserName = name;
+
+        userInfo.textContent  = `Angemeldet: ${name}`;
+        signOutBtn.style.display = "inline-block";
+
+        if (!didInitialLoad) {
+          if (!location.hash) location.hash = "#tagesprogramm";
+          routeToHash();
+          didInitialLoad = true;
+        }
+      } else {
+        showAuth();
+        setMenuToggleVisible(false);
+        window.currentUserName = null;
+        userInfo.textContent  = "Nicht angemeldet";
+        signOutBtn.style.display = "none";
+        didInitialLoad = false;
+      }
+    });
+  </script>
 </body>
 </html>
