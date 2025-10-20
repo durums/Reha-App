@@ -1,43 +1,55 @@
 <div class="view view-profil">
-  <h2>Profil</h2>
+  <h2 class="section-title">Profil</h2>
 
-  <section class="card like">
-    <h3>Persönliche Informationen</h3>
-    <div class="grid two">
-      <div><label>Name</label><div id="p-name">–</div></div>
-      <div><label>Geburtsdatum</label><div id="p-dob">–</div></div>
-      <div><label>E-Mail</label><div id="p-email">–</div></div>
-      <div><label>Telefon</label><div id="p-phone">–</div></div>
-      <div><label>Notfallkontakt</label><div id="p-emergency">–</div></div>
-      <div><label>Geschlecht</label><div id="p-gender">–</div></div>
+  <!-- Header-Karte -->
+  <section class="card">
+    <div class="profile-header">
+      <div class="avatar" id="p-avatar">U</div>
+      <div>
+        <div id="p-name" class="val" style="font-size:1.25rem;">–</div>
+        <div class="subtle" id="p-email">–</div>
+      </div>
+      <div class="kv">
+        <dt>Telefon</dt><dd id="p-phone">–</dd>
+        <dt>Notfall</dt><dd id="p-emergency">–</dd>
+      </div>
     </div>
   </section>
 
-  <section class="card like">
-    <h3>Medizinische Informationen</h3>
-    <div class="grid two">
-      <div><label>Diagnosen</label><div id="m-dx">–</div></div>
-      <div><label>OP-Datum</label><div id="m-op">–</div></div>
-      <div><label>Reha-Beginn / -Ende</label><div id="m-reha">–</div></div>
-      <div><label>Reha-Phase</label><div id="m-phase">–</div></div>
-      <div><label>Komorbiditäten</label><div id="m-comorbid">–</div></div>
-      <div><label>Medikamente</label><div id="m-meds">–</div></div>
-      <div><label>Allergien</label><div id="m-allergies">–</div></div>
-    </div>
-  </section>
+  <!-- Inhalte in zwei/drei Spalten -->
+  <div class="grid two">
+    <section class="card">
+      <h3>Persönliche Informationen</h3>
+      <div class="grid">
+        <div><label>Geburtsdatum</label><div id="p-dob" class="val">–</div></div>
+        <div><label>Geschlecht</label><div id="p-gender" class="val">–</div></div>
+      </div>
+    </section>
 
-  <section class="card like">
-    <h3>Funktioneller Status</h3>
-    <div class="grid two">
-      <div><label>Mobilität / Gehstrecke</label><div id="f-mobility">–</div></div>
-      <div><label>Hilfsmittel</label><div id="f-aids">–</div></div>
-      <div><label>Muskelkraft / Gelenke</label><div id="f-strength">–</div></div>
-      <div><label>Schmerz (0–10)</label><div id="f-pain">–</div></div>
-      <div><label>ADL / Selbstständigkeit</label><div id="f-adl">–</div></div>
-      <div><label>Koordination / Gleichgewicht</label><div id="f-balance">–</div></div>
-      <div><label>Kognition</label><div id="f-cognition">–</div></div>
-    </div>
-  </section>
+    <section class="card">
+      <h3>Medizinische Informationen</h3>
+      <div class="grid">
+        <div><label>Diagnosen</label><div id="m-dx" class="val">–</div></div>
+        <div><label>OP-Datum</label><div id="m-op" class="val">–</div></div>
+        <div><label>Reha-Beginn / -Ende</label><div id="m-reha" class="val">–</div></div>
+        <div><label>Reha-Phase</label><div id="m-phase" class="val">–</div></div>
+        <div><label>Komorbiditäten</label><div id="m-comorbid" class="val">–</div></div>
+        <div><label>Medikamente</label><div id="m-meds" class="val">–</div></div>
+        <div><label>Allergien</label><div id="m-allergies" class="val">–</div></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Funktioneller Status</h3>
+      <div class="grid">
+        <div><label>Mobilität / Gehstrecke</label><div id="f-mobility" class="val">–</div></div>
+        <div><label>Hilfsmittel</label><div id="f-aids" class="val">–</div></div>
+        <div><label>Muskelkraft / Gelenke</label><div id="f-strength" class="val">–</div></div>
+        <div><label>Schmerz (0–10)</label><div id="f-pain" class="val">–</div></div>
+        <div><label>ADL / Selbstständigkeit</label><div id="f-adl" class="val">–</div></div>
+        <div><label>Koordination / Gleichgewicht</label><div id="f-balance" class="val">–</div></div>
+        <div><label>Kognition</label><div id="f-cognition" class="val">–</div></div>
+      </div>
+    </section>
+  </div>
 </div>
-
-
