@@ -12,6 +12,26 @@
   <title>Reha Tagesprogramm</title>
 </head>
 <body class="center-auth">
+  <!-- 🔘 Menü-Button oben links -->
+  <button id="menuToggle" class="menu-toggle" style="display:none;">☰</button>
+  <!-- 🌐 Seitenmenü -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <h2>Menü</h2>
+      <button id="closeSidebar">×</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" id="menu-trainingsplan">🏋️ Trainingsplan</a></li>
+      <li><a href="#" id="menu-fortschritt">📊 Fortschritt</a></li>
+      <li><a href="#" id="menu-kalender">📅 Kalender</a></li>
+      <li><a href="#" id="menu-feedback">💬 Feedback</a></li>
+      <li><a href="#" id="menu-profil">👤 Profil</a></li>
+      <li><a href="#" id="menu-hilfe">❓ Hilfe</a></li>
+    </ul>
+  </div>
+
+  <!-- …danach deine Login-Card (#auth-forms) und #app -->
+
   <!-- 🔒 Login / Registrierung -->
   <div class="card" id="auth-forms">
     <h2>Anmeldung</h2>
@@ -169,27 +189,42 @@
         catch (e) { console.error(e); alert("Abmelden fehlgeschlagen."); }
       });
     }
-  
-    // Auth-Status: UI & App-Laden
+
+    // Sidebar-Refs + Helper
+    const sidebar     = document.getElementById("sidebar");
+    const menuToggle  = document.getElementById("menuToggle");
+    const closeSidebar= document.getElementById("closeSidebar");
+    
+    const setMenuToggleVisible = (visible) => {
+      if (menuToggle) menuToggle.style.display = visible ? "block" : "none";
+    };
+    
+    menuToggle?.addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+    closeSidebar?.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+    });
+    
+    // onAuthStateChanged behalten:
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Sichtbarkeit
         showApp();
+        setMenuToggleVisible(true);
         loadAppJSOnce();
-  
-        // Wer ist angemeldet?
         const name = user.displayName || user.email || ("UID: " + user.uid);
         if (userInfo) userInfo.textContent = `Angemeldet: ${name}`;
         if (signOutBtn) signOutBtn.style.display = "inline-block";
-  
-        // Optional: Custom Claims
         user.getIdTokenResult().then(t => console.log("Custom claims:", t.claims));
       } else {
         showAuth();
+        setMenuToggleVisible(false);
         if (userInfo) userInfo.textContent = "Nicht angemeldet";
         if (signOutBtn) signOutBtn.style.display = "none";
       }
     });
+
+
   </script>
 </body>
 </html>
