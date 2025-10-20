@@ -46,6 +46,10 @@
         <button class="nav-btn" id="prevDay">‹</button>
         <div class="current-date" id="currentDate"></div>
         <button class="nav-btn" id="nextDay">›</button>
+        <div id="user-area" style="display:flex;align-items:center;gap:0.5rem;">
+          <span id="user-info">Nicht angemeldet</span>
+          <button id="sign-out" style="display:none;">Abmelden</button>
+        </div>
       </div>
       <!-- optional -->
       <!-- <button id="logoutBtn" class="nav-btn">Logout</button> -->
@@ -138,27 +142,54 @@
         alert(err.message);
       }
     });
-
+  <script type="module">
+  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js";
+  
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(app);
     // App erst nach Login laden
-    function loadAppJSOnce() {
-      if (document.getElementById("app-js-loaded")) return;
-      const s = document.createElement("script");
-      s.src = "app.js";
-      s.id  = "app-js-loaded";
-      document.body.appendChild(s);
+  function loadAppJSOnce() {
+    // verhindert mehrfaches Laden
+    if (document.getElementById("app-js-loaded")) return;
+    const s = document.createElement("script");
+    s.src = "app.js";
+    s.id  = "app-js-loaded";
+    s.type = "module"; // wichtig, falls app.js auch Module nutzt
+    document.body.appendChild(s);
+  }
+  
+  function showApp() {
+    document.getElementById("app-section").style.display = "block";
+    document.getElementById("auth-section").style.display = "none";
+  }
+  
+  function showAuth() {
+    document.getElementById("app-section").style.display = "none";
+    document.getElementById("auth-section").style.display = "block";
+  }
+  
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("Eingeloggt als:", user.email || user.uid);
+      showApp();
+      loadAppJSOnce();
+  
+      // Custom Claims / Rollen optional abrufen:
+      user.getIdTokenResult().then(t => {
+        console.log("Custom claims:", t.claims);
+      });
+    } else {
+      console.log("Kein Nutzer angemeldet.");
+      showAuth();
     }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        showApp();
-        loadAppJSOnce();
-      } else {
-        showAuth();
-      }
-    });
-
-    // optional:
-    // document.getElementById("logoutBtn")?.addEventListener("click", () => signOut(auth));
+  });
+  
+  // Optional: Logout-Button
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    signOut(auth);
+  });
   </script>
+  
 </body>
 </html>
