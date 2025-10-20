@@ -1,57 +1,114 @@
+/* views/kalender.css */
 :root{
-  --grid:#E5E7EB; --head:#F8FAFC; --head-fg:#111827; --hour:#6B7280;
-  --own:#CDE8FF; --booked:#E5E7EB; --free:#fff; --today:#F0F9FF;
-  --gutter:70px; --header:44px; --allday:28px; --row:50px; --colmin:140px;
-}
-*{box-sizing:border-box}
-html,body{margin:0;font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111}
-
-.toolbar{display:flex;justify-content:space-between;gap:.5rem;align-items:center;background:var(--head);border-bottom:1px solid var(--grid);padding:.6rem .8rem}
-.left,.right{display:flex;gap:.5rem;align-items:center}
-button{border:1px solid #D1D5DB;background:#fff;padding:.4rem .6rem;border-radius:.5rem;cursor:pointer}
-button:hover{background:#F3F4F6}
-.pill{padding:.15rem .6rem;border:1px solid #D1D5DB;border-radius:999px;background:#fff}
-.muted{color:#6B7280}
-
-.calendar{height:calc(100vh - 64px);display:grid;grid-template-rows:var(--header) var(--allday) 1fr}
-.header{display:grid;grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));align-items:center;background:var(--head);border-bottom:1px solid var(--grid)}
-.header .cell{padding-left:.75rem;font-weight:600;color:var(--head-fg)}
-.header .time{padding-left:.5rem;font-weight:500;color:var(--hour)}
-.allday{display:grid;grid-template-columns:var(--gutter) 1fr;border-bottom:1px solid var(--grid);background:#fff}
-.allday .time{display:flex;align-items:center;padding-left:.5rem;color:var(--hour)}
-.grid{display:grid;grid-template-columns:var(--gutter) 1fr;height:100%}
-.hours{border-right:1px solid var(--grid)}
-.hour{height:var(--row);display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;color:var(--hour);border-bottom:1px solid var(--grid)}
-.days{display:grid;grid-template-columns:repeat(7, minmax(var(--colmin),1fr));overflow:auto}
-.col{position:relative;border-right:1px solid var(--grid)}
-.col:last-child{border-right:none}
-.slot{height:var(--row);border-bottom:1px solid var(--grid);display:flex;align-items:center;padding-left:.5rem;user-select:none}
-.slot.free{background:var(--free)}
-.slot.booked{background:var(--booked)}
-.slot.own{background:var(--own)}
-.col.today .slot{background:var(--today)}
-.slot:hover{outline:2px solid #BFDBFE}
-
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:1000}
-.card{background:#fff;border:1px solid var(--grid);border-radius:12px;padding:16px;width:min(420px, 92vw);box-shadow:0 12px 28px rgba(0,0,0,.15)}
-.row{display:flex;gap:.5rem;margin-top:.5rem}
-input[type="text"]{flex:1;padding:.45rem .6rem;border:1px solid #D1D5DB;border-radius:.5rem}
-
-dialog{border:none;border-radius:12px;box-shadow:0 12px 26px rgba(0,0,0,.18);padding:0}
-dialog form{padding:14px}
-.list{max-height:50vh;overflow:auto;border:1px solid var(--grid);border-radius:10px}
-.list .item{display:flex;justify-content:space-between;gap:.5rem;padding:.5rem .7rem;border-bottom:1px solid #F3F4F6}
-.list .item:last-child{border-bottom:none}
-.dlg-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.6rem}
-
-/* --- Fix für App-Layout-Container (GitHub Pages + Sidebar) --- */
-#content, .calendar {
-  min-height: calc(100vh - 140px) !important;
-  display: block !important;
+  --time-gutter: 80px;   /* linke Uhrzeiten-Spalte */
+  --hour-h: 52px;        /* Slot-Höhe */
+  --col-w: 160px;        /* Breite je Tages-Spalte */
+  --grid-line: #E5E7EB;
+  --head-bg: #F8FAFC;
+  --head-fg: #111827;
+  --hour-fg: #6B7280;
+  --own-bg: #CDE8FF;
+  --booked-bg: #E5E7EB;
+  --free-bg: #FFFFFF;
+  --today-tint: #F0F9FF;
 }
 
-.calendar {
-  overflow: auto !important;
-  background: #fff;
-  padding-bottom: 30px;
+/* Toolbar */
+.toolbar{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; padding:10px 12px; background:#fff; border-bottom:1px solid var(--grid-line);
 }
+.toolbar .left, .toolbar .right{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.toolbar .muted{ color:#6B7280; }
+.pill{ background:#eef2ff; color:#374151; padding:4px 10px; border-radius:999px; font-size:.9rem; }
+
+/* Kalender-Container (Header, All-Day, Raster) */
+.calendar{
+  display:grid;
+  grid-template-rows: auto 28px 1fr;
+  min-height: calc(100vh - 140px);          /* genug Höhe im App-Layout */
+  background:#fff;
+  overflow:auto;
+}
+
+/* Kopfzeile & Ganztägig: identische Spalten wie Raster */
+.header,
+.allday{
+  display:grid;
+  grid-template-columns: var(--time-gutter) repeat(7, var(--col-w));
+  background: var(--head-bg);
+  color: var(--head-fg);
+  align-items:center;
+  border-bottom:1px solid var(--grid-line);
+  position: sticky;
+  top: 0; z-index: 2;
+}
+.allday .time{ padding:4px 8px; color: var(--hour-fg); }
+
+/* Header-Zellen */
+.cell{
+  padding:6px 8px; text-align:left; border-right:1px solid var(--grid-line);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.cell.time{ background: var(--head-bg); font-weight:600; border-right:1px solid var(--grid-line); }
+
+/* Hauptgrid: Zeitgasse + Tagesbereich */
+.grid{
+  display:grid;
+  grid-template-columns: var(--time-gutter) 1fr;
+  height: 100%;
+  overflow:auto;
+}
+
+/* Stunden links */
+.hours{
+  display:grid;
+  grid-auto-rows: var(--hour-h);
+  background:#fff; color: var(--hour-fg);
+  border-right:1px solid var(--grid-line);
+}
+.hour{
+  display:flex; align-items:center; justify-content:flex-end;
+  padding-right:8px; border-bottom:1px solid var(--grid-line); font-size:.95rem;
+}
+
+/* Tagesbereich (7 Spalten, horizontal scrollbar bei Bedarf) */
+.days{
+  display:grid;
+  grid-template-columns: repeat(7, var(--col-w));
+  grid-auto-rows: 1fr;
+  overflow:auto;
+}
+
+/* Tages-Spalte = Grid über die Stunden */
+.col{
+  display:grid;
+  grid-auto-rows: var(--hour-h);
+  border-right:1px solid var(--grid-line);
+  min-width: var(--col-w);
+  background:#fff;
+}
+.col.today{ background: var(--today-tint); }
+
+/* Slots */
+.slot{
+  border-bottom:1px solid var(--grid-line);
+  padding:6px 8px; user-select:none; cursor:pointer;
+}
+.slot.free{   background: var(--free-bg); }
+.slot.booked{ background: var(--booked-bg); color:#374151; }
+.slot.own{    background: var(--own-bg);    color:#0b5394; font-weight:600; }
+
+/* Dialog */
+dialog{
+  border:1px solid var(--grid-line); border-radius:12px; padding:0; max-width:480px; width:90%;
+}
+dialog form{ padding:12px; }
+#dlgTitle{ margin:0 0 8px; font-size:1.1rem; }
+.list{ display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow:auto; padding:4px 0; }
+.item{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border:1px solid var(--grid-line); border-radius:10px; }
+.dlg-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:10px; }
+
+/* Kleinere Screens: Spalten schmaler */
+@media (max-width: 1100px){ :root{ --col-w: 130px; } }
+@media (max-width: 900px){  :root{ --col-w: 120px; } }
