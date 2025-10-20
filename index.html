@@ -194,6 +194,48 @@
       sidebar.classList.remove("active");
     });
     
+    // ---- Views laden ----
+    async function loadView(page) {
+      try {
+        const res = await fetch(`views/${page}.html`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const html = await res.text();
+        document.getElementById("content").innerHTML = html;
+      } catch (e) {
+        document.getElementById("content").innerHTML =
+          `<div style="padding:1rem;">Konnte "${page}" nicht laden.<br>${e}</div>`;
+      }
+    }
+    
+    // Sidebar-Links binden
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const page = link.id.replace('menu-', ''); // z.B. menu-kalender -> kalender
+        loadView(page);
+        document.getElementById("sidebar").classList.remove("active");
+      });
+    });
+    
+    // onAuthStateChanged minimal ändern: async + Startseite laden
+    // (Ersetze deinen bestehenden Callback damit)
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        showApp();
+        setMenuToggleVisible(true);
+        loadAppJSOnce();
+        await loadView('tagesprogramm'); // Startansicht
+        const name = user.displayName || user.email || ("UID: " + user.uid);
+        if (userInfo) userInfo.textContent = `Angemeldet: ${name}`;
+        if (signOutBtn) signOutBtn.style.display = "inline-block";
+      } else {
+        showAuth();
+        setMenuToggleVisible(false);
+        if (userInfo) userInfo.textContent = "Nicht angemeldet";
+        if (signOutBtn) signOutBtn.style.display = "none";
+      }
+    });
+
     // onAuthStateChanged behalten:
     onAuthStateChanged(auth, (user) => {
       if (user) {
