@@ -1,5 +1,4 @@
 // app.js - Hauptlogik für Reha Tagesprogramm
-// falls nicht bereits importiert:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js";
 
@@ -7,32 +6,41 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const userInfo = document.getElementById('user-info');
-const signOutBtn = document.getElementById('sign-out');
+// --- Auth-UI sauber nach DOM-Ready initialisieren ---
+function initAuthUI() {
+  const userInfo = document.getElementById('user-info');
+  const signOutBtn = document.getElementById('sign-out');
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Benutzer ist angemeldet
-    const name = user.displayName || user.email || ("UID: " + user.uid);
-    userInfo.textContent = `Angemeldet: ${name}`;
-    signOutBtn.style.display = 'inline-block';
-  } else {
-    // Kein Benutzer angemeldet
-    userInfo.textContent = 'Nicht angemeldet';
-    signOutBtn.style.display = 'none';
+  if (!userInfo || !signOutBtn) {
+    console.warn('Auth-UI: #user-info oder #sign-out nicht gefunden. HTML-Snippet in index.html einfügen.');
+    return;
   }
-});
 
-signOutBtn.addEventListener('click', async () => {
-  try {
-    await signOut(auth);
-    userInfo.textContent = 'Nicht angemeldet';
-    signOutBtn.style.display = 'none';
-  } catch (err) {
-    console.error('Sign-out error', err);
-    alert('Abmelden fehlgeschlagen — Konsole prüfen.');
-  }
-});
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const name = user.displayName || user.email || ("UID: " + user.uid);
+      userInfo.textContent = `Angemeldet: ${name}`;
+      signOutBtn.style.display = 'inline-block';
+      // optional: für Debug
+      window.currentUser = user;
+    } else {
+      userInfo.textContent = 'Nicht angemeldet';
+      signOutBtn.style.display = 'none';
+      window.currentUser = null;
+    }
+  });
+
+  signOutBtn.addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      userInfo.textContent = 'Nicht angemeldet';
+      signOutBtn.style.display = 'none';
+    } catch (err) {
+      console.error('Sign-out error', err);
+      alert('Abmelden fehlgeschlagen — Konsole prüfen.');
+    }
+  });
+}
 
 class RehaScheduleApp {
     constructor() {
@@ -538,10 +546,17 @@ class RehaScheduleApp {
 let app;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
+    
+    // Auth-UI initialisieren (Anzeige wer angemeldet ist)
+    initAuthUI();
+    
+    // Haupt-App starten
     app = new RehaScheduleApp();
+    
     // App global verfügbar machen für Service Worker
     window.app = app;
 });
+
 
 // Register service worker for offline functionality
 if ('serviceWorker' in navigator) {
