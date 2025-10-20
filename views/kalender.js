@@ -25,7 +25,7 @@
     render();
   });
 
-  // Optional: falls ihr den Usernamen nachträglich ändert
+  // Optional: falls wir den Usernamen nachträglich ändert
   window.addEventListener("reha-user-refresh", () => {
     user = (window.currentUserName || "").toString();
     render();
