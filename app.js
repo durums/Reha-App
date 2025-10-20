@@ -1,4 +1,38 @@
 // app.js - Hauptlogik für Reha Tagesprogramm
+// falls nicht bereits importiert:
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js";
+
+// init: verwende deine firebaseConfig wie in deinem Projekt
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const userInfo = document.getElementById('user-info');
+const signOutBtn = document.getElementById('sign-out');
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Benutzer ist angemeldet
+    const name = user.displayName || user.email || ("UID: " + user.uid);
+    userInfo.textContent = `Angemeldet: ${name}`;
+    signOutBtn.style.display = 'inline-block';
+  } else {
+    // Kein Benutzer angemeldet
+    userInfo.textContent = 'Nicht angemeldet';
+    signOutBtn.style.display = 'none';
+  }
+});
+
+signOutBtn.addEventListener('click', async () => {
+  try {
+    await signOut(auth);
+    userInfo.textContent = 'Nicht angemeldet';
+    signOutBtn.style.display = 'none';
+  } catch (err) {
+    console.error('Sign-out error', err);
+    alert('Abmelden fehlgeschlagen — Konsole prüfen.');
+  }
+});
 
 class RehaScheduleApp {
     constructor() {
