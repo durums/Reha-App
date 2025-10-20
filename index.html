@@ -133,7 +133,7 @@
       appDiv.style.display = "block";
     };
 
-    // 🔧 App JS einmalig laden
+    // 🔧 App JS einmalig laden (falls du noch app.js verwendest)
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
       const s = document.createElement("script");
@@ -183,61 +183,69 @@
     closeSidebar?.addEventListener("click", () => sidebar.classList.remove("active"));
 
     // 🔧 Views dynamisch laden (inkl. CSS & JS)
-async function loadView(page) {
-  const mount = document.getElementById("content");
-  const viewPath = `views/${page}.html`;
-  const cssPath = `views/${page}.css`;
-  const jsPath  = `views/${page}.js`;
+    async function loadView(page) {
+      const mount = document.getElementById("content");
+      const viewPath = `views/${page}.html`;
+      const cssPath = `views/${page}.css`;
+      const jsPath  = `views/${page}.js`;
 
-  try {
-    // 1️⃣ HTML laden
-    const res = await fetch(viewPath);
-    if (!res.ok) throw new Error(`HTTP ${res.status} – ${viewPath}`);
-    const html = await res.text();
+      try {
+        // 1) HTML laden
+        const res = await fetch(viewPath);
+        if (!res.ok) throw new Error(`HTTP ${res.status} – ${viewPath}`);
+        const html = await res.text();
 
-    // 2️⃣ DOM aus HTML extrahieren
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const newContent = doc.body.innerHTML;
+        // 2) DOM aus HTML extrahieren (nur Body-Inhalt)
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const newContent = doc.body.innerHTML;
 
-    // 3️⃣ CSS prüfen & anhängen (wenn noch nicht vorhanden)
-    if (!document.querySelector(`link[data-view="${page}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = cssPath;
-      link.dataset.view = page;
-      document.head.appendChild(link);
+        // 3) Altes View-CSS entfernen & neues anhängen
+        document.querySelectorAll('link[data-view]').forEach(l => l.remove());
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = cssPath;
+        link.dataset.view = page;
+        document.head.appendChild(link);
+
+        // 4) Inhalt ersetzen
+        mount.innerHTML = newContent;
+
+        // 5) JS der View neu laden
+        const oldScript = document.getElementById("dynamic-view-script");
+        if (oldScript) oldScript.remove();
+        const script = document.createElement("script");
+        script.src = jsPath;
+        script.id = "dynamic-view-script";
+        script.defer = true;
+        document.body.appendChild(script);
+
+      } catch (e) {
+        mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+        console.error(e);
+      }
     }
 
-    // 4️⃣ Inhalt ersetzen
-    mount.innerHTML = newContent;
+    // ✅ Robuste Sidebar-Delegation (funktioniert auch nach DOM-Updates)
+    function bindSidebarDelegation() {
+      if (sidebar.dataset.bound === "1") return;
+      sidebar.dataset.bound = "1";
 
-    // 5️⃣ JS nachladen (jedes Mal neu)
-    const oldScript = document.getElementById("dynamic-view-script");
-    if (oldScript) oldScript.remove();
-    const script = document.createElement("script");
-    script.src = jsPath;
-    script.id = "dynamic-view-script";
-    script.defer = true;
-    document.body.appendChild(script);
-
-  } catch (e) {
-    mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
-    console.error(e);
-  }
-}
-
-    // Sidebar-Links binden
-    document.querySelectorAll('.sidebar-menu a').forEach(link => {
-      link.addEventListener('click', e => {
+      sidebar.addEventListener("click", (e) => {
+        const a = e.target.closest(".sidebar-menu a");
+        if (!a) return;
         e.preventDefault();
-        const page = link.id.replace('menu-', '');
-        loadView(page);
-        document.getElementById("sidebar").classList.remove("active");
-      });
-    });
 
-    // ✅ Guard, um mehrfaches Überschreiben zu verhindern
+        const page = a.id.replace("menu-", "").trim();
+        console.log("[NAV] Klick:", page);
+        loadView(page);
+        sidebar.classList.remove("active");
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", bindSidebarDelegation);
+
+    // ✅ Guard gegen doppeltes Überschreiben
     let didInitialLoad = false;
 
     // 🔒 Auth-Zustand – nur EIN Listener!
@@ -245,11 +253,12 @@ async function loadView(page) {
       if (user) {
         showApp();
         setMenuToggleVisible(true);
-        loadAppJSOnce();
+        loadAppJSOnce?.(); // optional
 
-        // Nur beim ersten Login Tagesprogramm laden
+        bindSidebarDelegation(); // sicherheitshalber nach Login erneut binden
+
         if (!didInitialLoad) {
-          await loadView('tagesprogramm');
+          await loadView('tagesprogramm'); // Startansicht genau 1x
           didInitialLoad = true;
         }
       } else {
