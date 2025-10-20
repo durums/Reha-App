@@ -112,6 +112,10 @@
     const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth  = getAuth(appFB);
     const db    = getFirestore(appFB);
+    // 👇 für Views zugreifbar machen
+    window.auth = auth;
+    window.db   = db;
+
     
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
