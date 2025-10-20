@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="styles.css" />
   <title>Reha Tagesprogramm</title>
 </head>
-<body>
+<body class="center-auth">
   <!-- 🔒 Login / Registrierung -->
   <div class="card" id="auth-forms">
     <h2>Anmeldung</h2>
@@ -112,9 +112,18 @@
     const userInfo  = document.getElementById("user-info");
     const signOutBtn= document.getElementById("sign-out");
   
-    const showAuth = () => { authForms.style.display = "block"; appDiv.style.display = "none"; };
-    const showApp  = () => { authForms.style.display = "none";  appDiv.style.display = "block"; };
-  
+    const showAuth = () => {
+      document.body.classList.add("center-auth");
+      authForms.style.display = "block";
+      appDiv.style.display = "none";
+    };
+    
+    const showApp = () => {
+      document.body.classList.remove("center-auth");
+      authForms.style.display = "none";
+      appDiv.style.display = "block";
+    };
+
     // App erst nach Login laden
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
