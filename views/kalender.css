@@ -5,6 +5,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111}
+
 .toolbar{display:flex;justify-content:space-between;gap:.5rem;align-items:center;background:var(--head);border-bottom:1px solid var(--grid);padding:.6rem .8rem}
 .left,.right{display:flex;gap:.5rem;align-items:center}
 button{border:1px solid #D1D5DB;background:#fff;padding:.4rem .6rem;border-radius:.5rem;cursor:pointer}
@@ -13,7 +14,7 @@ button:hover{background:#F3F4F6}
 .muted{color:#6B7280}
 
 .calendar{height:calc(100vh - 64px);display:grid;grid-template-rows:var(--header) var(--allday) 1fr}
-.header{display:grid;grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));align-items:center;gap:0;background:var(--head);border-bottom:1px solid var(--grid)}
+.header{display:grid;grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));align-items:center;background:var(--head);border-bottom:1px solid var(--grid)}
 .header .cell{padding-left:.75rem;font-weight:600;color:var(--head-fg)}
 .header .time{padding-left:.5rem;font-weight:500;color:var(--hour)}
 .allday{display:grid;grid-template-columns:var(--gutter) 1fr;border-bottom:1px solid var(--grid);background:#fff}
@@ -31,7 +32,7 @@ button:hover{background:#F3F4F6}
 .col.today .slot{background:var(--today)}
 .slot:hover{outline:2px solid #BFDBFE}
 
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:1000}
 .card{background:#fff;border:1px solid var(--grid);border-radius:12px;padding:16px;width:min(420px, 92vw);box-shadow:0 12px 28px rgba(0,0,0,.15)}
 .row{display:flex;gap:.5rem;margin-top:.5rem}
 input[type="text"]{flex:1;padding:.45rem .6rem;border:1px solid #D1D5DB;border-radius:.5rem}
