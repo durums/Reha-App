@@ -12,13 +12,6 @@
   <title>Reha Tagesprogramm</title>
 </head>
 <body>
-  
-  <!-- Anzeige angemeldeter Benutzer -->
-  <div id="user-area" style="display:flex;align-items:center;gap:0.5rem;">
-    <span id="user-info">Nicht angemeldet</span>
-    <button id="sign-out" style="display:none;">Abmelden</button>
-  </div>
-
   <!-- 🔒 Login / Registrierung -->
   <div class="card" id="auth-forms">
     <h2>Anmeldung</h2>
@@ -91,13 +84,13 @@
   <script src="schedule-data.js"></script>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getAuth, onAuthStateChanged,
       createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+  
     const firebaseConfig = {
       apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
       authDomain: "reha-app-3d609.firebaseapp.com",
@@ -106,17 +99,31 @@
       messagingSenderId: "805175943839",
       appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
     };
-
-    const appFB = initializeApp(firebaseConfig);
+  
+    // Doppel-Init vermeiden (wichtig, da app.js später nochmal Firebase nutzen könnte)
+    const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth = getAuth(appFB);
     const db = getFirestore(appFB);
-
+  
+    // DOM-Refs
     const authForms = document.getElementById("auth-forms");
-    const appDiv = document.getElementById("app");
-
+    const appDiv    = document.getElementById("app");
+    const userInfo  = document.getElementById("user-info");
+    const signOutBtn= document.getElementById("sign-out");
+  
     const showAuth = () => { authForms.style.display = "block"; appDiv.style.display = "none"; };
     const showApp  = () => { authForms.style.display = "none";  appDiv.style.display = "block"; };
-
+  
+    // App erst nach Login laden
+    function loadAppJSOnce() {
+      if (document.getElementById("app-js-loaded")) return;
+      const s = document.createElement("script");
+      s.src = "app.js";
+      s.id  = "app-js-loaded";
+      s.type = "module";
+      document.body.appendChild(s);
+    }
+  
     // Login
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -125,10 +132,11 @@
       try {
         await signInWithEmailAndPassword(auth, email, pw);
       } catch (err) {
-        alert(err.message);
+        alert("Login fehlgeschlagen: " + err.message);
+        console.error(err);
       }
     });
-
+  
     // Signup
     document.getElementById("signup-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -139,57 +147,39 @@
         await setDoc(doc(db, "profiles", cred.user.uid), { email, createdAt: Date.now() });
         alert("Registriert! Du kannst dich jetzt anmelden.");
       } catch (err) {
-        alert(err.message);
+        alert("Registrierung fehlgeschlagen: " + err.message);
+        console.error(err);
       }
     });
-  <script type="module">
-  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-auth.js";
   
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-    // App erst nach Login laden
-  function loadAppJSOnce() {
-    // verhindert mehrfaches Laden
-    if (document.getElementById("app-js-loaded")) return;
-    const s = document.createElement("script");
-    s.src = "app.js";
-    s.id  = "app-js-loaded";
-    s.type = "module"; // wichtig, falls app.js auch Module nutzt
-    document.body.appendChild(s);
-  }
-  
-  function showApp() {
-    document.getElementById("app-section").style.display = "block";
-    document.getElementById("auth-section").style.display = "none";
-  }
-  
-  function showAuth() {
-    document.getElementById("app-section").style.display = "none";
-    document.getElementById("auth-section").style.display = "block";
-  }
-  
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Eingeloggt als:", user.email || user.uid);
-      showApp();
-      loadAppJSOnce();
-  
-      // Custom Claims / Rollen optional abrufen:
-      user.getIdTokenResult().then(t => {
-        console.log("Custom claims:", t.claims);
+    // Abmelden
+    if (signOutBtn) {
+      signOutBtn.addEventListener("click", async () => {
+        try { await signOut(auth); }
+        catch (e) { console.error(e); alert("Abmelden fehlgeschlagen."); }
       });
-    } else {
-      console.log("Kein Nutzer angemeldet.");
-      showAuth();
     }
-  });
   
-  // Optional: Logout-Button
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    signOut(auth);
-  });
+    // Auth-Status: UI & App-Laden
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Sichtbarkeit
+        showApp();
+        loadAppJSOnce();
+  
+        // Wer ist angemeldet?
+        const name = user.displayName || user.email || ("UID: " + user.uid);
+        if (userInfo) userInfo.textContent = `Angemeldet: ${name}`;
+        if (signOutBtn) signOutBtn.style.display = "inline-block";
+  
+        // Optional: Custom Claims
+        user.getIdTokenResult().then(t => console.log("Custom claims:", t.claims));
+      } else {
+        showAuth();
+        if (userInfo) userInfo.textContent = "Nicht angemeldet";
+        if (signOutBtn) signOutBtn.style.display = "none";
+      }
+    });
   </script>
-  
 </body>
 </html>
