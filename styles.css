@@ -26,75 +26,83 @@ html, body {
     width: 100%;
     max-width: 100vw;
 }
-
+/* === Modernes Login-Design === */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
-                 Helvetica, Arial, sans-serif, "Apple Color Emoji", 
-                 "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.4;
-    margin: 0;
-    padding: 0;
-    background: var(--color-header-bg);
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    display: flex;
-    justify-content: center;
-    /* Horizontales Scrollen verhindern */
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100vw;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #4e8ccf, #7bb7e5);
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.container {
-    width: 100%;
-    max-width: 600px;
-    background: white;
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    display: flex;
-    flex-direction: column;
-    /* Horizontales Scrollen verhindern */
-    overflow-x: hidden;
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  max-width: 350px;
+  width: 90%;
 }
 
-.header {
-    background: var(--color-header-bg);
-    color: white;
-    padding: 1rem;
-    padding-top: calc(1rem + env(safe-area-inset-top, 44px));
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.card h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem;
 }
 
-.header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
+.card form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
-.header h1:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.5);
+.card input {
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.header h1:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+.card input:focus {
+  border-color: #4e8ccf;
+  box-shadow: 0 0 4px rgba(78,140,207,0.3);
+  outline: none;
 }
 
-.header h1:focus:not(:focus-visible) {
-    outline: none;
-    box-shadow: none;
+.card button {
+  background: #4e8ccf;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.card button:hover {
+  background: #3a79b5;
+}
+
+details summary {
+  cursor: pointer;
+  color: #4e8ccf;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+details[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+#user-area {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 0.9rem;
 }
 
 /* PWA/Homescreen Apps */
