@@ -43,3 +43,15 @@ dialog form{padding:14px}
 .list .item{display:flex;justify-content:space-between;gap:.5rem;padding:.5rem .7rem;border-bottom:1px solid #F3F4F6}
 .list .item:last-child{border-bottom:none}
 .dlg-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.6rem}
+
+/* --- Fix für App-Layout-Container (GitHub Pages + Sidebar) --- */
+#content, .calendar {
+  min-height: calc(100vh - 140px) !important;
+  display: block !important;
+}
+
+.calendar {
+  overflow: auto !important;
+  background: #fff;
+  padding-bottom: 30px;
+}
