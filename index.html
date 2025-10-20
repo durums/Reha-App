@@ -33,6 +33,10 @@
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
+    <div id="user-area" style="position:absolute; top:10px; right:15px; font-size:0.9rem;">
+      <span id="user-info">Nicht angemeldet</span>
+      <button id="sign-out" style="display:none;">Abmelden</button>
+    </div>
     <div id="app-section">
   <div class="app-card">
     <h1>Reha Tagesprogramm</h1>
@@ -42,22 +46,18 @@
       <span id="currentDate" class="current-date"></span>
       <button id="nextDay" class="nav-btn">›</button>
     </div>
-
-    <div id="scheduleContainer"></div>
   </div>
 </div>
 
 
     <main class="main-content">
       <div class="sync-status" id="syncStatus">Synchronisiere...</div>
-
-      <div id="scheduleContainer"></div>
-
+    
       <div class="edit-section" id="editSection">
         <div class="edit-area active" id="editArea">
           <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
           <button class="save-btn" id="saveBtn">Speichern</button>
-
+    
           <div class="qr-section">
             <div class="qr-title">App teilen via QR-Code</div>
             <div class="qr-code" id="qrCode"></div>
@@ -66,6 +66,7 @@
         </div>
       </div>
     </main>
+
 
     <!-- Notizen Modal (jetzt innerhalb von #app) -->
     <div class="note-modal" id="noteModal">
