@@ -33,20 +33,20 @@
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
-    <header class="header">
-      <h1 id="titleButton">Reha Tagesprogramm</h1>
-      <div class="date-nav">
-        <button class="nav-btn" id="prevDay">‹</button>
-        <div class="current-date" id="currentDate"></div>
-        <button class="nav-btn" id="nextDay">›</button>
-        <div id="user-area" style="display:flex;align-items:center;gap:0.5rem;">
-          <span id="user-info">Nicht angemeldet</span>
-          <button id="sign-out" style="display:none;">Abmelden</button>
-        </div>
-      </div>
-      <!-- optional -->
-      <!-- <button id="logoutBtn" class="nav-btn">Logout</button> -->
-    </header>
+    <div id="app-section">
+  <div class="app-card">
+    <h1>Reha Tagesprogramm</h1>
+
+    <div class="date-nav">
+      <button id="prevDay" class="nav-btn">‹</button>
+      <span id="currentDate" class="current-date"></span>
+      <button id="nextDay" class="nav-btn">›</button>
+    </div>
+
+    <div id="scheduleContainer"></div>
+  </div>
+</div>
+
 
     <main class="main-content">
       <div class="sync-status" id="syncStatus">Synchronisiere...</div>
