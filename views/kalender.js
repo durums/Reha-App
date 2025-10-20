@@ -9,57 +9,74 @@
   let weekStart = mondayOf(new Date());
 
   // ---------- DOM ----------
-  const header = document.getElementById("header");
-  const hours = document.getElementById("hours");
-  const days = document.getElementById("days");
-  const rangeLabel = document.getElementById("rangeLabel");
-  const userPill = document.getElementById("userPill");
-  const overlay = document.getElementById("loginOverlay");
-  const nameInput = document.getElementById("nameInput");
-  const dialog = document.getElementById("dialog");
-  const dlgTitle = document.getElementById("dlgTitle");
-  const dlgList = document.getElementById("dlgList");
+  const header = () => document.getElementById("header");
+  const hours = () => document.getElementById("hours");
+  const daysC = () => document.getElementById("days");
+  const rangeLabel = () => document.getElementById("rangeLabel");
+  const userPill = () => document.getElementById("userPill");
+  const overlay = () => document.getElementById("loginOverlay");
+  const nameInput = () => document.getElementById("nameInput");
+  const dialog = () => document.getElementById("dialog");
+  const dlgTitle = () => document.getElementById("dlgTitle");
+  const dlgList = () => document.getElementById("dlgList");
 
-  document.getElementById("prevBtn").onclick = () => { weekStart = addDays(weekStart,-7); render(); };
-  document.getElementById("nextBtn").onclick = () => { weekStart = addDays(weekStart, 7); render(); };
-  document.getElementById("todayBtn").onclick = () => { weekStart = mondayOf(new Date()); render(); };
-  document.getElementById("bookBtn").onclick = () => pickFreeSlot(bookPicked);
-  document.getElementById("mineBtn").onclick = showMine;
-  document.getElementById("moveBtn").onclick = moveOrCancel;
-  document.getElementById("loginBtn").onclick = (e) => {
-    e.preventDefault();
-    const v = nameInput.value.trim();
-    if(!v) return alert("Bitte Namen eingeben.");
-    user = v;
-    localStorage.setItem("kal_user", v);
-    overlay.hidden = true;
-    userPill.textContent = v;
-  };
+  // Buttons
+  const btn = (id) => document.getElementById(id);
+
+  // ---------- Events initialisieren ----------
+  function bindOnce() {
+    // Navigation
+    btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
+    btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
+    btn("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
+
+    // Aktionen
+    btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
+    btn("mineBtn")?.addEventListener("click", showMine);
+    btn("moveBtn")?.addEventListener("click", moveOrCancel);
+
+    // Login
+    btn("loginBtn")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const v = nameInput().value.trim();
+      if(!v) return alert("Bitte Namen eingeben.");
+      user = v;
+      localStorage.setItem("kal_user", v);
+      overlay().hidden = true;
+      userPill().textContent = v;
+    });
+
+    // Falls kein Nutzer gesetzt: Overlay anbieten
+    ensureLogin();
+  }
 
   // ---------- Init ----------
-  ensureLogin();
-  render();
+  // Nach kurzem Timeout, damit DOM des Partials sicher im Dokument ist
+  window.requestAnimationFrame(() => {
+    bindOnce();
+    render();
+  });
 
   // ---------- Render ----------
   function render(){
     // Header
-    header.innerHTML = "";
-    header.append(cell("time","Zeit"));
+    header().innerHTML = "";
+    header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
     ds.forEach(d => {
       const lbl = `${DAYS[(d.getDay()+6)%7]} ${d.getDate()}.${d.getMonth()+1}.`;
-      header.append(cell("cell", lbl));
+      header().append(cell("cell", lbl));
     });
-    rangeLabel.textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
+    rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
 
     // Hours
-    hours.innerHTML = "";
+    hours().innerHTML = "";
     for(let h=START; h<=END; h++){
-      hours.append(div("hour", `${pad(h)}:00`));
+      hours().append(div("hour", `${pad(h)}:00`));
     }
 
     // Day columns
-    days.innerHTML = "";
+    daysC().innerHTML = "";
     const today = new Date();
     ds.forEach(d => {
       const tag = iso(d);
@@ -74,10 +91,10 @@
         el.onclick = onSlotClick;
         col.append(el);
       }
-      days.append(col);
+      daysC().append(col);
     });
 
-    userPill.textContent = user || "";
+    userPill().textContent = user || "";
   }
 
   // ---------- Klick-Logik ----------
@@ -124,41 +141,44 @@
   function pickFreeSlot(cb){
     const items = freeSlotsThisWeek();
     if(items.length===0){ alert("Keine freien Termine verfügbar (diese Woche)."); return; }
-    dlgTitle.textContent = "Freien Termin auswählen";
-    dlgList.innerHTML = "";
+    dlgTitle().textContent = "Freien Termin auswählen";
+    dlgList().innerHTML = "";
     for(const [tag,slot] of items){
       const row = div("item");
       row.append(div("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Auswählen";
-      b.onclick = () => { dialog.close(); cb(tag,slot); };
+      b.onclick = () => { dialog().close(); cb(tag,slot); };
       row.append(b);
-      dlgList.append(row);
+      dlgList().append(row);
     }
-    dialog.showModal();
+    dialog().showModal();
   }
+
   function bookPicked(tag,slot){
     book(tag,slot,user);
     alert(`Termin eingetragen: ${tag} ${slot}`);
     render();
   }
+
   function showMine(){
     const mine = mySlots();
     if(mine.length===0){ alert("Keine Termine gefunden."); return; }
     alert(mine.map(([t,s])=>`${t} ${s}`).join("\n"));
   }
+
   function moveOrCancel(){
     const mine = mySlots();
     if(mine.length===0){ alert("Keine Termine gefunden."); return; }
-    dlgTitle.textContent = "Eigene Termine";
-    dlgList.innerHTML = "";
+    dlgTitle().textContent = "Eigene Termine";
+    dlgList().innerHTML = "";
     for(const [tag,slot] of mine){
       const row = div("item");
       row.append(div("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Wählen";
       b.onclick = () => {
-        dialog.close();
+        dialog().close();
         const rest = daysBetween(new Date(), new Date(tag));
         if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
         const a = prompt("Tippe 'v' um zu verschieben, 'a' um abzusagen:");
@@ -169,9 +189,9 @@
         } else if(a !== null){ alert("Ungültige Eingabe."); }
       };
       row.append(b);
-      dlgList.append(row);
+      dlgList().append(row);
     }
-    dialog.showModal();
+    dialog().showModal();
   }
 
   // ---------- Speicher ----------
@@ -181,7 +201,7 @@
   function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
 
   // ---------- Helpers ----------
-  function ensureLogin(){ if(!user){ overlay.hidden = false; } }
+  function ensureLogin(){ if(!user){ overlay().hidden = false; } }
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
