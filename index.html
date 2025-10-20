@@ -57,35 +57,23 @@
       <span id="user-info">Nicht angemeldet</span>
       <button id="sign-out" style="display:none;">Abmelden</button>
     </div>
-    <div id="app-section">
-  <div class="app-card">
-    <h1>Reha Tagesprogramm</h1>
+    
+<div id="app-section">
+  <main id="content" class="main-content"></main>
+</div>
 
-    <div class="date-nav">
-      <button id="prevDay" class="nav-btn">‹</button>
-      <span id="currentDate" class="current-date"></span>
-      <button id="nextDay" class="nav-btn">›</button>
+<div class="sync-status" id="syncStatus">Synchronisiere...</div>
+<div class="edit-section" id="editSection">
+  <div class="edit-area active" id="editArea">
+    <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
+    <button class="save-btn" id="saveBtn">Speichern</button>
+    <div class="qr-section">
+      <div class="qr-title">App teilen via QR-Code</div>
+      <div class="qr-code" id="qrCode"></div>
+      <div class="qr-url" id="qrUrl"></div>
     </div>
   </div>
 </div>
-
-
-    <main class="main-content">
-      <div class="sync-status" id="syncStatus">Synchronisiere...</div>
-    
-      <div class="edit-section" id="editSection">
-        <div class="edit-area active" id="editArea">
-          <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
-          <button class="save-btn" id="saveBtn">Speichern</button>
-    
-          <div class="qr-section">
-            <div class="qr-title">App teilen via QR-Code</div>
-            <div class="qr-code" id="qrCode"></div>
-            <div class="qr-url" id="qrUrl"></div>
-          </div>
-        </div>
-      </div>
-    </main>
 
 
     <!-- Notizen Modal (jetzt innerhalb von #app) -->
