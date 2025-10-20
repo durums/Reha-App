@@ -1,0 +1,50 @@
+<div class="view view-fortschritt">
+  <h2 class="section-title">Dein Fortschritt</h2>
+  <p class="subtle" style="margin-top:-.5rem">Verfolge deine Rehabilitation und erreiche Ziele</p>
+
+  <!-- KPI-Karten -->
+  <div class="fp-kpis">
+    <article class="card kpi">
+      <div class="kpi-head">
+        <div>Übungen diese Woche</div>
+        <span class="kpi-icon">🩺</span>
+      </div>
+      <div class="kpi-value"><span id="kpi-week-done">0</span> <small>von <span id="kpi-week-target">0</span></small></div>
+      <div class="kpi-bar"><div id="bar-week"></div></div>
+    </article>
+
+    <article class="card kpi">
+      <div class="kpi-head">
+        <div>Aktive Tage</div>
+        <span class="kpi-icon">📅</span>
+      </div>
+      <div class="kpi-value"><span id="kpi-days-active">0</span> <small>von 7</small></div>
+      <div class="kpi-bar"><div id="bar-days"></div></div>
+    </article>
+
+    <article class="card kpi">
+      <div class="kpi-head">
+        <div>Gesamtfortschritt</div>
+        <span class="kpi-icon">📈</span>
+      </div>
+      <div class="kpi-value"><span id="kpi-total-pct">0%</span> <small>des Programms</small></div>
+      <div class="kpi-bar"><div id="bar-total"></div></div>
+    </article>
+
+    <article class="card kpi">
+      <div class="kpi-head">
+        <div>Errungenschaften</div>
+        <span class="kpi-icon">🏅</span>
+      </div>
+      <div class="kpi-value"><span id="kpi-achievements">0</span> <small>freigeschaltet</small></div>
+      <div class="kpi-bar"><div id="bar-achv"></div></div>
+    </article>
+  </div>
+
+  <!-- Aktivitätenliste -->
+  <section class="card" style="margin-top:1rem;">
+    <h3 style="margin:0 0 .25rem;">Letzte Aktivitäten</h3>
+    <p class="subtle" style="margin:0 0 1rem;">Deine kürzlich absolvierten Übungen</p>
+    <div id="fp-activities" class="fp-activities"></div>
+  </section>
+</div>
