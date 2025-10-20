@@ -1,0 +1,42 @@
+/* Layout */
+.view-trainingsplan { padding-bottom: 2rem; }
+.tp-tabs{display:flex;gap:.5rem;margin:1rem 0 1.25rem;}
+.tp-tab{
+  border:1px solid var(--primary-weak, #dff1fb);
+  background: var(--surface,#fff);
+  border-radius:999px;
+  padding:.55rem 1rem; cursor:pointer; font-weight:600;
+  box-shadow: var(--shadow,0 4px 16px rgba(0,0,0,.06));
+}
+.tp-tab.active{ background: var(--primary,#2b90d9); color:#fff; border-color: transparent; }
+.tp-grid{
+  display:grid; gap:1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+/* Card */
+.tp-card{
+  background:var(--surface,#fff); border-radius:16px; box-shadow:var(--shadow,0 6px 24px rgba(0,0,0,.06));
+  padding:1rem 1rem 1rem; border:1px solid rgba(0,0,0,.04);
+}
+.tp-head{display:flex; gap:.75rem; align-items:center; margin-bottom:.25rem;}
+.tp-emoji{font-size:1.75rem; line-height:1;}
+.tp-title{font-weight:800; font-size:1.05rem; margin:0;}
+.tp-sub{color:var(--muted,#6b7280); margin:.15rem 0 .5rem; font-size:.92rem;}
+.tp-meta{display:flex; align-items:center; gap:.75rem; margin-bottom:.75rem;}
+.tp-meta .dot{display:inline-flex; align-items:center; gap:.4rem; color:var(--muted,#6b7280); font-size:.92rem;}
+.tp-badge{
+  padding:.25rem .55rem; border-radius:999px; font-size:.8rem; font-weight:700;
+  background:#e8f8ef; color:#2c7a4b;
+}
+.tp-badge.mittel{ background:#fff7e6; color:#946200; }
+.tp-badge.schwer{ background:#fde8e8; color:#9b1c1c; }
+
+.tp-actions{display:flex; gap:.5rem;}
+.tp-start{
+  flex:1; display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  border:0; border-radius:12px; padding:.65rem 1rem; cursor:pointer;
+  background:var(--primary,#2b90d9); color:#fff; font-weight:700; box-shadow:var(--shadow,0 6px 24px rgba(0,0,0,.06));
+}
+.tp-start:active{transform:translateY(1px);}
+.tp-time-icon{width:18px;height:18px;opacity:.8;}
