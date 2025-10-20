@@ -121,3 +121,12 @@ dialog form{ padding:12px; }
 
 /* Anzahl der Zeilen der Tagesspalten an Stundenbereich koppeln */
 .col { grid-auto-rows: var(--hour-h); }
+.header .cell strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.hour {
+  font-weight: 600;
+  color: #374151;
+}
