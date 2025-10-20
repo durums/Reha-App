@@ -182,33 +182,50 @@
     menuToggle?.addEventListener("click", () => sidebar.classList.toggle("active"));
     closeSidebar?.addEventListener("click", () => sidebar.classList.remove("active"));
 
-    // 🔧 Views laden (Kalender = Spezialfall mit Iframe)
-    async function loadView(page) {
-      const mount = document.getElementById("content");
+    // 🔧 Views dynamisch laden (inkl. CSS & JS)
+async function loadView(page) {
+  const mount = document.getElementById("content");
+  const viewPath = `views/${page}.html`;
+  const cssPath = `views/${page}.css`;
+  const jsPath  = `views/${page}.js`;
 
-      if (page === "kalender") {
-        mount.innerHTML = `
-          <style>
-            .iframe-wrap { height: calc(100vh - 140px); }
-            .iframe-wrap iframe { width: 100%; height: 100%; border: 0; }
-          </style>
-          <div class="iframe-wrap">
-            <iframe src="views/kalender.html" title="Kalender"></iframe>
-          </div>
-        `;
-        return;
-      }
+  try {
+    // 1️⃣ HTML laden
+    const res = await fetch(viewPath);
+    if (!res.ok) throw new Error(`HTTP ${res.status} – ${viewPath}`);
+    const html = await res.text();
 
-      // Standard: andere Seiten normal aus /views laden
-      try {
-        const res = await fetch(\`views/\${page}.html\`);
-        if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
-        const html = await res.text();
-        mount.innerHTML = html;
-      } catch (e) {
-        mount.innerHTML = \`<div style="padding:1rem;">Konnte "\${page}" nicht laden.<br>\${e}</div>\`;
-      }
+    // 2️⃣ DOM aus HTML extrahieren
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const newContent = doc.body.innerHTML;
+
+    // 3️⃣ CSS prüfen & anhängen (wenn noch nicht vorhanden)
+    if (!document.querySelector(`link[data-view="${page}"]`)) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = cssPath;
+      link.dataset.view = page;
+      document.head.appendChild(link);
     }
+
+    // 4️⃣ Inhalt ersetzen
+    mount.innerHTML = newContent;
+
+    // 5️⃣ JS nachladen (jedes Mal neu)
+    const oldScript = document.getElementById("dynamic-view-script");
+    if (oldScript) oldScript.remove();
+    const script = document.createElement("script");
+    script.src = jsPath;
+    script.id = "dynamic-view-script";
+    script.defer = true;
+    document.body.appendChild(script);
+
+  } catch (e) {
+    mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+    console.error(e);
+  }
+}
 
     // Sidebar-Links binden
     document.querySelectorAll('.sidebar-menu a').forEach(link => {
