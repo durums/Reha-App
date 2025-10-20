@@ -1,85 +1,103 @@
-(async function(){
-  const auth = window.auth, db = window.db;
-  if(!auth?.currentUser) return;
-
+// views/kalender.js
+(function () {
   const $ = id => document.getElementById(id);
-  const setStatus = (msg,type="ok")=>{
-    const el = $("pf-status");
-    el.textContent = msg || "";
-    el.style.color = type==="err" ? "#b00020" : "var(--muted)";
-  };
-  const initials = (nameOrMail)=>{
-    const s=(nameOrMail||"").trim(); if(!s) return "U";
-    if(s.includes("@")) return s[0].toUpperCase();
-    const p=s.split(/\s+/); return (p[0]?.[0]||"U").toUpperCase()+(p[1]?.[0]||"");
-  };
 
-  // Prefill aus Auth + Firestore
-  const user = auth.currentUser;
-  const display = user.displayName || "";
-  const [first,last] = display.split(" ");
-  $("pf-first").value = first || "";
-  $("pf-last").value  = last  || "";
-  $("pf-email").value = user.email || "";
-  $("pf-avatar").textContent = initials(display || user.email);
+  // === State: aktuelle Woche (Montag) ===
+  const today = new Date();
+  let weekStart = startOfWeek(today); // Montag
 
-  try{
-    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const snap = await getDoc(doc(db,"profiles",user.uid));
-    const data = snap.exists() ? snap.data() : {};
-    $("pf-phone").value = data.phone || "";
-    $("pf-reminders").checked = !!data.remindersEnabled;
-    $("pf-summary").checked   = !!data.weeklySummaryEnabled;
-  }catch(e){ console.warn(e); }
+  function startOfWeek(d){
+    const x = new Date(d);
+    const day = (x.getDay() + 6) % 7; // Mo=0
+    x.setHours(0,0,0,0);
+    x.setDate(x.getDate() - day);
+    return x;
+  }
 
-  // Foto (optional: als DataURL speichern)
-  $("pf-photo").addEventListener("change", async (e)=>{
-    const file = e.target.files?.[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{ $("pf-avatar").textContent=""; $("pf-avatar").style.backgroundImage=`url(${reader.result})`; $("pf-avatar").style.backgroundSize="cover"; };
-    reader.readAsDataURL(file);
-    // Tipp: für echtes Hosting -> Firebase Storage nutzen und URL in profiles speichern.
-  });
+  // === UI: Buttons / User ===
+  $("#userPill").textContent = (window.currentUserName || "Angemeldet");
 
-  // Speichern
-  $("pf-save").addEventListener("click", async ()=>{
-    setStatus("Speichere…");
-    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const first = $("pf-first").value.trim(), last = $("pf-last").value.trim();
-    const phone = $("pf-phone").value.trim();
-    const reminders = $("pf-reminders").checked;
-    const summary   = $("pf-summary").checked;
+  $("#prevBtn").addEventListener("click", () => { weekStart.setDate(weekStart.getDate() - 7); render(); });
+  $("#nextBtn").addEventListener("click", () => { weekStart.setDate(weekStart.getDate() + 7); render(); });
+  $("#todayBtn").addEventListener("click", () => { weekStart = startOfWeek(new Date()); render(); });
 
-    try{
-      // Auth-DisplayName aktualisieren
-      const { updateProfile } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      await updateProfile(user, { displayName: (first||last)? `${first} ${last}`.trim() : null });
+  // === Render ===
+  function render() {
+    renderHeader();
+    renderHours();
+    renderDays();
+    renderRangeLabel();
+  }
 
-      // Firestore-Profil mergen
-      await setDoc(doc(db,"profiles",user.uid), {
-        phone, remindersEnabled: reminders, weeklySummaryEnabled: summary
-      }, { merge:true });
+  function fmtDate(d, opts){ return d.toLocaleDateString("de-DE", opts); }
 
-      // UI
-      $("pf-avatar").textContent = initials(first ? `${first} ${last}` : (user.email||""));
-      setStatus("Gespeichert.");
-    }catch(err){
-      console.error(err);
-      setStatus("Speichern fehlgeschlagen.", "err");
+  function renderHeader(){
+    const header = $("#header");
+    header.innerHTML = "";
+    // linke Zeit-Spalte
+    const timeCell = document.createElement("div");
+    timeCell.className = "cell time";
+    timeCell.textContent = ""; // leer
+    header.appendChild(timeCell);
+
+    // 7 Tage
+    for (let i=0;i<7;i++){
+      const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const wd = fmtDate(d, { weekday:"short" });
+      const dm = fmtDate(d, { day:"2-digit", month:"2-digit" });
+      cell.innerHTML = `<strong>${wd}</strong> ${dm}`;
+      header.appendChild(cell);
     }
-  });
+  }
 
-  // Passwort ändern (Reset-Mail)
-  $("pf-pass").addEventListener("click", async ()=>{
-    const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-    try{
-      await sendPasswordResetEmail(auth, user.email);
-      alert("E-Mail zum Zurücksetzen des Passworts wurde gesendet.");
-    }catch(e){
-      alert("Konnte E-Mail nicht senden: " + (e?.code || e));
+  function renderHours(){
+    const hours = $("#hours");
+    hours.innerHTML = "";
+    for (let h=0; h<24; h++){
+      const row = document.createElement("div");
+      row.className = "hour";
+      row.textContent = String(h).padStart(2,"0")+":00";
+      hours.appendChild(row);
     }
-  });
+  }
 
-  // (MFA Placeholder)
-  $("pf-mfa").addEventListener("click", ()=>{ /* disabled */ });
+  function renderDays(){
+    const days = $("#days");
+    days.innerHTML = "";
+
+    const now = new Date();
+    const isSameDay = (a,b)=> a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+
+    for (let i=0;i<7;i++){
+      const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
+
+      const col = document.createElement("div");
+      col.className = "col" + (isSameDay(d, now) ? " today" : "");
+      col.dataset.date = d.toISOString().slice(0,10);
+
+      // 24 Slots pro Tag
+      for (let h=0; h<24; h++){
+        const slot = document.createElement("div");
+        slot.className = "slot free";
+        slot.dataset.iso = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h).toISOString();
+        slot.textContent = ""; // optional: „frei“
+        col.appendChild(slot);
+      }
+      days.appendChild(col);
+    }
+  }
+
+  function renderRangeLabel(){
+    const start = new Date(weekStart);
+    const end   = new Date(weekStart); end.setDate(end.getDate()+6);
+    const label =
+      `${fmtDate(start,{weekday:"short", day:"2-digit", month:"2-digit"})} – ` +
+      `${fmtDate(end,  {weekday:"short", day:"2-digit", month:"2-digit", year:"numeric"})}`;
+    $("#rangeLabel").textContent = label;
+  }
+
+  // initial
+  render();
 })();
