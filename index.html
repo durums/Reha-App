@@ -112,6 +112,17 @@
     const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth  = getAuth(appFB);
     const db    = getFirestore(appFB);
+    
+    function loadAppJSOnce() {
+      if (document.getElementById("app-js-loaded")) return;
+      const s = document.createElement("script");
+      s.src = "app.js";
+      s.id = "app-js-loaded";
+      s.type = "module";
+      document.body.appendChild(s);
+    }
+    loadAppJSOnce(); // ⬅️ direkt laden
+
 
     const authForms = document.getElementById("auth-forms");
     const appDiv    = document.getElementById("app");
