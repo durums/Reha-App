@@ -182,59 +182,63 @@
     menuToggle?.addEventListener("click", () => sidebar.classList.toggle("active"));
     closeSidebar?.addEventListener("click", () => sidebar.classList.remove("active"));
 
-// 🔧 Views laden (Kalender = Spezialfall mit Iframe)
-async function loadView(page) {
-  const mount = document.getElementById("content");
+    // 🔧 Views laden (Kalender = Spezialfall mit Iframe)
+    async function loadView(page) {
+      const mount = document.getElementById("content");
 
-  if (page === "kalender") {
-    mount.innerHTML = `
-      <style>
-        .iframe-wrap { height: calc(100vh - 140px); }
-        .iframe-wrap iframe { width: 100%; height: 100%; border: 0; }
-      </style>
-      <div class="iframe-wrap">
-        <iframe src="views/kalender.html" title="Kalender"></iframe>
-      </div>
-    `;
-    return;
-  }
+      if (page === "kalender") {
+        mount.innerHTML = `
+          <style>
+            .iframe-wrap { height: calc(100vh - 140px); }
+            .iframe-wrap iframe { width: 100%; height: 100%; border: 0; }
+          </style>
+          <div class="iframe-wrap">
+            <iframe src="views/kalender.html" title="Kalender"></iframe>
+          </div>
+        `;
+        return;
+      }
 
-  // Standard: andere Seiten normal aus /views laden
-  try {
-    const res = await fetch(\`views/\${page}.html\`);
-    if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
-    const html = await res.text();
-    mount.innerHTML = html;
-  } catch (e) {
-    mount.innerHTML = \`<div style="padding:1rem;">Konnte "\${page}" nicht laden.<br>\${e}</div>\`;
-  }
-}
+      // Standard: andere Seiten normal aus /views laden
+      try {
+        const res = await fetch(\`views/\${page}.html\`);
+        if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
+        const html = await res.text();
+        mount.innerHTML = html;
+      } catch (e) {
+        mount.innerHTML = \`<div style="padding:1rem;">Konnte "\${page}" nicht laden.<br>\${e}</div>\`;
+      }
+    }
 
-    // 🔧 Sidebar-Links aktivieren
+    // Sidebar-Links binden
     document.querySelectorAll('.sidebar-menu a').forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
         const page = link.id.replace('menu-', '');
         loadView(page);
-        sidebar.classList.remove("active");
+        document.getElementById("sidebar").classList.remove("active");
       });
     });
 
-    // 🔒 Auth-Zustand
+    // ✅ Guard, um mehrfaches Überschreiben zu verhindern
+    let didInitialLoad = false;
+
+    // 🔒 Auth-Zustand – nur EIN Listener!
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         showApp();
         setMenuToggleVisible(true);
         loadAppJSOnce();
-        await loadView('tagesprogramm'); // Startansicht
-        const name = user.displayName || user.email || ("UID: " + user.uid);
-        userInfo.textContent = \`Angemeldet: \${name}\`;
-        signOutBtn.style.display = "inline-block";
+
+        // Nur beim ersten Login Tagesprogramm laden
+        if (!didInitialLoad) {
+          await loadView('tagesprogramm');
+          didInitialLoad = true;
+        }
       } else {
         showAuth();
         setMenuToggleVisible(false);
-        userInfo.textContent = "Nicht angemeldet";
-        signOutBtn.style.display = "none";
+        didInitialLoad = false;
       }
     });
   </script>
