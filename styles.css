@@ -556,6 +556,98 @@ details[open] summary {
     background: #d32f1f;
 }
 
+/* === Reha App Layout schöner machen === */
+#app-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, #8fc6d9, #b7e2eb);
+  min-height: 100vh;
+  padding-top: 4rem;
+  color: #222;
+}
+
+.app-card {
+  background: #ffffffcc; /* leicht transparent */
+  backdrop-filter: blur(6px);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  width: 95%;
+  max-width: 600px;
+  transition: all 0.3s ease;
+}
+
+.app-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+.app-card h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #1c3c54;
+  font-size: 1.6rem;
+}
+
+.date-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e8f3f8;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.nav-btn {
+  background: #4e8ccf;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #3a79b5;
+}
+
+.current-date {
+  font-weight: 600;
+  color: #1c3c54;
+}
+
+.schedule-item {
+  border-left: 5px solid #4e8ccf;
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.schedule-time {
+  color: #4e8ccf;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.schedule-title {
+  color: #222;
+  font-size: 1.1rem;
+  margin-top: 0.3rem;
+}
+
+.schedule-location-instructor {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+
 /* Mobile PWA Anpassungen */
 @media (max-width: 768px) {
     .header {
