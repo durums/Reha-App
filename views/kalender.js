@@ -1,23 +1,23 @@
 (() => {
   // ---------- Konstanten ----------
-  const START = 8, END = 17; // inkl.
+  const START = 8, END = 17; // Arbeitszeiten
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
   // ---------- State ----------
-  let store = load();                                  // Termine aus localStorage
-  let user  = (window.currentUserName || "").toString(); // Name/Email aus Firebase
+  let store = load();
+  let user = window.currentUserName || "Gast"; // Firebase-Name übernehmen
   let weekStart = mondayOf(new Date());
 
   // ---------- DOM ----------
-  const header     = () => document.getElementById("header");
-  const hours      = () => document.getElementById("hours");
-  const daysC      = () => document.getElementById("days");
+  const header = () => document.getElementById("header");
+  const hours = () => document.getElementById("hours");
+  const daysC = () => document.getElementById("days");
   const rangeLabel = () => document.getElementById("rangeLabel");
-  const userPill   = () => document.getElementById("userPill");
-  const dialog     = () => document.getElementById("dialog");
-  const dlgTitle   = () => document.getElementById("dlgTitle");
-  const dlgList    = () => document.getElementById("dlgList");
-  const btn        = (id) => document.getElementById(id);
+  const userPill = () => document.getElementById("userPill");
+  const dialog = () => document.getElementById("dialog");
+  const dlgTitle = () => document.getElementById("dlgTitle");
+  const dlgList = () => document.getElementById("dlgList");
+  const btn = (id) => document.getElementById(id);
 
   // ---------- Init ----------
   window.requestAnimationFrame(() => {
@@ -25,20 +25,12 @@
     render();
   });
 
-  // Optional: falls wir den Usernamen nachträglich ändert
-  window.addEventListener("reha-user-refresh", () => {
-    user = (window.currentUserName || "").toString();
-    render();
-  });
-
-  // ---------- Events initialisieren ----------
+  // ---------- Events ----------
   function bindOnce() {
-    // Navigation
     btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
     btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
     btn("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
 
-    // Aktionen
     btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     btn("mineBtn")?.addEventListener("click", showMine);
     btn("moveBtn")?.addEventListener("click", moveOrCancel);
@@ -46,7 +38,7 @@
 
   // ---------- Render ----------
   function render(){
-    // Kopf
+    // Header
     header().innerHTML = "";
     header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
@@ -70,9 +62,9 @@
       const col = div("col" + (sameDate(d,today) ? " today" : ""));
       for(let h=START; h<=END; h++){
         const slot = `${pad(h)}:00`;
-        const who  = (store[tag]||{})[slot];
-        const cls  = who ? (isMe(who) ? "own" : "booked") : "free";
-        const el   = div(`slot ${cls}`, who ? (isMe(who) ? "Mein Termin" : "Belegt") : "");
+        const who = (store[tag]||{})[slot];
+        const cls = who ? (who===user ? "own" : "booked") : "free";
+        const el = div(`slot ${cls}`, who ? (who===user ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
@@ -81,26 +73,26 @@
       daysC().append(col);
     });
 
-    userPill().textContent = window.currentUserName || ""; // Anzeige oben rechts
+    userPill().textContent = user || "Gast";
   }
 
   // ---------- Klick-Logik ----------
   function onSlotClick(e){
-    const tag  = e.currentTarget.dataset.date;
+    const tag = e.currentTarget.dataset.date;
     const slot = e.currentTarget.dataset.slot;
-    const who  = (store[tag]||{})[slot];
-    const me   = (window.currentUserName || user || "Gast").toString();
+    const who = (store[tag]||{})[slot];
 
     if(!who){
+      if(!user) return alert("Bitte anmelden, um Termine zu buchen.");
       if(confirm(`Möchtest du ${tag} um ${slot} buchen?`)){
-        book(tag, slot, me);
+        book(tag, slot, user);
         alert(`Termin eingetragen: ${tag} ${slot}`);
         render();
       }
       return;
     }
 
-    if(isMe(who)){
+    if(who === user){
       const rest = daysBetween(new Date(), new Date(tag));
       if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
       const a = prompt("Eigener Termin: Tippe 'v' zum Verschieben, 'a' zum Absagen:");
@@ -111,7 +103,7 @@
       } else if (a === "v"){
         unbook(tag, slot);
         pickFreeSlot((ntag,nslot)=>{
-          if(ntag){ book(ntag,nslot,me); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
+          if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
           else { alert("Verschieben abgebrochen. Alter Termin wurde entfernt."); }
           render();
         });
@@ -143,8 +135,7 @@
   }
 
   function bookPicked(tag,slot){
-    const me = (window.currentUserName || user || "Gast").toString();
-    book(tag,slot,me);
+    book(tag,slot,user);
     alert(`Termin eingetragen: ${tag} ${slot}`);
     render();
   }
@@ -173,12 +164,11 @@
         if(a === "a"){ unbook(tag,slot); alert("Termin abgesagt."); render(); }
         else if(a === "v"){
           unbook(tag,slot);
-          const me = (window.currentUserName || user || "Gast").toString();
-          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,me); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
+          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
         } else if(a !== null){ alert("Ungültige Eingabe."); }
       };
       row.append(b);
-      dlgList.append(row);
+      dlgList().append(row);
     }
     dialog().showModal();
   }
@@ -186,23 +176,14 @@
   // ---------- Speicher ----------
   function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
   function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
-  function book(tag,slot,name){ (store[tag] ||= {})[slot] = name; save(); }
-  function unbook(tag,slot){
-    if(store[tag]){
-      delete store[tag][slot];
-      if(!Object.keys(store[tag]).length) delete store[tag];
-      save();
-    }
-  }
+  function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
+  function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
 
   // ---------- Helpers ----------
-  function isMe(name){ return name === (window.currentUserName || user); }
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
-      Object.entries(slots).forEach(([slot,name])=>{
-        if(isMe(name)) out.push([tag,slot]);
-      });
+      Object.entries(slots).forEach(([slot,name])=>{ if(name===user) out.push([tag,slot]); });
     });
     out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
     return out;
@@ -218,6 +199,7 @@
     }
     return out;
   }
+
   function mondayOf(d){ const x = new Date(d); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
   function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
   function iso(d){ return d.toISOString().slice(0,10); }
