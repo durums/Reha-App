@@ -1,0 +1,137 @@
+<!-- views/profil.html -->
+<section class="profile-page">
+  <div class="profile-hero cardish">
+    <div class="avatar-wrap">
+      <img id="profileAvatar" src="" alt="Profilbild" onerror="this.src='https://avatar.iran.liara.run/public';">
+    </div>
+    <div class="hero-text">
+      <h2 id="pf-name">Max Mustermann</h2>
+      <p class="meta">
+        <span id="pf-geburtsdatum">Geb. 12.03.1985</span> •
+        <span id="pf-geschlecht">männlich</span> •
+        <span id="pf-phase">Reha-Phase II (ambulant)</span>
+      </p>
+      <div class="contact">
+        <a id="pf-email" href="mailto:max@example.com">max@example.com</a>
+        <span>•</span>
+        <a id="pf-telefon" href="tel:+491701234567">+49 170 1234567</a>
+        <span>• Notfall:</span>
+        <strong id="pf-notfall">Anna Muster, +49 160 9876543</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Persönliches -->
+    <div class="cardish">
+      <h3>🧑‍💼 Persönliche Informationen</h3>
+      <dl class="kv">
+        <div><dt>Name</dt><dd id="pi-name">Max Mustermann</dd></div>
+        <div><dt>Geburtsdatum</dt><dd id="pi-geburtsdatum">12.03.1985</dd></div>
+        <div><dt>Geschlecht</dt><dd id="pi-geschlecht">männlich</dd></div>
+        <div><dt>E-Mail</dt><dd id="pi-email">max@example.com</dd></div>
+        <div><dt>Telefon</dt><dd id="pi-telefon">+49 170 1234567</dd></div>
+        <div><dt>Notfallkontakt</dt><dd id="pi-notfall">Anna Muster, +49 160 9876543</dd></div>
+      </dl>
+    </div>
+
+    <!-- Medizinisch -->
+    <div class="cardish">
+      <h3>🩺 Medizinische Informationen</h3>
+      <dl class="kv">
+        <div><dt>Diagnosen</dt>
+          <dd id="mi-diagnosen">
+            <span class="tag">Knie-TEP links</span>
+            <span class="tag">Bandscheibenvorfall L5/S1</span>
+          </dd>
+        </div>
+        <div><dt>Operationsdatum</dt><dd id="mi-op">18.07.2024</dd></div>
+        <div><dt>Reha</dt><dd id="mi-reha">Beginn 01.09.2024 • Ende 30.10.2024</dd></div>
+        <div><dt>Begleiterkrankungen</dt>
+          <dd id="mi-komorbid">
+            <span class="tag tag-grey">Hypertonie</span>
+            <span class="tag tag-grey">Diabetes Typ 2</span>
+          </dd>
+        </div>
+        <div><dt>Medikamente</dt><dd id="mi-medikamente">Metformin, Ramipril</dd></div>
+        <div><dt>Allergien</dt><dd id="mi-allergien">Penicillin</dd></div>
+      </dl>
+    </div>
+
+    <!-- Funktioneller Status -->
+    <div class="cardish">
+      <h3>🏃‍♂️ Funktioneller Status</h3>
+      <ul class="status-list">
+        <li>
+          <span>Mobilität / Gehstrecke</span>
+          <strong id="fs-mobilitaet">800 m mit Unterarmgehstütze</strong>
+        </li>
+        <li>
+          <span>Muskelkraft / Gelenkstatus</span>
+          <strong id="fs-kraft">Quadrizeps 4/5 • Kniebeugung 0–100°</strong>
+        </li>
+        <li>
+          <span>Schmerzstatus (0–10)</span>
+          <div class="bar">
+            <div class="bar-fill" style="width:40%;" id="fs-schmerz" aria-label="4 von 10"></div>
+          </div>
+          <small class="bar-label">aktuell: 4/10</small>
+        </li>
+        <li>
+          <span>ADL / Selbstständigkeit</span>
+          <strong id="fs-adl">Treppen mit Geländer, An-/Ausziehen selbstständig</strong>
+        </li>
+        <li>
+          <span>Koordination / Gleichgewicht</span>
+          <strong id="fs-koord">Einbeinstand 8 s rechts / 5 s links</strong>
+        </li>
+        <li>
+          <span>Kognition (falls relevant)</span>
+          <strong id="fs-kog">unauffällig</strong>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ——— Profil-View Styles (scoped) ——— */
+.profile-page { padding: 1rem; max-width: 1100px; margin: 0 auto; }
+.cardish{
+  background:#fff; border-radius:12px; padding:1rem 1.25rem; box-shadow:0 8px 24px rgba(0,0,0,.06);
+  border-left:4px solid var(--color-header-bg);
+}
+.profile-hero{ display:flex; gap:1rem; align-items:center; margin-bottom:1rem; }
+.avatar-wrap{ width:88px; height:88px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.avatar-wrap img{ width:100%; height:100%; object-fit:cover; }
+.hero-text h2{ margin:0 0 .25rem 0; color:#1c3c54; font-size:1.5rem;}
+.hero-text .meta{ color:#395873; }
+.contact{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.35rem; color:#2b2b2b; }
+.grid{ display:grid; grid-template-columns:1fr; gap:1rem; }
+@media(min-width:900px){ .grid{ grid-template-columns:1fr 1fr; } .grid>.cardish:last-child{ grid-column:1 / -1; } }
+
+.kv{ margin-top:.5rem; }
+.kv > div{ display:grid; grid-template-columns:180px 1fr; gap:.5rem .75rem; padding:.35rem 0; border-bottom:1px dashed #eee; }
+.kv dt{ color:#666; }
+.kv dd{ color:#222; }
+
+.tag{
+  display:inline-block; background: var(--color-orange-bg); color:#7a4e14; padding:.25rem .5rem;
+  border-radius:999px; font-size:.85rem; margin:.15rem .25rem .15rem 0; border:1px solid #f2d2a6;
+}
+.tag-grey{ background:#eef2f6; color:#35506b; border-color:#dde6ef; }
+
+.status-list{ list-style:none; padding:0; margin:.25rem 0 0; display:flex; flex-direction:column; gap:.6rem; }
+.status-list li{ display:flex; flex-direction:column; gap:.2rem; }
+.status-list span{ color:#666; }
+.status-list strong{ color:#222; }
+
+.bar{ width:100%; height:10px; background:#eef2f6; border-radius:999px; overflow:hidden; }
+.bar-fill{ height:100%; background:linear-gradient(90deg, var(--color-orange), var(--color-red)); }
+
+.profile-page h3{ color:#1c3c54; margin-bottom:.5rem; }
+</style>
+
+<script>
+// Optional: hier könntest du später echte Profildaten einsetzen (z.B. aus Firestore)
+</script>
