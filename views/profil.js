@@ -1,70 +1,52 @@
 (async function () {
-  // Sicherstellen, dass Auth/DB da sind
-  const auth = window.auth;
-  const db   = window.db;
-  if (!auth || !db) {
-    console.warn("Firebase-Instanzen nicht gefunden.");
-    return;
-  }
-
-  // Helfer
-  const $ = (id) => document.getElementById(id);
-  const setText = (id, val) => { const el = $(id); if (el) el.textContent = val ?? "–"; };
-  const fmtDate = (v) => {
-    if (!v) return "–";
-    try {
-      // unterstützt: JS-Date, millis, Firestore Timestamp
-      const d = v.toDate ? v.toDate() : (typeof v === "number" ? new Date(v) : new Date(v));
-      return isNaN(d) ? "–" : d.toLocaleDateString("de-DE");
-    } catch { return "–"; }
+  const auth = window.auth, db = window.db;
+  const $ = (id)=>document.getElementById(id);
+  const set=(id,val)=>{const el=$(id); if(el) el.textContent=val??"–";};
+  const fmtDate = (v)=>{
+    if(!v) return "–";
+    try{const d=v?.toDate?v.toDate():new Date(v); return isNaN(d)? "–" : d.toLocaleDateString("de-DE");}
+    catch{ return "–"; }
   };
-  const join = (v) => Array.isArray(v) ? (v.length ? v.join(", ") : "–") : (v || "–");
+  const list=(v)=>Array.isArray(v)?(v.length?v.join(", "):"–"):(v||"–");
+  const initials=(nameOrMail)=>{
+    const s=(nameOrMail||"").trim();
+    if(!s) return "U";
+    if(s.includes("@")) return s[0].toUpperCase();
+    const parts=s.split(/\s+/); return (parts[0]?.[0]||"U").toUpperCase() + (parts[1]?.[0]||"");
+  };
 
-  // Wenn nicht eingeloggt → Info anzeigen
-  const user = auth.currentUser;
-  if (!user) {
-    setText("p-name",   "— (Bitte anmelden) —");
-    setText("p-email",  "—");
-    return;
-  }
+  const u = auth.currentUser;
+  if(!u){ set("p-name","— (Bitte anmelden) —"); return; }
 
-  // Auth-Basisdaten
-  setText("p-name",  user.displayName || user.email || ("UID:" + user.uid));
-  setText("p-email", user.email || "–");
-  setText("p-phone", user.phoneNumber || "–");
+  const display = u.displayName || u.email || ("UID:" + u.uid);
+  set("p-name", display);
+  set("p-email", u.email || "–");
+  set("p-phone", u.phoneNumber || "–");
+  const av=$("p-avatar"); if(av) av.textContent = initials(display);
 
-  // Profildaten aus Firestore
-  try {
-    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const ref  = doc(db, "profiles", user.uid);
-    const snap = await getDoc(ref);
+  try{
+    const {doc,getDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const snap = await getDoc(doc(db,"profiles",u.uid));
+    const d = snap.exists()? snap.data(): {};
 
-    const data = snap.exists() ? snap.data() : {};
+    set("p-dob", fmtDate(d.dob));
+    set("p-emergency", d.emergencyContact || "–");
+    set("p-gender", d.gender || "–");
 
-    // Persönlich
-    setText("p-dob",        fmtDate(data.dob));
-    setText("p-emergency",  data.emergencyContact || "–");
-    setText("p-gender",     data.gender || "–");
+    set("m-dx", list(d.diagnoses));
+    set("m-op", fmtDate(d.opDate));
+    set("m-reha", `${fmtDate(d.rehaStart)} – ${fmtDate(d.rehaEnd)}`);
+    set("m-phase", d.rehaPhase || "–");
+    set("m-comorbid", list(d.comorbidities));
+    set("m-meds", list(d.medications));
+    set("m-allergies", list(d.allergies));
 
-    // Medizinisch
-    setText("m-dx",         join(data.diagnoses));
-    setText("m-op",         fmtDate(data.opDate));
-    setText("m-reha",       (fmtDate(data.rehaStart) + " – " + fmtDate(data.rehaEnd)).replace("– – –", "–"));
-    setText("m-phase",      data.rehaPhase || "–");
-    setText("m-comorbid",   join(data.comorbidities));
-    setText("m-meds",       join(data.medications));
-    setText("m-allergies",  join(data.allergies));
-
-    // Funktionell
-    setText("f-mobility",   data.mobility || "–");
-    setText("f-aids",       join(data.aids));
-    setText("f-strength",   data.strength || "–");
-    setText("f-pain",       (data.painLevel ?? "–"));
-    setText("f-adl",        data.adl || "–");
-    setText("f-balance",    data.balance || "–");
-    setText("f-cognition",  data.cognition || "–");
-
-  } catch (e) {
-    console.error("Profil laden fehlgeschlagen:", e);
-  }
+    set("f-mobility", d.mobility || "–");
+    set("f-aids", list(d.aids));
+    set("f-strength", d.strength || "–");
+    set("f-pain", d.painLevel ?? "–");
+    set("f-adl", d.adl || "–");
+    set("f-balance", d.balance || "–");
+    set("f-cognition", d.cognition || "–");
+  }catch(e){ console.error(e); }
 })();
