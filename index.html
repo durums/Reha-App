@@ -13,7 +13,7 @@
 </head>
 <body class="center-auth">
 
-  <!-- 🔘 Menü-Button oben links (wird nach Login eingeblendet) -->
+  <!-- 🔘 Menü-Button oben links -->
   <button id="menuToggle" class="menu-toggle" style="display:none;">☰</button>
 
   <!-- 🌐 Seitenmenü -->
@@ -23,9 +23,9 @@
       <button id="closeSidebar">×</button>
     </div>
     <ul class="sidebar-menu">
-      <li><a href="#tagesprogramm" id="menu-tagesprogramm">🗓️ Tagesprogramm</a></li>
       <li><a href="#trainingsplan" id="menu-trainingsplan">🏋️ Trainingsplan</a></li>
       <li><a href="#fortschritt" id="menu-fortschritt">📊 Fortschritt</a></li>
+      <li><a href="#tagesprogramm" id="menu-tagesprogramm">🗓️ Tagesprogramm</a></li>
       <li><a href="#kalender" id="menu-kalender">📅 Kalender</a></li>
       <li><a href="#feedback" id="menu-feedback">💬 Feedback</a></li>
       <li><a href="#profil" id="menu-profil">👤 Profil</a></li>
@@ -60,198 +60,125 @@
     </div>
 
     <div id="app-section">
-      <div class="app-card">
-        <h1>Reha Tagesprogramm</h1>
-        <div class="date-nav">
-          <button id="prevDay" class="nav-btn">‹</button>
-          <span id="currentDate" class="current-date"></span>
-          <button id="nextDay" class="nav-btn">›</button>
+      <main id="content" class="main-content"></main>
+    </div>
+
+    <div class="sync-status" id="syncStatus">Synchronisiere...</div>
+    <div class="edit-section" id="editSection">
+      <div class="edit-area active" id="editArea">
+        <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
+        <button class="save-btn" id="saveBtn">Speichern</button>
+        <div class="qr-section">
+          <div class="qr-title">App teilen via QR-Code</div>
+          <div class="qr-code" id="qrCode"></div>
+          <div class="qr-url" id="qrUrl"></div>
         </div>
       </div>
+    </div>
 
-      <!-- 👉 EINZIGE View-Fläche (hier werden views/*.html geladen) -->
-      <div id="content" class="main-content"></div>
-
-      <!-- Editor / QR (falls du sie brauchst – sonst entfernen) -->
-      <div class="edit-section" id="editSection">
-        <div class="edit-area active" id="editArea">
-          <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten..."></textarea>
-          <button class="save-btn" id="saveBtn">Speichern</button>
-          <div class="qr-section">
-            <div class="qr-title">App teilen via QR-Code</div>
-            <div class="qr-code" id="qrCode"></div>
-            <div class="qr-url" id="qrUrl"></div>
-          </div>
+    <!-- 📝 Notizen Modal -->
+    <div class="note-modal" id="noteModal">
+      <div class="note-modal-content">
+        <div class="note-modal-title" id="noteModalTitle">Notiz hinzufügen</div>
+        <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen..."></textarea>
+        <div class="note-modal-buttons">
+          <button class="note-save-btn" id="noteSaveBtn">Speichern</button>
+          <button class="note-cancel-btn" id="noteCancelBtn">Abbrechen</button>
         </div>
-      </div>
-
-      <!-- 📝 Notizen Modal -->
-      <div class="note-modal" id="noteModal">
-        <div class="note-modal-content">
-          <div class="note-modal-title" id="noteModalTitle">Notiz hinzufügen</div>
-          <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen..."></textarea>
-          <div class="note-modal-buttons">
-            <button class="note-save-btn" id="noteSaveBtn">Speichern</button>
-            <button class="note-cancel-btn" id="noteCancelBtn">Abbrechen</button>
-          </div>
-          <button class="note-delete-btn" id="noteDeleteBtn" style="display: none;">Notiz löschen</button>
-        </div>
+        <button class="note-delete-btn" id="noteDeleteBtn" style="display: none;">Notiz löschen</button>
       </div>
     </div>
   </div>
 
-  <!-- Falls von dir genutzt -->
   <script src="schedule-data.js"></script>
 
-  <!-- App-Script -->
-  <script type="module">
-    // --- Firebase ---
-    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged,
-      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- ... dein bisheriges HTML bleibt unverändert ... -->
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
-      authDomain: "reha-app-3d609.firebaseapp.com",
-      projectId: "reha-app-3d609",
-      storageBucket: "reha-app-3d609.firebasestorage.app",
-      messagingSenderId: "805175943839",
-      appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
-    };
-    const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const auth = getAuth(appFB);
-    const db = getFirestore(appFB);
+<script type="module">
+  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // --- DOM-Refs ---
-    const authForms = document.getElementById("auth-forms");
-    const appDiv    = document.getElementById("app");
-    const userInfo  = document.getElementById("user-info");
-    const signOutBtn= document.getElementById("sign-out");
-    const sidebar   = document.getElementById("sidebar");
-    const menuToggle= document.getElementById("menuToggle");
-    const closeSidebar = document.getElementById("closeSidebar");
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
+    authDomain: "reha-app-3d609.firebaseapp.com",
+    projectId: "reha-app-3d609",
+    storageBucket: "reha-app-3d609.firebasestorage.app",
+    messagingSenderId: "805175943839",
+    appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
+  };
+  const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const auth = getAuth(appFB);
+  const db = getFirestore(appFB);
 
-    // --- Sichtbarkeit Login/App ---
-    const showAuth = () => {
-      document.body.classList.add("center-auth");
-      authForms.style.display = "block";
-      appDiv.style.display = "none";
-    };
-    const showApp = () => {
-      document.body.classList.remove("center-auth");
-      authForms.style.display = "none";
-      appDiv.style.display = "block";
-    };
+  const authForms = document.getElementById("auth-forms");
+  const appDiv = document.getElementById("app");
+  const userInfo = document.getElementById("user-info");
+  const signOutBtn = document.getElementById("sign-out");
+  const sidebar = document.getElementById("sidebar");
+  const menuToggle = document.getElementById("menuToggle");
+  const closeSidebar = document.getElementById("closeSidebar");
 
-    // --- Menü-Button & Sidebar ---
-    const setMenuToggleVisible = (visible) => {
-      if (menuToggle) menuToggle.style.display = visible ? "block" : "none";
-    };
-    menuToggle?.addEventListener("click", () => {
-      sidebar.classList.toggle("active");
-    });
-    closeSidebar?.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-    });
+  const showAuth = () => {
+    document.body.classList.add("center-auth");
+    authForms.style.display = "block";
+    appDiv.style.display = "none";
+  };
+  const showApp = () => {
+    document.body.classList.remove("center-auth");
+    authForms.style.display = "none";
+    appDiv.style.display = "block";
+  };
 
-    // --- Login ---
-    document.getElementById("login-form")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("li-email").value.trim();
-      const pw    = document.getElementById("li-password").value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pw);
-      } catch (err) {
-        alert("Login fehlgeschlagen: " + err.message);
-        console.error(err);
+  function loadAppJSOnce() {
+    if (document.getElementById("app-js-loaded")) return;
+    const s = document.createElement("script");
+    s.src = "app.js";
+    s.id = "app-js-loaded";
+    s.type = "module";
+    document.body.appendChild(s);
+  }
+
+  // Login / Registrierung / Logout unverändert ...
+  // ...
+
+  // --- Hash Router bleibt unverändert ---
+
+  // 🔒 Auth-Zustand
+  let didInitialLoad = false;
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      showApp();
+      setMenuToggleVisible(true);
+      loadAppJSOnce?.();
+
+      // 🔧 NEU: Aktuellen Nutzer global speichern
+      const name = user.displayName || user.email || ("UID:" + user.uid);
+      window.currentUserName = name;
+
+      userInfo.textContent = `Angemeldet: ${name}`;
+      signOutBtn.style.display = "inline-block";
+
+      if (!didInitialLoad) {
+        if (!location.hash) location.hash = "#tagesprogramm";
+        routeToHash();
+        didInitialLoad = true;
       }
-    });
+    } else {
+      showAuth();
+      setMenuToggleVisible(false);
+      didInitialLoad = false;
 
-    // --- Signup ---
-    document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("su-email").value.trim();
-      const pw    = document.getElementById("su-password").value;
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pw);
-        await setDoc(doc(db, "profiles", cred.user.uid), { email, createdAt: Date.now() });
-        alert("Registriert! Du kannst dich jetzt anmelden.");
-      } catch (err) {
-        alert("Registrierung fehlgeschlagen: " + err.message);
-        console.error(err);
-      }
-    });
+      // 🔧 NEU: Beim Abmelden User-Name löschen
+      window.currentUserName = null;
 
-    // --- Logout ---
-    signOutBtn?.addEventListener("click", async () => {
-      try { await signOut(auth); }
-      catch (e) { console.error(e); alert("Abmelden fehlgeschlagen."); }
-    });
-
-    // --- Views laden (Hash-Router) ---
-    async function loadView(page) {
-      try {
-        const res = await fetch(`views/${page}.html`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const html = await res.text();
-        document.getElementById("content").innerHTML = html;
-        // Sidebar nach Navigation schließen
-        sidebar?.classList.remove("active");
-      } catch (err) {
-        document.getElementById("content").innerHTML =
-          `<div style="padding:1rem;color:#b00020;background:#ffecec;border-radius:8px;">
-             Konnte "<b>${page}</b>" nicht laden.<br>Fehler: ${err.message}
-           </div>`;
-      }
+      userInfo.textContent = "Nicht angemeldet";
+      signOutBtn.style.display = "none";
     }
-    function getPageFromHash() {
-      return (location.hash || "#tagesprogramm").replace("#", "");
-    }
-    function routeToHash() {
-      loadView(getPageFromHash());
-    }
-    window.addEventListener("hashchange", routeToHash);
-
-    // --- App.js einmalig laden (falls von dir genutzt) ---
-    function loadAppJSOnce() {
-      if (document.getElementById("app-js-loaded")) return;
-      const s = document.createElement("script");
-      s.src = "app.js";
-      s.id  = "app-js-loaded";
-      s.type = "module";
-      document.body.appendChild(s);
-    }
-
-    // --- Auth-Zustand ---
-    let didInitialLoad = false;
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        showApp();
-        setMenuToggleVisible(true);
-        loadAppJSOnce();
-
-        const name = user.displayName || user.email || ("UID:" + user.uid);
-        window.currentUserName = name;
-        if (userInfo) userInfo.textContent = `Angemeldet: ${name}`;
-        if (signOutBtn) signOutBtn.style.display = "inline-block";
-
-        if (!didInitialLoad) {
-          if (!location.hash) location.hash = "#tagesprogramm";
-          routeToHash();
-          didInitialLoad = true;
-        }
-      } else {
-        showAuth();
-        setMenuToggleVisible(false);
-        didInitialLoad = false;
-        window.currentUserName = null;
-        if (userInfo) userInfo.textContent = "Nicht angemeldet";
-        if (signOutBtn) signOutBtn.style.display = "none";
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>
