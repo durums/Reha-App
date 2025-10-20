@@ -6,36 +6,52 @@
   let user = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
 
-  const header = () => document.getElementById("header");
-  const hours = () => document.getElementById("hours");
-  const daysC = () => document.getElementById("days");
+  const header     = () => document.getElementById("header");
+  const hours      = () => document.getElementById("hours");
+  const daysC      = () => document.getElementById("days");
   const rangeLabel = () => document.getElementById("rangeLabel");
-  const userPill = () => document.getElementById("userPill");
-  const dialog = () => document.getElementById("dialog");
-  const dlgTitle = () => document.getElementById("dlgTitle");
-  const dlgList = () => document.getElementById("dlgList");
-  const btn = (id) => document.getElementById(id);
+  const userPill   = () => document.getElementById("userPill");
+  const dialog     = () => document.getElementById("dialog");
+  const dlgTitle   = () => document.getElementById("dlgTitle");
+  const dlgList    = () => document.getElementById("dlgList");
+  const btn        = (id) => document.getElementById(id);
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const checkInterval = setInterval(() => {
-      if (document.getElementById("header")) {
-        clearInterval(checkInterval);
-        bindOnce();
-        setTimeout(() => render(), 300);
-      }
-    }, 100);
-  });
+  // ---------- ROBUSTER INIT für dynamisches Nachladen ----------
+  function initCalendar() {
+    const ok = header() && hours() && daysC();
+    if (!ok) {
+      const t = setInterval(() => {
+        if (header() && hours() && daysC()) {
+          clearInterval(t);
+          bindOnce();
+          setTimeout(render, 50);
+        }
+      }, 50);
+      return;
+    }
+    bindOnce();
+    setTimeout(render, 50);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCalendar);
+  } else {
+    initCalendar();
+  }
+  // ---------- /INIT ----------
 
   function bindOnce() {
     btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
     btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
     btn("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
+
     btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     btn("mineBtn")?.addEventListener("click", showMine);
     btn("moveBtn")?.addEventListener("click", moveOrCancel);
   }
 
   function render(){
+    // Header (Wochentage)
     header().innerHTML = "";
     header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
@@ -43,13 +59,15 @@
       const lbl = `${DAYS[(d.getDay()+6)%7]} ${d.getDate()}.${d.getMonth()+1}.`;
       header().append(cell("cell", lbl));
     });
-    rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
+    rangeLabel() && (rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`);
 
+    // Stunden links
     hours().innerHTML = "";
     for(let h=START; h<=END; h++){
       hours().append(div("hour", `${pad(h)}:00`));
     }
 
+    // Tages-Spalten
     daysC().innerHTML = "";
     const today = new Date();
     ds.forEach(d => {
@@ -68,7 +86,7 @@
       daysC().append(col);
     });
 
-    userPill().textContent = user || "Gast";
+    userPill() && (userPill().textContent = user || "Gast");
   }
 
   function onSlotClick(e){
@@ -166,11 +184,13 @@
     dialog().showModal();
   }
 
+  // Speicher
   function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
   function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
   function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
   function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
 
+  // Helpers
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
@@ -179,7 +199,6 @@
     out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
     return out;
   }
-
   function freeSlotsThisWeek(){
     const out = [];
     for(let i=0;i<7;i++){
