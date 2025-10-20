@@ -4,24 +4,32 @@
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
   // ---------- State ----------
-  let store = load();
-  let user = localStorage.getItem("kal_user") || "";
+  let store = load();                                  // Termine aus localStorage
+  let user  = (window.currentUserName || "").toString(); // Name/Email aus Firebase
   let weekStart = mondayOf(new Date());
 
   // ---------- DOM ----------
-  const header = () => document.getElementById("header");
-  const hours = () => document.getElementById("hours");
-  const daysC = () => document.getElementById("days");
+  const header     = () => document.getElementById("header");
+  const hours      = () => document.getElementById("hours");
+  const daysC      = () => document.getElementById("days");
   const rangeLabel = () => document.getElementById("rangeLabel");
-  const userPill = () => document.getElementById("userPill");
-  const overlay = () => document.getElementById("loginOverlay");
-  const nameInput = () => document.getElementById("nameInput");
-  const dialog = () => document.getElementById("dialog");
-  const dlgTitle = () => document.getElementById("dlgTitle");
-  const dlgList = () => document.getElementById("dlgList");
+  const userPill   = () => document.getElementById("userPill");
+  const dialog     = () => document.getElementById("dialog");
+  const dlgTitle   = () => document.getElementById("dlgTitle");
+  const dlgList    = () => document.getElementById("dlgList");
+  const btn        = (id) => document.getElementById(id);
 
-  // Buttons
-  const btn = (id) => document.getElementById(id);
+  // ---------- Init ----------
+  window.requestAnimationFrame(() => {
+    bindOnce();
+    render();
+  });
+
+  // Optional: falls ihr den Usernamen nachträglich ändert
+  window.addEventListener("reha-user-refresh", () => {
+    user = (window.currentUserName || "").toString();
+    render();
+  });
 
   // ---------- Events initialisieren ----------
   function bindOnce() {
@@ -34,32 +42,11 @@
     btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     btn("mineBtn")?.addEventListener("click", showMine);
     btn("moveBtn")?.addEventListener("click", moveOrCancel);
-
-    // Login
-    btn("loginBtn")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      const v = nameInput().value.trim();
-      if(!v) return alert("Bitte Namen eingeben.");
-      user = v;
-      localStorage.setItem("kal_user", v);
-      overlay().hidden = true;
-      userPill().textContent = v;
-    });
-
-    // Falls kein Nutzer gesetzt: Overlay anbieten
-    ensureLogin();
   }
-
-  // ---------- Init ----------
-  // Nach kurzem Timeout, damit DOM des Partials sicher im Dokument ist
-  window.requestAnimationFrame(() => {
-    bindOnce();
-    render();
-  });
 
   // ---------- Render ----------
   function render(){
-    // Header
+    // Kopf
     header().innerHTML = "";
     header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
@@ -69,13 +56,13 @@
     });
     rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
 
-    // Hours
+    // Stunden
     hours().innerHTML = "";
     for(let h=START; h<=END; h++){
       hours().append(div("hour", `${pad(h)}:00`));
     }
 
-    // Day columns
+    // Spalten
     daysC().innerHTML = "";
     const today = new Date();
     ds.forEach(d => {
@@ -83,9 +70,9 @@
       const col = div("col" + (sameDate(d,today) ? " today" : ""));
       for(let h=START; h<=END; h++){
         const slot = `${pad(h)}:00`;
-        const who = (store[tag]||{})[slot];
-        const cls = who ? (who===user ? "own" : "booked") : "free";
-        const el = div(`slot ${cls}`, who ? (who===user ? "Mein Termin" : "Belegt") : "");
+        const who  = (store[tag]||{})[slot];
+        const cls  = who ? (isMe(who) ? "own" : "booked") : "free";
+        const el   = div(`slot ${cls}`, who ? (isMe(who) ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
@@ -94,26 +81,26 @@
       daysC().append(col);
     });
 
-    userPill().textContent = user || "";
+    userPill().textContent = window.currentUserName || ""; // Anzeige oben rechts
   }
 
   // ---------- Klick-Logik ----------
   function onSlotClick(e){
-    const tag = e.currentTarget.dataset.date;
+    const tag  = e.currentTarget.dataset.date;
     const slot = e.currentTarget.dataset.slot;
-    const who = (store[tag]||{})[slot];
+    const who  = (store[tag]||{})[slot];
+    const me   = (window.currentUserName || user || "Gast").toString();
 
     if(!who){
-      if(!user){ ensureLogin(); return; }
       if(confirm(`Möchtest du ${tag} um ${slot} buchen?`)){
-        book(tag, slot, user);
+        book(tag, slot, me);
         alert(`Termin eingetragen: ${tag} ${slot}`);
         render();
       }
       return;
     }
 
-    if(who === user){
+    if(isMe(who)){
       const rest = daysBetween(new Date(), new Date(tag));
       if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
       const a = prompt("Eigener Termin: Tippe 'v' zum Verschieben, 'a' zum Absagen:");
@@ -124,7 +111,7 @@
       } else if (a === "v"){
         unbook(tag, slot);
         pickFreeSlot((ntag,nslot)=>{
-          if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
+          if(ntag){ book(ntag,nslot,me); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
           else { alert("Verschieben abgebrochen. Alter Termin wurde entfernt."); }
           render();
         });
@@ -156,7 +143,8 @@
   }
 
   function bookPicked(tag,slot){
-    book(tag,slot,user);
+    const me = (window.currentUserName || user || "Gast").toString();
+    book(tag,slot,me);
     alert(`Termin eingetragen: ${tag} ${slot}`);
     render();
   }
@@ -185,11 +173,12 @@
         if(a === "a"){ unbook(tag,slot); alert("Termin abgesagt."); render(); }
         else if(a === "v"){
           unbook(tag,slot);
-          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
+          const me = (window.currentUserName || user || "Gast").toString();
+          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,me); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
         } else if(a !== null){ alert("Ungültige Eingabe."); }
       };
       row.append(b);
-      dlgList().append(row);
+      dlgList.append(row);
     }
     dialog().showModal();
   }
@@ -197,15 +186,23 @@
   // ---------- Speicher ----------
   function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
   function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
-  function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
-  function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
+  function book(tag,slot,name){ (store[tag] ||= {})[slot] = name; save(); }
+  function unbook(tag,slot){
+    if(store[tag]){
+      delete store[tag][slot];
+      if(!Object.keys(store[tag]).length) delete store[tag];
+      save();
+    }
+  }
 
   // ---------- Helpers ----------
-  function ensureLogin(){ if(!user){ overlay().hidden = false; } }
+  function isMe(name){ return name === (window.currentUserName || user); }
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
-      Object.entries(slots).forEach(([slot,name])=>{ if(name===user) out.push([tag,slot]); });
+      Object.entries(slots).forEach(([slot,name])=>{
+        if(isMe(name)) out.push([tag,slot]);
+      });
     });
     out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
     return out;
