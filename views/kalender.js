@@ -1,14 +1,11 @@
 (() => {
-  // ---------- Konstanten ----------
-  const START = 8, END = 17; // Arbeitszeiten
+  const START = 8, END = 17;
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
-  // ---------- State ----------
   let store = load();
-  let user = window.currentUserName || "Gast"; // Firebase-Name übernehmen
+  let user = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
 
-  // ---------- DOM ----------
   const header = () => document.getElementById("header");
   const hours = () => document.getElementById("hours");
   const daysC = () => document.getElementById("days");
@@ -19,26 +16,26 @@
   const dlgList = () => document.getElementById("dlgList");
   const btn = (id) => document.getElementById(id);
 
-  // ---------- Init ----------
-  window.requestAnimationFrame(() => {
-    bindOnce();
-    render();
+  document.addEventListener("DOMContentLoaded", () => {
+    const checkInterval = setInterval(() => {
+      if (document.getElementById("header")) {
+        clearInterval(checkInterval);
+        bindOnce();
+        setTimeout(() => render(), 300);
+      }
+    }, 100);
   });
 
-  // ---------- Events ----------
   function bindOnce() {
     btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
     btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
     btn("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
-
     btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     btn("mineBtn")?.addEventListener("click", showMine);
     btn("moveBtn")?.addEventListener("click", moveOrCancel);
   }
 
-  // ---------- Render ----------
   function render(){
-    // Header
     header().innerHTML = "";
     header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
@@ -48,13 +45,11 @@
     });
     rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
 
-    // Stunden
     hours().innerHTML = "";
     for(let h=START; h<=END; h++){
       hours().append(div("hour", `${pad(h)}:00`));
     }
 
-    // Spalten
     daysC().innerHTML = "";
     const today = new Date();
     ds.forEach(d => {
@@ -76,7 +71,6 @@
     userPill().textContent = user || "Gast";
   }
 
-  // ---------- Klick-Logik ----------
   function onSlotClick(e){
     const tag = e.currentTarget.dataset.date;
     const slot = e.currentTarget.dataset.slot;
@@ -116,7 +110,6 @@
     alert("Dieser Slot ist bereits belegt.");
   }
 
-  // ---------- Dialoge ----------
   function pickFreeSlot(cb){
     const items = freeSlotsThisWeek();
     if(items.length===0){ alert("Keine freien Termine verfügbar (diese Woche)."); return; }
@@ -173,13 +166,11 @@
     dialog().showModal();
   }
 
-  // ---------- Speicher ----------
   function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
   function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
   function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
   function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
 
-  // ---------- Helpers ----------
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
@@ -188,6 +179,7 @@
     out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
     return out;
   }
+
   function freeSlotsThisWeek(){
     const out = [];
     for(let i=0;i<7;i++){
