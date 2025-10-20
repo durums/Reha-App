@@ -32,10 +32,8 @@ body {
   background: linear-gradient(135deg, #4e8ccf, #7bb7e5);
   height: 100vh;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
+
 
 .card {
   background: white;
