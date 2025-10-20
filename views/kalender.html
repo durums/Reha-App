@@ -1,59 +1,45 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kalender</title>
-  <link rel="stylesheet" href="kalender.css">
-</head>
-<body>
-  <div class="toolbar">
-    <div class="left">
-      <button id="prevBtn">◀︎ Woche</button>
-      <button id="todayBtn">Heute</button>
-      <button id="nextBtn">Woche ▶︎</button>
-      <span id="rangeLabel" class="muted"></span>
-    </div>
-    <div class="right">
-      <button id="bookBtn">Termin beantragen</button>
-      <button id="mineBtn">Eigene Termine</button>
-      <button id="moveBtn">Verschieben/absagen</button>
-      <span id="userPill" class="pill"></span>
-    </div>
+<!-- views/kalender.html -->
+<div class="toolbar">
+  <div class="left">
+    <button id="prevBtn">◀︎ Woche</button>
+    <button id="todayBtn">Heute</button>
+    <button id="nextBtn">Woche ▶︎</button>
+    <span id="rangeLabel" class="muted"></span>
   </div>
-
-  <div class="calendar">
-    <div class="header" id="header"></div>
-    <div class="allday"><div class="time">Ganztägig</div></div>
-    <div class="grid">
-      <div class="hours" id="hours"></div>
-      <div class="days" id="days"></div>
-    </div>
+  <div class="right">
+    <button id="bookBtn">Termin beantragen</button>
+    <button id="mineBtn">Eigene Termine</button>
+    <button id="moveBtn">Verschieben/absagen</button>
+    <span id="userPill" class="pill"></span>
   </div>
+</div>
 
-  <!-- einfacher Dialog -->
-  <dialog id="dialog">
-    <form method="dialog">
-      <h3 id="dlgTitle">Auswahl</h3>
-      <div id="dlgList" class="list"></div>
-      <div class="dlg-actions">
-        <button value="cancel">Abbrechen</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Login-Overlay -->
-  <div class="overlay" id="loginOverlay" hidden>
-    <div class="card">
-      <h3>Bitte Kundennamen eingeben</h3>
-      <div class="row">
-        <input type="text" id="nameInput" placeholder="z. B. Max">
-        <button id="loginBtn">Login</button>
-      </div>
-      <p class="muted">Der Name wird lokal im Browser gespeichert.</p>
-    </div>
+<div class="calendar">
+  <div class="header" id="header"></div>
+  <div class="allday"><div class="time">Ganztägig</div></div>
+  <div class="grid">
+    <div class="hours" id="hours"></div>
+    <div class="days" id="days"></div>
   </div>
+</div>
 
-  <script src="kalender.js"></script>
-</body>
-</html>
+<dialog id="dialog">
+  <form method="dialog">
+    <h3 id="dlgTitle">Auswahl</h3>
+    <div id="dlgList" class="list"></div>
+    <div class="dlg-actions">
+      <button value="cancel">Abbrechen</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="overlay" id="loginOverlay" hidden>
+  <div class="card">
+    <h3>Bitte Kundennamen eingeben</h3>
+    <div class="row">
+      <input type="text" id="nameInput" placeholder="z. B. Max">
+      <button id="loginBtn">Login</button>
+    </div>
+    <p class="muted">Der Name wird lokal im Browser gespeichert.</p>
+  </div>
+</div>
