@@ -50,6 +50,34 @@
   cursor: not-allowed;
 }
 
+/* Einheitliches Styling für alle Buttons in der Seitenkarte */
+.pf-side-card .pf-row-btn {
+  width: 100%;
+  text-align: left;
+  padding: .75rem .9rem;
+  border-radius: 10px;
+  border: 1px solid #b7e3f7;
+  background: linear-gradient(135deg, #b7e3f7, #d9fff4);
+  color: #1b5f73;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+
+.pf-side-card .pf-row-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #a8def3, #c9fff0);
+}
+
+.pf-side-card .pf-row-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Optional: deaktivierte Buttons (z. B. 2FA, Sprache, Privatsphäre) farblich gleich, aber ohne Hover-Effekt */
+.pf-side-card .pf-row-btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+
 
 .pf-list{display:grid; gap:.75rem; margin-top:.5rem;}
 .pf-check{ display:flex; gap:.75rem; align-items:center; cursor:pointer; }
