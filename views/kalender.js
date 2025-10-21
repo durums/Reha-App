@@ -1,117 +1,223 @@
-// views/kalender.js
-document.addEventListener("DOMContentLoaded", () => {
-  const $ = id => document.getElementById(id);
+(() => {
+  const START = 8, END = 17;
+  const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
-  const START_HOUR = 8;
-  const END_HOUR = 17;
-  const today = new Date();
-  let weekStart = getMonday(today);
+  let store = load();
+  let user = window.currentUserName || "Gast";
+  let weekStart = mondayOf(new Date());
 
-  function getMonday(d) {
-    const x = new Date(d);
-    const day = (x.getDay() + 6) % 7; // Montag=0
-    x.setHours(0, 0, 0, 0);
-    x.setDate(x.getDate() - day);
-    return x;
-  }
+  const header     = () => document.getElementById("header");
+  const hours      = () => document.getElementById("hours");
+  const daysC      = () => document.getElementById("days");
+  const rangeLabel = () => document.getElementById("rangeLabel");
+  const userPill   = () => document.getElementById("userPill");
+  const dialog     = () => document.getElementById("dialog");
+  const dlgTitle   = () => document.getElementById("dlgTitle");
+  const dlgList    = () => document.getElementById("dlgList");
+  const btn        = (id) => document.getElementById(id);
 
-  $("#userPill").textContent = window.currentUserName || "Angemeldet";
-
-  $("#prevBtn").addEventListener("click", () => {
-    weekStart.setDate(weekStart.getDate() - 7);
-    render();
-  });
-  $("#nextBtn").addEventListener("click", () => {
-    weekStart.setDate(weekStart.getDate() + 7);
-    render();
-  });
-  $("#todayBtn").addEventListener("click", () => {
-    weekStart = getMonday(new Date());
-    render();
-  });
-
-  function render() {
-    renderHeader();
-    renderHours();
-    renderDays();
-    renderRangeLabel();
-  }
-
-  function fmt(d, opts) {
-    return d.toLocaleDateString("de-DE", opts);
-  }
-
-  function renderHeader() {
-    const header = $("#header");
-    header.innerHTML = "";
-
-    const timeCell = document.createElement("div");
-    timeCell.className = "cell time";
-    header.appendChild(timeCell);
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(weekStart);
-      d.setDate(weekStart.getDate() + i);
-      const c = document.createElement("div");
-      c.className = "cell";
-      c.innerHTML = `<strong>${fmt(d, { weekday: "short" })}</strong> ${fmt(d, {
-        day: "2-digit",
-        month: "2-digit",
-      })}`;
-      header.appendChild(c);
+  // ---------- ROBUSTER INIT für dynamisches Nachladen ----------
+  function initCalendar() {
+    const ok = header() && hours() && daysC();
+    if (!ok) {
+      const t = setInterval(() => {
+        if (header() && hours() && daysC()) {
+          clearInterval(t);
+          bindOnce();
+          setTimeout(render, 50);
+        }
+      }, 50);
+      return;
     }
+    bindOnce();
+    setTimeout(render, 50);
   }
 
-  function renderHours() {
-    const hours = $("#hours");
-    hours.innerHTML = "";
-    for (let h = START_HOUR; h <= END_HOUR; h++) {
-      const el = document.createElement("div");
-      el.className = "hour";
-      el.textContent = `${String(h).padStart(2, "0")}:00`;
-      hours.appendChild(el);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCalendar);
+  } else {
+    initCalendar();
+  }
+  // ---------- /INIT ----------
+
+  function bindOnce() {
+    btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
+    btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
+    btn("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
+
+    btn("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
+    btn("mineBtn")?.addEventListener("click", showMine);
+    btn("moveBtn")?.addEventListener("click", moveOrCancel);
+  }
+
+  function render(){
+    // Header (Wochentage)
+    header().innerHTML = "";
+    header().append(cell("time","Zeit"));
+    const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
+    ds.forEach(d => {
+      const lbl = `${DAYS[(d.getDay()+6)%7]} ${d.getDate()}.${d.getMonth()+1}.`;
+      header().append(cell("cell", lbl));
+    });
+    rangeLabel() && (rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`);
+
+    // Stunden links
+    hours().innerHTML = "";
+    for(let h=START; h<=END; h++){
+      hours().append(div("hour", `${pad(h)}:00`));
     }
-  }
 
-  function renderDays() {
-    const days = $("#days");
-    days.innerHTML = "";
-    const now = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(weekStart);
-      d.setDate(weekStart.getDate() + i);
-
-      const col = document.createElement("div");
-      col.className = "col" + (isSameDay(d, now) ? " today" : "");
-      col.dataset.date = d.toISOString().slice(0, 10);
-
-      for (let h = START_HOUR; h <= END_HOUR; h++) {
-        const slot = document.createElement("div");
-        slot.className = "slot free";
-        col.appendChild(slot);
+    // Tages-Spalten
+    daysC().innerHTML = "";
+    const today = new Date();
+    ds.forEach(d => {
+      const tag = iso(d);
+      const col = div("col" + (sameDate(d,today) ? " today" : ""));
+      for(let h=START; h<=END; h++){
+        const slot = `${pad(h)}:00`;
+        const who = (store[tag]||{})[slot];
+        const cls = who ? (who===user ? "own" : "booked") : "free";
+        const el = div(`slot ${cls}`, who ? (who===user ? "Mein Termin" : "Belegt") : "");
+        el.dataset.date = tag;
+        el.dataset.slot = slot;
+        el.onclick = onSlotClick;
+        col.append(el);
       }
+      daysC().append(col);
+    });
 
-      days.appendChild(col);
+    userPill() && (userPill().textContent = user || "Gast");
+  }
+
+  function onSlotClick(e){
+    const tag = e.currentTarget.dataset.date;
+    const slot = e.currentTarget.dataset.slot;
+    const who = (store[tag]||{})[slot];
+
+    if(!who){
+      if(!user) return alert("Bitte anmelden, um Termine zu buchen.");
+      if(confirm(`Möchtest du ${tag} um ${slot} buchen?`)){
+        book(tag, slot, user);
+        alert(`Termin eingetragen: ${tag} ${slot}`);
+        render();
+      }
+      return;
     }
+
+    if(who === user){
+      const rest = daysBetween(new Date(), new Date(tag));
+      if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
+      const a = prompt("Eigener Termin: Tippe 'v' zum Verschieben, 'a' zum Absagen:");
+      if(a === "a"){
+        unbook(tag, slot);
+        alert("Termin abgesagt.");
+        render();
+      } else if (a === "v"){
+        unbook(tag, slot);
+        pickFreeSlot((ntag,nslot)=>{
+          if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
+          else { alert("Verschieben abgebrochen. Alter Termin wurde entfernt."); }
+          render();
+        });
+      } else if (a !== null) {
+        alert("Ungültige Eingabe.");
+      }
+      return;
+    }
+
+    alert("Dieser Slot ist bereits belegt.");
   }
 
-  function renderRangeLabel() {
-    const start = new Date(weekStart);
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 6);
-    $("#rangeLabel").textContent =
-      `${fmt(start, { day: "2-digit", month: "2-digit" })} – ` +
-      `${fmt(end, { day: "2-digit", month: "2-digit", year: "numeric" })}`;
+  function pickFreeSlot(cb){
+    const items = freeSlotsThisWeek();
+    if(items.length===0){ alert("Keine freien Termine verfügbar (diese Woche)."); return; }
+    dlgTitle().textContent = "Freien Termin auswählen";
+    dlgList().innerHTML = "";
+    for(const [tag,slot] of items){
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
+      const b = document.createElement("button");
+      b.textContent = "Auswählen";
+      b.onclick = () => { dialog().close(); cb(tag,slot); };
+      row.append(b);
+      dlgList().append(row);
+    }
+    dialog().showModal();
   }
 
-  function isSameDay(a, b) {
-    return (
-      a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate()
-    );
+  function bookPicked(tag,slot){
+    book(tag,slot,user);
+    alert(`Termin eingetragen: ${tag} ${slot}`);
+    render();
   }
 
-  render();
-});
+  function showMine(){
+    const mine = mySlots();
+    if(mine.length===0){ alert("Keine Termine gefunden."); return; }
+    alert(mine.map(([t,s])=>`${t} ${s}`).join("\n"));
+  }
+
+  function moveOrCancel(){
+    const mine = mySlots();
+    if(mine.length===0){ alert("Keine Termine gefunden."); return; }
+    dlgTitle().textContent = "Eigene Termine";
+    dlgList().innerHTML = "";
+    for(const [tag,slot] of mine){
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
+      const b = document.createElement("button");
+      b.textContent = "Wählen";
+      b.onclick = () => {
+        dialog().close();
+        const rest = daysBetween(new Date(), new Date(tag));
+        if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
+        const a = prompt("Tippe 'v' um zu verschieben, 'a' um abzusagen:");
+        if(a === "a"){ unbook(tag,slot); alert("Termin abgesagt."); render(); }
+        else if(a === "v"){
+          unbook(tag,slot);
+          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
+        } else if(a !== null){ alert("Ungültige Eingabe."); }
+      };
+      row.append(b);
+      dlgList().append(row);
+    }
+    dialog().showModal();
+  }
+
+  // Speicher
+  function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
+  function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
+  function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
+  function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
+
+  // Helpers
+  function mySlots(){
+    const out = [];
+    Object.entries(store).forEach(([tag,slots])=>{
+      Object.entries(slots).forEach(([slot,name])=>{ if(name===user) out.push([tag,slot]); });
+    });
+    out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+    return out;
+  }
+  function freeSlotsThisWeek(){
+    const out = [];
+    for(let i=0;i<7;i++){
+      const d = addDays(weekStart,i), tag = iso(d);
+      for(let h=START; h<=END; h++){
+        const slot = `${pad(h)}:00`;
+        if(!store[tag] || !store[tag][slot]) out.push([tag,slot]);
+      }
+    }
+    return out;
+  }
+
+  function mondayOf(d){ const x = new Date(d); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function iso(d){ return d.toISOString().slice(0,10); }
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function sameDate(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function fmt(d){ return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`; }
+  function daysBetween(a,b){ const A=new Date(a.getFullYear(),a.getMonth(),a.getDate()); const B=new Date(b.getFullYear(),b.getMonth(),b.getDate()); return Math.round((B-A)/(1000*60*60*24)); }
+  function div(cls,txt=""){ const n=document.createElement("div"); if(cls) n.className=cls; if(txt) n.textContent=txt; return n; }
+  function cell(cls,txt){ const n=document.createElement("div"); n.className = cls==="time" ? "cell time" : "cell"; n.textContent=txt; return n; }
+})();
