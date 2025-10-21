@@ -1,22 +1,30 @@
 (() => {
+  // ---------- Konstanten ----------
   const START = 8, END = 17;
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+  const STORAGE_KEY = "kal_data";
 
+  // ---------- User (vom Host / index.html gesetzt) ----------
+  const userId   = window.currentUserId   || "guest";
+  const userName = window.currentUserName || "Gast";
+
+  // ---------- State ----------
   let store = load();
-  let user = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
 
-  const header     = () => document.getElementById("header");
-  const hours      = () => document.getElementById("hours");
-  const daysC      = () => document.getElementById("days");
-  const rangeLabel = () => document.getElementById("rangeLabel");
-  const userPill   = () => document.getElementById("userPill");
-  const dialog     = () => document.getElementById("dialog");
-  const dlgTitle   = () => document.getElementById("dlgTitle");
-  const dlgList    = () => document.getElementById("dlgList");
-  const btn        = (id) => document.getElementById(id);
+  // ---------- DOM Shortcuts ----------
+  const el         = (id) => document.getElementById(id);
+  const header     = () => el("header");
+  const hours      = () => el("hours");
+  const daysC      = () => el("days");
+  const rangeLabel = () => el("rangeLabel");
+  const userPill   = () => el("userPill");
+  const dialog     = () => el("dialog");
+  const dlgTitle   = () => el("dlgTitle");
+  const dlgList    = () => el("dlgList");
+  const btn        = (id) => el(id);
 
-  // ---------- ROBUSTER INIT für dynamisches Nachladen ----------
+  // ---------- ROBUSTER INIT (für dynamische Views) ----------
   function initCalendar() {
     const ok = header() && hours() && daysC();
     if (!ok) {
@@ -32,14 +40,13 @@
     bindOnce();
     setTimeout(render, 50);
   }
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initCalendar);
   } else {
     initCalendar();
   }
-  // ---------- /INIT ----------
 
+  // ---------- Events ----------
   function bindOnce() {
     btn("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,-7); render(); });
     btn("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, 7); render(); });
@@ -50,8 +57,9 @@
     btn("moveBtn")?.addEventListener("click", moveOrCancel);
   }
 
+  // ---------- Render ----------
   function render(){
-    // Header (Wochentage)
+    // Kopf (Wochentage)
     header().innerHTML = "";
     header().append(cell("time","Zeit"));
     const ds = [...Array(7)].map((_,i)=> addDays(weekStart,i));
@@ -59,7 +67,7 @@
       const lbl = `${DAYS[(d.getDay()+6)%7]} ${d.getDate()}.${d.getMonth()+1}.`;
       header().append(cell("cell", lbl));
     });
-    rangeLabel() && (rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`);
+    if (rangeLabel()) rangeLabel().textContent = `${fmt(ds[0])} – ${fmt(ds[6])}`;
 
     // Stunden links
     hours().innerHTML = "";
@@ -76,8 +84,14 @@
       for(let h=START; h<=END; h++){
         const slot = `${pad(h)}:00`;
         const who = (store[tag]||{})[slot];
-        const cls = who ? (who===user ? "own" : "booked") : "free";
-        const el = div(`slot ${cls}`, who ? (who===user ? "Mein Termin" : "Belegt") : "");
+
+        // Abwärtskompatibilität: who kann String ODER Objekt {uid,name} sein
+        const whoName = typeof who === "string" ? who : who?.name;
+        const whoUid  = typeof who === "string" ? null : who?.uid;
+        const isMine  = whoUid ? (whoUid === userId) : (whoName === userName);
+
+        const cls = who ? (isMine ? "own" : "booked") : "free";
+        const el  = div(`slot ${cls}`, who ? (isMine ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
@@ -86,25 +100,30 @@
       daysC().append(col);
     });
 
-    userPill() && (userPill().textContent = user || "Gast");
+    if (userPill()) userPill().textContent = userName || "Gast";
   }
 
+  // ---------- Klick-Logik ----------
   function onSlotClick(e){
     const tag = e.currentTarget.dataset.date;
     const slot = e.currentTarget.dataset.slot;
     const who = (store[tag]||{})[slot];
 
     if(!who){
-      if(!user) return alert("Bitte anmelden, um Termine zu buchen.");
       if(confirm(`Möchtest du ${tag} um ${slot} buchen?`)){
-        book(tag, slot, user);
+        book(tag, slot);
         alert(`Termin eingetragen: ${tag} ${slot}`);
         render();
       }
       return;
     }
 
-    if(who === user){
+    // Abwärtskompatibel prüfen, ob eigener Termin
+    const whoName = typeof who === "string" ? who : who?.name;
+    const whoUid  = typeof who === "string" ? null : who?.uid;
+    const isMine  = whoUid ? (whoUid === userId) : (whoName === userName);
+
+    if(isMine){
       const rest = daysBetween(new Date(), new Date(tag));
       if(rest < 3){ alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
       const a = prompt("Eigener Termin: Tippe 'v' zum Verschieben, 'a' zum Absagen:");
@@ -115,7 +134,7 @@
       } else if (a === "v"){
         unbook(tag, slot);
         pickFreeSlot((ntag,nslot)=>{
-          if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
+          if(ntag){ book(ntag,nslot); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
           else { alert("Verschieben abgebrochen. Alter Termin wurde entfernt."); }
           render();
         });
@@ -128,6 +147,7 @@
     alert("Dieser Slot ist bereits belegt.");
   }
 
+  // ---------- Dialoge ----------
   function pickFreeSlot(cb){
     const items = freeSlotsThisWeek();
     if(items.length===0){ alert("Keine freien Termine verfügbar (diese Woche)."); return; }
@@ -146,7 +166,7 @@
   }
 
   function bookPicked(tag,slot){
-    book(tag,slot,user);
+    book(tag,slot);
     alert(`Termin eingetragen: ${tag} ${slot}`);
     render();
   }
@@ -175,7 +195,7 @@
         if(a === "a"){ unbook(tag,slot); alert("Termin abgesagt."); render(); }
         else if(a === "v"){
           unbook(tag,slot);
-          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
+          pickFreeSlot((ntag,nslot)=>{ if(ntag){ book(ntag,nslot); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
         } else if(a !== null){ alert("Ungültige Eingabe."); }
       };
       row.append(b);
@@ -184,21 +204,37 @@
     dialog().showModal();
   }
 
-  // Speicher
-  function load(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
-  function save(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
-  function book(tag,slot,name){ if(!store[tag]) store[tag] = {}; store[tag][slot] = name; save(); }
-  function unbook(tag,slot){ if(store[tag]){ delete store[tag][slot]; if(Object.keys(store[tag]).length===0) delete store[tag]; save(); } }
+  // ---------- Speicher ----------
+  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); } catch { return {}; } }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
 
-  // Helpers
+  function book(tag,slot){
+    if(!store[tag]) store[tag] = {};
+    store[tag][slot] = { uid: userId, name: userName }; // NEU: objekt statt string
+    save();
+  }
+  function unbook(tag,slot){
+    if(store[tag]){
+      delete store[tag][slot];
+      if(Object.keys(store[tag]).length===0) delete store[tag];
+      save();
+    }
+  }
+
+  // ---------- Helpers ----------
   function mySlots(){
     const out = [];
     Object.entries(store).forEach(([tag,slots])=>{
-      Object.entries(slots).forEach(([slot,name])=>{ if(name===user) out.push([tag,slot]); });
+      Object.entries(slots).forEach(([slot,who])=>{
+        const uid = typeof who === "string" ? null : who?.uid;
+        const nm  = typeof who === "string" ? who : who?.name;
+        if (uid ? (uid === userId) : (nm === userName)) out.push([tag,slot]);
+      });
     });
     out.sort((a,b)=> a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
     return out;
   }
+
   function freeSlotsThisWeek(){
     const out = [];
     for(let i=0;i<7;i++){
