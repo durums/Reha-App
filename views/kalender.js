@@ -255,5 +255,9 @@
   function fmt(d){ return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`; }
   function daysBetween(a,b){ const A=new Date(a.getFullYear(),a.getMonth(),a.getDate()); const B=new Date(b.getFullYear(),b.getMonth(),b.getDate()); return Math.round((B-A)/(1000*60*60*24)); }
   function div(cls,txt=""){ const n=document.createElement("div"); if(cls) n.className=cls; if(txt) n.textContent=txt; return n; }
-  function cell(cls,txt){ const n=document.createElement("div"); n.className = cls==="time" ? "cell time" : "cell"; n.textContent=txt; return n; }
-})();
+  function cell(cls, txt){
+  const n = document.createElement("div");
+  n.className = cls === "time" ? "cell time" : "cell";
+  n.textContent = txt;
+  return n;
+}
