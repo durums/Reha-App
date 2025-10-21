@@ -1,13 +1,28 @@
-<section class="page tagesprogramm">
-  <div class="app-card">
-    <h1>Reha Tagesprogramm</h1>
+<!-- views/tagesprogramm.html -->
+<div class="day-overview">
+  <h2>🗓️ Tagesprogramm</h2>
+  <p id="dayDate"></p>
 
-    <div class="date-nav">
-      <button id="prevDay" class="nav-btn">‹</button>
-      <span id="currentDate" class="current-date"></span>
-      <button id="nextDay" class="nav-btn">›</button>
+  <section class="day-section">
+    <h3>🏋️‍♂️ Trainingseinheit</h3>
+    <div id="trainingToday">Lade Trainingsplan…</div>
+  </section>
+
+  <section class="day-section">
+    <h3>📅 Heutige Termine</h3>
+    <ul id="todayAppointments" class="day-list"></ul>
+  </section>
+
+  <section class="day-section">
+    <h3>📊 Fortschritt</h3>
+    <div id="progressToday" class="progress-box">
+      <div class="bar"><div id="progressBar"></div></div>
+      <p id="progressText"></p>
     </div>
+  </section>
 
-    <div id="scheduleContainer"></div>
-  </div>
-</section>
+  <section class="day-section">
+    <h3>💬 Motivation</h3>
+    <p id="motivationText"></p>
+  </section>
+</div>
