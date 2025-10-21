@@ -1,0 +1,26 @@
+<!-- views/feedback.html -->
+<div class="feedback-container">
+  <h2>💬 Feedback</h2>
+  <p>Wir freuen uns über Ihre Rückmeldung zu unserem Reha-Programm.</p>
+
+  <form id="feedbackForm" class="feedback-form">
+    <label for="fbText">Ihre Nachricht:</label>
+    <textarea id="fbText" placeholder="Ihr Feedback ..." required></textarea>
+
+    <label for="fbRating">Bewertung:</label>
+    <select id="fbRating" required>
+      <option value="">– bitte auswählen –</option>
+      <option value="5">⭐⭐⭐⭐⭐ (sehr gut)</option>
+      <option value="4">⭐⭐⭐⭐ (gut)</option>
+      <option value="3">⭐⭐⭐ (neutral)</option>
+      <option value="2">⭐⭐ (eher schlecht)</option>
+      <option value="1">⭐ (schlecht)</option>
+    </select>
+
+    <button type="submit">Absenden</button>
+  </form>
+
+  <hr />
+  <h3>Letzte Rückmeldungen</h3>
+  <ul id="feedbackList" class="feedback-list"></ul>
+</div>
