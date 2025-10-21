@@ -1,5 +1,5 @@
 <!-- views/kalender.html -->
-<section class="toolbar">
+<div class="toolbar">
   <div class="left">
     <button id="prevBtn">◀︎ Woche</button>
     <button id="todayBtn">Heute</button>
@@ -12,22 +12,18 @@
     <button id="moveBtn">Verschieben / Absagen</button>
     <span id="userPill" class="pill"></span>
   </div>
-</section>
+</div>
 
-<section class="calendar">
-  <div class="header" id="header"></div>
-
-  <div class="allday">
-    <div class="time">Ganztägig</div>
+<!-- 👇 Wrapper mit eindeutiger ID -->
+<div id="kal">
+  <div id="header"></div>
+  <div id="allday"><div class="time">Ganztägig</div></div>
+  <div id="grid">
+    <div id="hours"></div>
+    <div id="days"></div>
   </div>
+</div>
 
-  <div class="grid">
-    <div class="hours" id="hours"></div>
-    <div class="days" id="days"></div>
-  </div>
-</section>
-
-<!-- Auswahl-/Listen-Dialog (für freie Slots & eigene Termine) -->
 <dialog id="dialog">
   <form method="dialog">
     <h3 id="dlgTitle">Auswahl</h3>
