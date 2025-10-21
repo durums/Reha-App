@@ -101,3 +101,36 @@
 .pf-list{display:grid; gap:.75rem; margin-top:.5rem;}
 .pf-check{ display:flex; gap:.75rem; align-items:center; cursor:pointer; }
 .pf-check input{ width:18px; height:18px; }
+
+/* Einheitliches Button-Design */
+.pf-side-card .pf-row-btn {
+  width: 100%;
+  text-align: left;
+  padding: .75rem .9rem;
+  border-radius: 10px;
+  border: 1px solid #b7e3f7;
+  background: linear-gradient(135deg, #b7e3f7, #d9fff4);
+  color: #1b5f73;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+
+.pf-side-card .pf-row-btn:hover {
+  background: linear-gradient(135deg, #a8def3, #c9fff0);
+}
+
+.pf-side-card .pf-row-btn:active {
+  transform: translateY(1px);
+}
+
+/* Pseudo-disabled-Style */
+.pf-side-card .pf-row-btn.is-disabled {
+  cursor: not-allowed;
+  opacity: .95;
+}
+
+.pf-side-card .pf-row-btn.is-disabled:active {
+  transform: none;
+}
+
