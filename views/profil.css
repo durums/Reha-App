@@ -27,6 +27,30 @@
 }
 .pf-side-card .pf-row-btn:active{transform:translateY(1px);}
 
+.pf-side-card .pf-row-btn {
+  width: 100%;
+  text-align: left;
+  padding: .75rem .9rem;
+  border-radius: 10px;
+  border: 1px solid #eef2f7;
+  background: #fff;
+  color: #1b5f73;          /* ✅ Textfarbe explizit setzen */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.pf-side-card .pf-row-btn:hover {
+  background: #f0fafc;      /* leichte Hover-Farbe */
+}
+
+.pf-side-card .pf-row-btn:disabled {
+  background: #f7f9fb;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+
 .pf-list{display:grid; gap:.75rem; margin-top:.5rem;}
 .pf-check{ display:flex; gap:.75rem; align-items:center; cursor:pointer; }
 .pf-check input{ width:18px; height:18px; }
