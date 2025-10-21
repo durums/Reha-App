@@ -1,0 +1,24 @@
+.view-hilfe { padding-bottom: 2rem; }
+
+.pf-faq {
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  background: #fff;
+  padding: .75rem 1rem;
+}
+.pf-faq summary {
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: .4rem;
+}
+.pf-faq p { margin: 0; color: #444; line-height: 1.5; }
+
+.pf-contact-list {
+  list-style: none;
+  padding: 0;
+  margin: .5rem 0 1rem 0;
+}
+.pf-contact-list li {
+  margin-bottom: .4rem;
+  color: #333;
+}
