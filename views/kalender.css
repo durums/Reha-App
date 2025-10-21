@@ -1,93 +1,42 @@
-/* views/kalender.css */
 :root{
-  --grid:#E5E7EB;        /* Linien */
-  --head:#F8FAFC;        /* Kopfzeile */
-  --head-fg:#111827;     /* Kopftext */
-  --hour:#6B7280;        /* Zeit links */
-  --own:#CDE8FF;         /* eigene Buchung */
-  --booked:#E5E7EB;      /* belegt (andere) */
-  --free:#FFFFFF;        /* frei */
-  --today:#F0F9FF;       /* heutige Spalte */
-  --gutter:70px;         /* linke Zeitspalte */
-  --header:44px;         /* Höhe Kopfzeile */
-  --allday:28px;         /* Höhe Ganztägig-Zeile */
-  --row:50px;            /* Zeilenhöhe pro Stunde */
-  --colmin:140px;        /* min. Spaltenbreite pro Tag */
+  --grid:#E5E7EB; --head:#F8FAFC; --head-fg:#111827; --hour:#6B7280;
+  --own:#CDE8FF; --booked:#E5E7EB; --free:#fff; --today:#F0F9FF;
+  --gutter:70px; --header:44px; --allday:28px; --row:50px; --colmin:140px;
 }
-
-/* Basis */
 *{box-sizing:border-box}
-html,body{margin:0;font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111}
+html,body{font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111}
 
-/* Toolbar */
-.toolbar{
-  display:flex;justify-content:space-between;gap:.5rem;align-items:center;
-  background:var(--head);border-bottom:1px solid var(--grid);
-  padding:.6rem .8rem;
-}
+.toolbar{display:flex;justify-content:space-between;gap:.5rem;align-items:center;background:var(--head);border-bottom:1px solid var(--grid);padding:.6rem .8rem}
 .left,.right{display:flex;gap:.5rem;align-items:center}
-button{
-  border:1px solid #D1D5DB;background:#fff;padding:.4rem .6rem;
-  border-radius:.5rem;cursor:pointer
-}
+button{border:1px solid #D1D5DB;background:#fff;padding:.4rem .6rem;border-radius:.5rem;cursor:pointer}
 button:hover{background:#F3F4F6}
 .pill{padding:.15rem .6rem;border:1px solid #D1D5DB;border-radius:999px;background:#fff}
 .muted{color:#6B7280}
 
-/* Kalender-Layout */
-.calendar{
-  height:calc(100vh - 64px);
-  display:grid;grid-template-rows:var(--header) var(--allday) 1fr;
-  background:#fff;
-}
+/* ===== Kalenderraster – alles strikt über IDs, damit nichts kollidiert ===== */
+#kal{height:calc(100vh - 64px);display:grid;grid-template-rows:var(--header) var(--allday) 1fr;background:#fff}
+#header{display:grid;grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));align-items:center;background:var(--head);border-bottom:1px solid var(--grid)}
+#header .cell{padding-left:.75rem;font-weight:600;color:var(--head-fg)}
+#header .time{padding-left:.5rem;font-weight:500;color:var(--hour)}
 
-/* Kopfzeile (Wochentage + Datum) */
-.header{
-  display:grid;
-  grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));
-  align-items:center;
-  background:var(--head);
-  border-bottom:1px solid var(--grid);
-}
-.header .cell{padding-left:.75rem;font-weight:600;color:var(--head-fg)}
-.header .time{padding-left:.5rem;font-weight:500;color:var(--hour)}
+#allday{display:grid;grid-template-columns:var(--gutter) 1fr;border-bottom:1px solid var(--grid);background:#fff}
+#allday .time{display:flex;align-items:center;padding-left:.5rem;color:var(--hour)}
 
-/* Ganztägig-Zeile */
-.allday{
-  display:grid;grid-template-columns:var(--gutter) 1fr;
-  border-bottom:1px solid var(--grid);background:#fff
-}
-.allday .time{
-  display:flex;align-items:center;padding-left:.5rem;color:var(--hour)
-}
+#grid{display:grid;grid-template-columns:var(--gutter) 1fr;height:100%}
+#hours{border-right:1px solid var(--grid)}
+.hour{height:var(--row);display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;color:var(--hour);border-bottom:1px solid var(--grid)}
 
-/* Grid-Bereich */
-.grid{display:grid;grid-template-columns:var(--gutter) 1fr;height:100%}
-.hours{border-right:1px solid var(--grid)}
-.hour{
-  height:var(--row);display:flex;align-items:center;justify-content:flex-end;
-  padding-right:.5rem;color:var(--hour);border-bottom:1px solid var(--grid)
-}
-
-/* Tages-Spalten + Slots */
-.days{
-  display:grid;grid-template-columns:repeat(7, minmax(var(--colmin),1fr));
-  overflow:auto;
-}
+#days{display:grid;grid-template-columns:repeat(7, minmax(var(--colmin),1fr));overflow:auto}
 .col{position:relative;border-right:1px solid var(--grid)}
 .col:last-child{border-right:none}
-
-.slot{
-  height:var(--row);border-bottom:1px solid var(--grid);
-  display:flex;align-items:center;padding-left:.5rem;user-select:none
-}
+.slot{height:var(--row);border-bottom:1px solid var(--grid);display:flex;align-items:center;padding-left:.5rem;user-select:none}
 .slot.free{background:var(--free)}
 .slot.booked{background:var(--booked)}
 .slot.own{background:var(--own)}
 .col.today .slot{background:var(--today)}
 .slot:hover{outline:2px solid #BFDBFE}
 
-/* Dialog (Listen-Auswahl) */
+/* Dialog & Listen */
 dialog{border:none;border-radius:12px;box-shadow:0 12px 26px rgba(0,0,0,.18);padding:0}
 dialog form{padding:14px}
 .list{max-height:50vh;overflow:auto;border:1px solid var(--grid);border-radius:10px}
@@ -95,7 +44,5 @@ dialog form{padding:14px}
 .list .item:last-child{border-bottom:none}
 .dlg-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.6rem}
 
-/* Kompatibilität mit deinem App-Container (Sidebar/Layout) */
-#content, .calendar{
-  min-height:calc(100vh - 140px);
-}
+/* Konteinerhöhen im App-Layout erzwingen */
+#content, #kal { min-height: calc(100vh - 140px) !important; display:block !important; }
