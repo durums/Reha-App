@@ -49,4 +49,9 @@
     set("f-balance", d.balance || "–");
     set("f-cognition", d.cognition || "–");
   }catch(e){ console.error(e); }
+  
+  document.querySelectorAll('.pf-row-btn.is-disabled').forEach(btn => {
+    btn.addEventListener('click', e => e.preventDefault());
+  });
+
 })();
