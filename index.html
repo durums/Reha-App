@@ -178,8 +178,16 @@
 
     // --- Sidebar ---
     const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
-    menuToggle.addEventListener("click",  () => sidebar.classList.toggle("active"));
-    closeSidebar.addEventListener("click", () => sidebar.classList.remove("active"));
+    
+    menuToggle.addEventListener("click", () => {
+      sidebar.classList.add("active");   // Sidebar öffnen
+      setMenuToggleVisible(false);       // Menü-Button ausblenden
+    });
+    
+    closeSidebar.addEventListener("click", () => {
+      sidebar.classList.remove("active"); // Sidebar schließen
+      setMenuToggleVisible(true);         // Menü-Button wieder zeigen
+    });
 
     // --- Views dynamisch laden ---
     async function loadView(page) {
