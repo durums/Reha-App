@@ -225,17 +225,22 @@
       }
     }
 
-    // --- Router ---
     function routeToHash() {
       let page = (location.hash || "#tagesprogramm").slice(1).trim();
       if (!page) page = "tagesprogramm";
+    
       loadView(page);
+    
+      // Sidebar schließen und Menü-Button wieder anzeigen
       sidebar.classList.remove("active");
+      setMenuToggleVisible(true);
+    
+      // Aktiven Menüpunkt hervorheben
       document.querySelectorAll(".sidebar-menu a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
       });
     }
-    window.addEventListener("hashchange", routeToHash);
+
 
     // --- Auth-State ---
     let didInitialLoad = false;
