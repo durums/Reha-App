@@ -1,10 +1,9 @@
 (async function () {
   const auth = window.auth, db = window.db;
-  if (!auth || !db) {
-    console.warn("auth oder db ist nicht vorhanden.");
-  }
+  if (!auth || !db) console.warn("auth oder db ist nicht vorhanden.");
 
   const $ = (id) => document.getElementById(id);
+  const on = (id, fn) => { const el = $(id); if (el) el.addEventListener("click", fn); };
 
   // Helpers
   const setText = (id, val) => { const el = $(id); if (el) el.textContent = (val ?? "–"); };
@@ -28,11 +27,9 @@
   // Aktueller User
   const u = auth?.currentUser;
   if (!u) {
-    // Auf dieser Profil-Seite existieren keine p-* Felder – wir setzen nur Avatar falls vorhanden.
     setText("pf-avatar", "U");
     const status = $("pf-status");
     if (status) status.textContent = "— (Bitte anmelden) —";
-    // Ohne User kein Laden/Speichern
   } else {
     const display = u.displayName || u.email || ("UID:" + u.uid);
 
@@ -40,7 +37,7 @@
     const av = $("pf-avatar");
     if (av) av.textContent = initials(display);
 
-    // Formularfelder vorausfüllen (falls vorhanden)
+    // Formularfelder vorausfüllen
     setValue("pf-email", u.email || "");
     setValue("pf-phone", u.phoneNumber || "");
 
@@ -50,47 +47,26 @@
       const snap = await getDoc(doc(db, "profiles", u.uid));
       const d = snap.exists() ? snap.data() : {};
 
-      // Vor-/Nachname (falls gespeichert)
       if (d.firstName) setValue("pf-first", d.firstName);
       if (d.lastName) setValue("pf-last", d.lastName);
       if (d.phone) setValue("pf-phone", d.phone);
 
-      // Benachrichtigungen
       if ($("pf-reminders")) $("pf-reminders").checked = !!d.notifications?.reminders;
       if ($("pf-summary")) $("pf-summary").checked = !!d.notifications?.summary;
-
-      // (Andere Felder – nur Beispiel; existieren auf dieser Seite nicht)
-      // fmtDate(d.dob) etc. bei Bedarf nutzen.
     } catch (e) {
       console.error(e);
     }
   }
 
-  // Deaktivierte Buttons (Fallback): nun nicht mehr nötig, aber falls im Markup irgendwo .is-disabled bleibt:
+  // Fallback: pseudo-disabled Buttons blocken
   document.querySelectorAll(".pf-row-btn.is-disabled").forEach(btn => {
     btn.addEventListener("click", e => e.preventDefault());
   });
 
-  // === Sicherheit ===
-  const on = (id, fn) => { const el = $(id); if (el) el.addEventListener("click", fn); };
-
-  on("pf-pass", () => {
-    alert("Passwort ändern – Funktion kommt bald!");
-    // Beispiel: window.location.href = "/passwort.html";
-  });
-
-  on("pf-mfa", () => {
-    alert("Zwei-Faktor-Authentifizierung aktivieren – Funktion kommt bald!");
-  });
-
-  // === Einstellungen ===
-  on("pf-lang", () => {
-    alert("Sprache ändern – Funktion kommt bald!");
-  });
-
-  on("pf-privacy", () => {
-    alert("Privatsphäre-Einstellungen – Funktion kommt bald!");
-  });
+  // === Einstellungen / Sicherheit (außer Passwort – das kommt unten mit Modal) ===
+  on("pf-mfa", () => alert("Zwei-Faktor-Authentifizierung aktivieren – Funktion kommt bald!"));
+  on("pf-lang", () => alert("Sprache ändern – Funktion kommt bald!"));
+  on("pf-privacy", () => alert("Privatsphäre-Einstellungen – Funktion kommt bald!"));
 
   // === Foto-Upload: Avatar-Preview ===
   const fileInput = $("pf-photo");
@@ -105,7 +81,7 @@
           av.style.backgroundImage = `url('${reader.result}')`;
           av.style.backgroundSize = "cover";
           av.style.backgroundPosition = "center";
-          av.textContent = ""; // Initialen ausblenden, wenn Foto da
+          av.textContent = "";
         }
       };
       reader.readAsDataURL(file);
@@ -119,7 +95,6 @@
       const status = $("pf-status");
       try {
         const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
         const payload = {
           firstName: $("pf-first")?.value?.trim() || null,
           lastName: $("pf-last")?.value?.trim() || null,
@@ -130,7 +105,6 @@
           },
           updatedAt: serverTimestamp(),
         };
-
         await setDoc(doc(db, "profiles", auth.currentUser.uid), payload, { merge: true });
 
         if (status) status.textContent = "Gespeichert!";
@@ -141,9 +115,115 @@
         }, 1200);
       } catch (e) {
         console.error(e);
+        const status = $("pf-status");
         if (status) status.textContent = "Fehler beim Speichern.";
       }
     });
   }
+
+  // =========================
+  // Passwort ändern (mit Re-Auth)
+  // =========================
+
+  function createModal(html) {
+    if (document.querySelector(".pf-modal")) return null;
+    const modal = document.createElement("div");
+    modal.className = "pf-modal";
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+    return modal;
+  }
+
+  function showPasswordModal() {
+    const modal = createModal(`
+      <div class="pf-modal-content">
+        <h3>Passwort ändern</h3>
+        <p>Bitte gib dein neues Passwort ein:</p>
+        <input id="pf-new-pass" type="password" placeholder="Neues Passwort" class="pf-input" />
+        <div class="pf-modal-actions">
+          <button id="pf-cancel" class="btn ghost">Abbrechen</button>
+          <button id="pf-save-pass" class="btn">Speichern</button>
+        </div>
+        <span id="pf-pass-msg" class="subtle"></span>
+      </div>
+    `);
+    if (!modal) return;
+
+    const msg = document.getElementById("pf-pass-msg");
+    document.getElementById("pf-cancel").addEventListener("click", () => modal.remove());
+
+    document.getElementById("pf-save-pass").addEventListener("click", async () => {
+      const newPass = document.getElementById("pf-new-pass").value.trim();
+      if (newPass.length < 6) { msg.textContent = "Das Passwort muss mindestens 6 Zeichen haben."; return; }
+
+      try {
+        const { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } =
+          await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+        const user = getAuth().currentUser;
+        if (!user) { msg.textContent = "Bitte melde dich erneut an."; return; }
+
+        // Versuch 1: direkt ändern
+        try {
+          await updatePassword(user, newPass);
+          msg.textContent = "✅ Passwort erfolgreich geändert!";
+          msg.style.color = "green";
+          setTimeout(() => modal.remove(), 1500);
+          return;
+        } catch (err) {
+          // Wenn Re-Auth nötig:
+          if (err?.code !== "auth/requires-recent-login") throw err;
+        }
+
+        // Re-Auth Dialog anzeigen (nur für E-Mail/Passwort)
+        if (!user.email) {
+          msg.textContent = "Erneute Anmeldung erforderlich. Bitte melde dich neu an.";
+          return;
+        }
+
+        // Re-Auth Modal
+        const reauthModal = createModal(`
+          <div class="pf-modal-content">
+            <h3>Erneut anmelden</h3>
+            <p>Zur Sicherheit bestätige bitte dein aktuelles Passwort für <b>${user.email}</b>.</p>
+            <input id="pf-current-pass" type="password" placeholder="Aktuelles Passwort" class="pf-input" />
+            <div class="pf-modal-actions">
+              <button id="pf-reauth-cancel" class="btn ghost">Abbrechen</button>
+              <button id="pf-reauth-ok" class="btn">Bestätigen</button>
+            </div>
+            <span id="pf-reauth-msg" class="subtle"></span>
+          </div>
+        `);
+        const reMsg = document.getElementById("pf-reauth-msg");
+        document.getElementById("pf-reauth-cancel").addEventListener("click", () => reauthModal?.remove());
+        document.getElementById("pf-reauth-ok").addEventListener("click", async () => {
+          const currentPass = document.getElementById("pf-current-pass").value;
+          if (!currentPass) { reMsg.textContent = "Bitte Passwort eingeben."; return; }
+          try {
+            const cred = EmailAuthProvider.credential(user.email, currentPass);
+            await reauthenticateWithCredential(user, cred);
+            await updatePassword(user, newPass);
+            reMsg.textContent = "";
+            reauthModal?.remove();
+            msg.textContent = "✅ Passwort erfolgreich geändert!";
+            msg.style.color = "green";
+            setTimeout(() => modal.remove(), 1500);
+          } catch (e) {
+            console.error(e);
+            reMsg.textContent = "Re-Auth fehlgeschlagen. Bitte prüfe dein Passwort.";
+            reMsg.style.color = "red";
+          }
+        });
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "Fehler: " + (err?.message || "Passwort konnte nicht geändert werden.");
+        msg.style.color = "red";
+      }
+    });
+  }
+
+  // Button verküpfen (ohne doppelten Alert-Listener)
+  const passBtn = $("pf-pass");
+  if (passBtn) passBtn.addEventListener("click", showPasswordModal);
 
 })();
