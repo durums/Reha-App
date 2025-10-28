@@ -3,7 +3,7 @@
   const currentWeek = 4; // 🔧 Beispielpatient befindet sich in Woche 4
   const maxWeeks = 12;
 
-  /* --- Beispiel-Daten aus dem Formular (werden automatisch eingelesen) --- */
+/* --- Beispiel-Daten aus dem Formular (werden automatisch eingelesen) --- */
 const exampleFormData = {
   "4-6": {
     weekKey: "4-6",
@@ -29,7 +29,7 @@ const exampleFormData = {
 // Diese Beispiel-Daten automatisch im LocalStorage speichern, falls leer
 if (!localStorage.getItem("phase_form_data")) {
   localStorage.setItem("phase_form_data", JSON.stringify(exampleFormData));
-}
+}  
 
   // Default-Phasen (werden durch Formulardaten überschrieben, falls vorhanden)
   const phasesDefault = [
