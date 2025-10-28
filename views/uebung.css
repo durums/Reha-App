@@ -1,0 +1,21 @@
+:root{
+  --bg:#F9FAFB; --header:#A8D0E6; --text:#111827; --muted:#6B7280; --card:#fff; --shadow:0 8px 24px rgba(0,0,0,.08);
+  --primary:#2563EB; --primary-hover:#1D4ED8;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text)}
+.u-header{background:var(--header);padding:16px 24px;display:flex;align-items:center;gap:16px}
+.u-back{color:#0b3b57;text-decoration:none;font-weight:600}
+.u-wrap{max-width:1200px;padding:40px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.u-meta{display:flex;gap:16px;align-items:center;background:var(--card);padding:16px 20px;border-radius:14px;box-shadow:var(--shadow)}
+.u-emoji{font-size:40px}
+.u-h2{margin:.25rem 0 0 0;font-size:20px;font-weight:600}
+.u-tags{display:flex;gap:8px;margin-top:8px}
+.u-tag{font-size:12px;padding:4px 8px;border-radius:999px;background:#E5E7EB;color:#111827}
+.u-desc,.u-timer,.u-video{background:var(--card);padding:16px 20px;border-radius:14px;box-shadow:var(--shadow)}
+.u-timer-display{font-variant-numeric:tabular-nums;font-size:40px;font-weight:700;margin:8px 0}
+.u-timer-actions{display:flex;gap:8px}
+.u-timer-actions button{background:var(--primary);color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+.u-timer-actions button:hover{background:var(--primary-hover)}
+.u-hint{color:var(--muted);font-size:14px;margin-top:8px}
