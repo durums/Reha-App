@@ -1,6 +1,14 @@
 <div class="view view-trainingsplan">
-  <h2 class="section-title">Übungen</h2>
-  <p class="subtle" style="margin-top:-.5rem">Wähle deine Übungen nach Körperbereich aus</p>
+  <h2 class="section-title">Trainingsplan</h2>
+  <p class="intro">
+    Dein persönlicher Trainingsbereich – finde gezielte Übungen für deinen Körperbereich 
+    und verbessere Kraft, Stabilität und Ausdauer. 
+  </p>
+
+  <div class="tp-overview">
+    <p>Wähle unten einen Bereich aus, um passende Übungen zu sehen. Jede Übung enthält 
+      eine kurze Beschreibung, ein Video-Tutorial und empfohlene Wiederholungen.</p>
+  </div>
 
   <div class="tp-tabs" role="tablist" aria-label="Körperbereich">
     <button class="tp-tab active" data-filter="oberkoerper" role="tab" aria-selected="true">Oberkörper</button>
@@ -8,7 +16,22 @@
     <button class="tp-tab" data-filter="rumpf" role="tab" aria-selected="false">Rumpf</button>
   </div>
 
-  <div id="tp-grid" class="tp-grid"></div>
+  <div id="tp-grid" class="tp-grid">
+    <!-- Dynamische Übungskarten werden hier eingefügt -->
+  </div>
+
+  <div class="tp-hint">
+    <h3>💡 Tipp:</h3>
+    <p>Starte mit 2–3 Übungen pro Bereich, bevor du die Intensität erhöhst. 
+    Kombiniere gezieltes Training mit ausreichenden Pausen – Fortschritt entsteht durch Konstanz!</p>
+  </div>
+
+  <div class="tp-cta">
+    <h3>🎯 Dein Ziel, dein Plan</h3>
+    <p>Erstelle dir eine individuelle Trainingsroutine oder folge einem vorgeschlagenen Plan, 
+    der auf deinen Fitnesslevel abgestimmt ist.</p>
+    <button class="tp-btn-start">Individuellen Plan erstellen</button>
+  </div>
 </div>
 
 <!-- Video-Dialog -->
@@ -24,11 +47,3 @@
            style="width:100%; max-height:70vh; border-radius:12px;"></video>
   </div>
 </div>
-
-
-
-
-
-
-
-
