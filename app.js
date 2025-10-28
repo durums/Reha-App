@@ -52,20 +52,29 @@ function initAuthUI() {
     }
   });
 
-  // --- Logout-Button ---
+// --- Logout-Button ---
   signOutBtn.addEventListener('click', async () => {
     try {
-      await signOut(auth);
-
-      // Menü schließen & Button ausblenden
+      // Sidebar & Menü-Button sofort schließen
+      const sidebar = document.getElementById('sidebar');
+      const menuToggle = document.querySelector('.menu-toggle');
       if (sidebar) sidebar.classList.remove('active');
-      if (menuToggle) menuToggle.style.display = 'none';
-
-      // Optional: Loginseite oder Startansicht zeigen
-      window.location.hash = ''; // oder: window.location.href = "index.html";
+      if (menuToggle) menuToggle.classList.remove('active');
+  
+      // Kurz kleine Verzögerung, damit Animation wirken kann
+      setTimeout(async () => {
+        await signOut(auth);
+  
+        // Menü-Button ausblenden
+        if (menuToggle) menuToggle.style.display = 'none';
+  
+        // Optional: zurück zur Login-/Startseite
+        window.location.hash = '';
+        // oder: window.location.href = "index.html";
+      }, 200);
+  
     } catch (err) {
       console.error('Sign-out error', err);
       alert('Abmelden fehlgeschlagen — Konsole prüfen.');
     }
   });
-}
