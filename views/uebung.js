@@ -9,14 +9,12 @@ const LONG_DESC = {
   schulterkreisen: `
     <h4>🌀 Übung: Schulterkreisen</h4>
     <p><strong>Ziel:</strong> Sanfte Mobilisation der Schultergelenke – verbessert Beweglichkeit, Durchblutung und löst Verspannungen.</p>
-
     <h5>🔹 Ausgangsposition</h5>
     <ul>
       <li>Aufrecht stehen oder mit geradem Rücken auf einen Stuhl setzen.</li>
       <li>Arme hängen locker seitlich am Körper.</li>
       <li>Schultern entspannt, Blick nach vorn.</li>
     </ul>
-
     <h5>🔹 Durchführung</h5>
     <ol>
       <li>Schultern langsam nach oben Richtung Ohren heben.</li>
@@ -25,14 +23,12 @@ const LONG_DESC = {
       <li>Nach vorne bringen und in die Ausgangsposition zurückkehren.</li>
     </ol>
     <p>→ Das ist eine vollständige Kreisbewegung. Ruhig, gleichmäßig, ohne Schwung.</p>
-
     <h5>🔹 Wiederholungen</h5>
     <ul>
       <li>10–15 Kreise nach <strong>hinten</strong>.</li>
       <li>Danach 10–15 Kreise nach <strong>vorne</strong>.</li>
       <li>Atmung ruhig weiterführen – kein Pressen.</li>
     </ul>
-
     <h5>🔹 Wichtige Hinweise</h5>
     <ul>
       <li>Bewegung sanft und schmerzfrei ausführen.</li>
@@ -40,18 +36,15 @@ const LONG_DESC = {
       <li>Ideal als Aufwärm- oder Lockerungsübung vor weiteren Übungen.</li>
     </ul>
   `,
-
   nackendehnung: `
     <h4>🧘‍♀️ Übung: Nackendehnung</h4>
     <p><strong>Ziel:</strong> Sanfte Entspannung und Dehnung der Nackenmuskulatur – hilft gegen Verspannungen und beugt Kopfschmerzen vor.</p>
-
     <h5>🔹 Ausgangsposition</h5>
     <ul>
       <li>Setze dich aufrecht auf einen Stuhl oder stelle dich locker hin.</li>
       <li>Rücken gerade, Schultern locker und tief.</li>
       <li>Kopf neutral, Blick nach vorne.</li>
     </ul>
-
     <h5>🔹 Durchführung</h5>
     <ol>
       <li>Kopf langsam zur rechten Seite neigen, als würdest du das Ohr sanft zur Schulter bringen.</li>
@@ -61,13 +54,11 @@ const LONG_DESC = {
       <li>Andere Seite dehnen (Ohr zur linken Schulter).</li>
     </ol>
     <p>👉 Optional: Für stärkere Dehnung die Hand der geneigten Seite leicht auf den Kopf legen und minimal nachziehen – ohne Druck.</p>
-
     <h5>🔹 Wiederholungen</h5>
     <ul>
       <li>Jede Seite 2–3 Mal halten.</li>
       <li>Dazwischen kurz lockern und tief atmen.</li>
     </ul>
-
     <h5>🔹 Wichtige Hinweise</h5>
     <ul>
       <li>Bewegung langsam und kontrolliert – kein Rucken oder Ziehen.</li>
@@ -75,19 +66,16 @@ const LONG_DESC = {
       <li>Ideal zur Entlastung nach Computerarbeit oder zur Lockerung zwischendurch.</li>
     </ul>
   `,
-  
   armrotation: `
     <h4>💪 Übung: Armrotation</h4>
     <p><strong>Ziel:</strong> Mobilisation und Lockerung der Schulter- und Oberarmmuskulatur.<br>
     Fördert die Beweglichkeit im Schultergelenk und stabilisiert die Rotatorenmanschette.</p>
-
     <h5>🔹 Ausgangsposition</h5>
     <ul>
       <li>Stelle dich aufrecht hin, Füße etwa schulterbreit auseinander.</li>
       <li>Arme hängen locker seitlich am Körper.</li>
       <li>Schultern bleiben entspannt und nicht hochgezogen.</li>
     </ul>
-
     <h5>🔹 Durchführung</h5>
     <ol>
       <li>Ellenbogen auf etwa 90° beugen, Unterarme nach vorne zeigen lassen (Türrahmenhaltung).</li>
@@ -96,13 +84,11 @@ const LONG_DESC = {
       <li>Dann langsam wieder nach innen drehen, bis sich die Unterarme vor dem Körper kreuzen.</li>
       <li>Ruhig und kontrolliert bewegen — kein Schwung, kein Ziehen.</li>
     </ol>
-
     <h5>🔹 Wiederholungen</h5>
     <ul>
       <li>10–15 Wiederholungen, danach kurze Pause.</li>
       <li>2–3 Durchgänge, je nach Wohlbefinden.</li>
     </ul>
-
     <h5>🔹 Wichtige Hinweise</h5>
     <ul>
       <li>Bewegung sanft und schmerzfrei ausführen.</li>
@@ -113,7 +99,6 @@ const LONG_DESC = {
   `
 };
 
-
 // (Pragmatisch) kleine Datenbasis lokal – später gern zentral auslagern
 const WORKOUTS = [
   { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke.',
@@ -122,7 +107,8 @@ const WORKOUTS = [
   { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur.',
     emoji:'🧘‍♀️', duration:8, level:'leicht', area:'Oberkörper',
     videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
-  { id:'arm-rotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation.',
+  // 👇 ID auf "armrotation" vereinheitlicht
+  { id:'armrotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation.',
     emoji:'💪', duration:10, level:'mittel', area:'Oberkörper',
     videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
   { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft.',
@@ -140,7 +126,13 @@ function fmtMMSS(sec){const m=String(Math.floor(sec/60)).padStart(2,'0');const s
 (function init(){
   const id = getId();
   const w = WORKOUTS.find(x => x.id === id);
-  if(!w){ alert('Übung nicht gefunden.'); location.href = 'trainingsplan.html'; return; }
+
+  if(!w){
+    alert('Übung nicht gefunden.');
+    // Sauber zurück in die App auf den Trainingsplan
+    location.href = 'https://durums.github.io/Reha-App/#trainingsplan';
+    return;
+  }
 
   // Render
   q('#u-title').textContent = w.title;
@@ -156,7 +148,6 @@ function fmtMMSS(sec){const m=String(Math.floor(sec/60)).padStart(2,'0');const s
   vid.removeAttribute('src');
   vid.preload = 'none';
   if (w.videoUrl) {
-    // Ladequelle erst, wenn Nutzer das Video sichtbar hat (schon gegeben) – aber noch kein Autoplay
     vid.src = w.videoUrl;
   }
   vid.addEventListener('error', () => {
