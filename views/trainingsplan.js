@@ -10,7 +10,7 @@
     { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur',
       emoji:'🧘‍♀️', duration:8, level:'leicht', area:'oberkoerper',
       videoUrl: '/views/Videos-Training/test_clip.mp4' },
-    { id:'arm-rotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
+    { id:'arm_rotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
       emoji:'💪', duration:10, level:'mittel', area:'oberkoerper',
       videoUrl: '/views/Videos-Training/test_clip.mp4' },
     { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft',
