@@ -1,126 +1,48 @@
-/* views/termine.css */
-:root {
-  --bg: #111827;        /* Hintergrund */
-  --card: #1f2937;      /* Karten dunkel */
-  --accent: #60a5fa;    /* Akzent blau */
-  --text: #f3f4f6;      /* Text hell */
-  --muted: #9ca3af;     /* Sekundärtext */
-  --line: rgba(255,255,255,0.08);
+:root{
+  --bg:#0b0f14; /* dunkler Style wie im Screenshot */
+  --card:#171c22;
+  --muted:#9aa5b1;
+  --line:#22303d;
+  --accent:#60a5fa;
+  --past:#374151;
+  --ok:#34d399;
+  --warn:#fbbf24;
+}
+body .termine_toolbar_reset{} /* noop to avoid tree shaking */
+
+.termine-toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 14px;border-bottom:1px solid var(--line);background:transparent
+}
+.termine-toolbar h2{margin:0;font-size:18px}
+.termine-toolbar .filters{display:flex;gap:8px}
+.termine-toolbar .filters button{
+  padding:6px 10px;border:1px solid var(--line);background:#11161c;color:#fff;border-radius:10px;cursor:pointer
+}
+.termine-toolbar .filters button.active{border-color:var(--accent)}
+
+.termine-list{padding:12px;display:flex;flex-direction:column;gap:10px}
+
+.termine-day{
+  color:var(--muted);font-weight:600;margin:14px 6px 6px
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+.termine-card{
+  background:var(--card);color:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.25);
 }
+.termine-row{display:flex;align-items:center;gap:10px}
+.termine-time{font-weight:700;min-width:64px}
+.termine-title{flex:1}
+.termine-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.termine-badge{
+  font-size:12px;border-radius:8px;padding:2px 8px;border:1px solid var(--line)
+}
+.termine-badge.upcoming{background:#0e1a26;color:#cfe5ff;border-color:#17324a}
+.termine-badge.past{background:#11161c;color:#bcc5cf;border-color:#1b2733}
 
-.termine-page {
-  max-width: 920px;
-  margin: 34px auto 56px;
-  padding: 0 18px;
+.termine-actions{display:flex;gap:8px;margin-top:10px}
+.termine-actions button{
+  padding:6px 8px;border:1px solid var(--line);background:#0f151c;color:#fff;border-radius:8px;cursor:pointer
 }
-
-h1 {
-  margin: 0 0 .25rem 0;
-  text-align: center;
-  color: var(--accent);
-}
-
-.subtitle {
-  text-align: center;
-  color: var(--muted);
-  margin: 0 0 1.4rem 0;
-}
-
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 12px;
-}
-
-.btn {
-  background: #111827;
-  color: var(--text);
-  border: 1px solid var(--line);
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.btn:hover { background: #0b1220; }
-
-.section-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #dbeafe;
-  margin: 10px 0 10px;
-}
-
-.termine-container {
-  display: grid;
-  gap: 14px;
-}
-
-.termin {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px 16px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.28);
-  transition: transform .15s ease, background .15s ease, border-color .2s ease;
-}
-
-.termin:hover {
-  transform: translateY(-2px);
-  background: #253041;
-}
-
-.termin .row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 4px;
-}
-
-.termin .title {
-  margin: 0 0 2px 0;
-  color: var(--accent);
-  font-weight: 800;
-}
-
-.badge {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  padding: 4px 8px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: #e5e7eb;
-  background: rgba(255,255,255,0.03);
-  font-size: .9rem;
-}
-
-.meta {
-  color: var(--text);
-  margin: 0;
-  font-size: 0.95rem;
-}
-
-.muted { color: var(--muted); }
-
-.empty {
-  display: grid;
-  place-items: center;
-  margin-top: 22px;
-}
-.empty-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px;
-  text-align: center;
-  max-width: 560px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.28);
-}
-.empty-title { font-weight: 900; margin-bottom: 4px; }
-.empty-sub { color: var(--muted); }
+.termine-actions button.primary{border-color:var(--accent)}
