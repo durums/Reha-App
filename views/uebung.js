@@ -4,6 +4,45 @@ const ASSET_BASE = (() => {
   try { return new URL('.', src).pathname; } catch { return '/views/'; }
 })();
 
+// Lange Inhalte pro Übung (HTML erlaubt)
+const LONG_DESC = {
+  schulterkreisen: `
+    <h4>🌀 Übung: Schulterkreisen</h4>
+    <p><strong>Ziel:</strong> Sanfte Mobilisation der Schultergelenke – verbessert Beweglichkeit, Durchblutung und löst Verspannungen.</p>
+
+    <h5>🔹 Ausgangsposition</h5>
+    <ul>
+      <li>Aufrecht stehen oder mit geradem Rücken auf einen Stuhl setzen.</li>
+      <li>Arme hängen locker seitlich am Körper.</li>
+      <li>Schultern entspannt, Blick nach vorn.</li>
+    </ul>
+
+    <h5>🔹 Durchführung</h5>
+    <ol>
+      <li>Schultern langsam nach oben Richtung Ohren heben.</li>
+      <li>Dann nach hinten führen (Schulterblätter leicht zusammenziehen).</li>
+      <li>Nach unten sinken lassen.</li>
+      <li>Nach vorne bringen und in die Ausgangsposition zurückkehren.</li>
+    </ol>
+    <p>→ Das ist eine vollständige Kreisbewegung. Ruhig, gleichmäßig, ohne Schwung.</p>
+
+    <h5>🔹 Wiederholungen</h5>
+    <ul>
+      <li>10–15 Kreise nach <strong>hinten</strong>.</li>
+      <li>Danach 10–15 Kreise nach <strong>vorne</strong>.</li>
+      <li>Atmung ruhig weiterführen – kein Pressen.</li>
+    </ul>
+
+    <h5>🔹 Wichtige Hinweise</h5>
+    <ul>
+      <li>Bewegung sanft und schmerzfrei ausführen.</li>
+      <li>Bei Ziehen/Schmerz den Bewegungsradius verkleinern.</li>
+      <li>Ideal als Aufwärm- oder Lockerungsübung vor weiteren Übungen.</li>
+    </ul>
+  `
+};
+
+
 // (Pragmatisch) kleine Datenbasis lokal – später gern zentral auslagern
 const WORKOUTS = [
   { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke.',
@@ -39,7 +78,7 @@ function fmtMMSS(sec){const m=String(Math.floor(sec/60)).padStart(2,'0');const s
   q('#u-duration').textContent = `${w.duration} Min`;
   q('#u-level').textContent = w.level ? (w.level[0].toUpperCase()+w.level.slice(1)) : '–';
   q('#u-area').textContent = w.area || '–';
-  q('#u-desc-text').textContent = w.desc || '';
+  q('#u-desc-text').innerHTML = LONG_DESC[w.id] || `<p>${w.desc || ''}</p>`;
 
   // Video erst beim Bedarf laden (kein Autoload)
   const vid = q('#u-video');
