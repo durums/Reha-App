@@ -20,25 +20,25 @@
 
       <div class="pf-grid">
         <div>
-          <label>Vorname</label>
-          <input id="pf-first" type="text" placeholder="Max" />
+          <label for="pf-first">Vorname</label>
+          <input id="pf-first" type="text" placeholder="Max" autocomplete="given-name" />
         </div>
         <div>
-          <label>Nachname</label>
-          <input id="pf-last" type="text" placeholder="Mustermann" />
+          <label for="pf-last">Nachname</label>
+          <input id="pf-last" type="text" placeholder="Mustermann" autocomplete="family-name" />
         </div>
         <div class="pf-colspan">
-          <label>E-Mail</label>
+          <label for="pf-email">E-Mail</label>
           <input id="pf-email" type="email" disabled />
         </div>
         <div class="pf-colspan">
-          <label>Telefon</label>
-          <input id="pf-phone" type="tel" placeholder="+49 123 456789" />
+          <label for="pf-phone">Telefon</label>
+          <input id="pf-phone" type="tel" placeholder="+49 123 456789" autocomplete="tel" />
         </div>
       </div>
 
       <div class="pf-actions">
-        <button id="pf-save" class="btn">Änderungen speichern</button>
+        <button id="pf-save" class="btn" type="button">Änderungen speichern</button>
         <span id="pf-status" class="subtle"></span>
       </div>
     </section>
@@ -67,16 +67,38 @@
 
       <section class="card pf-side-card">
         <div class="pf-card-title">Sicherheit</div>
-        <button id="pf-pass" class="pf-row-btn">Passwort ändern</button>
-        <button id="pf-mfa" class="pf-row-btn is-disabled" aria-disabled="true">Zwei-Faktor-Authentifizierung</button>
+        <button id="pf-pass" class="pf-row-btn" type="button">Passwort ändern</button>
+        <button id="pf-mfa" class="pf-row-btn" type="button" disabled>Zwei-Faktor-Authentifizierung</button>
       </section>
-      
+
       <section class="card pf-side-card">
         <div class="pf-card-title">Einstellungen</div>
-        <button class="pf-row-btn is-disabled" aria-disabled="true">Sprache</button>
-        <button class="pf-row-btn is-disabled" aria-disabled="true">Privatsphäre</button>
+        <button id="pf-lang" class="pf-row-btn" type="button" disabled>Sprache</button>
+        <button id="pf-privacy" class="pf-row-btn" type="button" disabled>Privatsphäre</button>
       </section>
     </div>
+  </div>
+</div>
+
+<!-- Passwort ändern Dialog (einzig gültige Instanz) -->
+<div id="pf-pass-dialog" class="pf-modal" style="display:none">
+  <div class="pf-modal-content" role="dialog" aria-modal="true" aria-labelledby="pf-pass-title">
+    <h3 id="pf-pass-title">Passwort ändern</h3>
+    <p class="subtle">Bitte bestätige dein aktuelles Passwort und gib ein neues ein.</p>
+
+    <label for="pf-pass-old" class="sr-only">Aktuelles Passwort</label>
+    <input id="pf-pass-old" class="pf-input" type="password"
+           placeholder="Aktuelles Passwort" autocomplete="current-password" />
+
+    <label for="pf-pass-new" class="sr-only">Neues Passwort</label>
+    <input id="pf-pass-new" class="pf-input" type="password"
+           placeholder="Neues Passwort" autocomplete="new-password" />
+
+    <div class="pf-actions">
+      <button id="pf-pass-save" class="btn" type="button">Speichern</button>
+      <button id="pf-pass-cancel" class="btn ghost" type="button">Abbrechen</button>
+    </div>
+    <span id="pf-pass-status" class="subtle" aria-live="polite"></span>
   </div>
 </div>
 
