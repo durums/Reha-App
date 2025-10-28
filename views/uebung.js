@@ -74,7 +74,7 @@ const LONG_DESC = {
       <li>Übung niemals in den Schmerz hinein ausführen.</li>
       <li>Ideal zur Entlastung nach Computerarbeit oder zur Lockerung zwischendurch.</li>
     </ul>
-  `
+  `,
   arm-rotation: `
     <h4>💪 Übung: Armrotation</h4>
     <p><strong>Ziel:</strong> Mobilisation und Lockerung der Schulter- und Oberarmmuskulatur.<br>
