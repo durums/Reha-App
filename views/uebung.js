@@ -39,6 +39,41 @@ const LONG_DESC = {
       <li>Bei Ziehen/Schmerz den Bewegungsradius verkleinern.</li>
       <li>Ideal als Aufwärm- oder Lockerungsübung vor weiteren Übungen.</li>
     </ul>
+  `,
+
+  nackendehnung: `
+    <h4>🧘‍♀️ Übung: Nackendehnung</h4>
+    <p><strong>Ziel:</strong> Sanfte Entspannung und Dehnung der Nackenmuskulatur – hilft gegen Verspannungen und beugt Kopfschmerzen vor.</p>
+
+    <h5>🔹 Ausgangsposition</h5>
+    <ul>
+      <li>Setze dich aufrecht auf einen Stuhl oder stelle dich locker hin.</li>
+      <li>Rücken gerade, Schultern locker und tief.</li>
+      <li>Kopf neutral, Blick nach vorne.</li>
+    </ul>
+
+    <h5>🔹 Durchführung</h5>
+    <ol>
+      <li>Kopf langsam zur rechten Seite neigen, als würdest du das Ohr sanft zur Schulter bringen.</li>
+      <li>Schultern unten lassen – nicht hochziehen!</li>
+      <li>Dehnung auf der gegenüberliegenden Seite spüren.</li>
+      <li>15–20 Sekunden halten, dann langsam zur Mitte zurückkehren.</li>
+      <li>Andere Seite dehnen (Ohr zur linken Schulter).</li>
+    </ol>
+    <p>👉 Optional: Für stärkere Dehnung die Hand der geneigten Seite leicht auf den Kopf legen und minimal nachziehen – ohne Druck.</p>
+
+    <h5>🔹 Wiederholungen</h5>
+    <ul>
+      <li>Jede Seite 2–3 Mal halten.</li>
+      <li>Dazwischen kurz lockern und tief atmen.</li>
+    </ul>
+
+    <h5>🔹 Wichtige Hinweise</h5>
+    <ul>
+      <li>Bewegung langsam und kontrolliert – kein Rucken oder Ziehen.</li>
+      <li>Übung niemals in den Schmerz hinein ausführen.</li>
+      <li>Ideal zur Entlastung nach Computerarbeit oder zur Lockerung zwischendurch.</li>
+    </ul>
   `
 };
 
