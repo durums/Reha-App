@@ -31,7 +31,13 @@
       <li><a href="#feedback"      id="menu-feedback">💬 Feedback</a></li>
       <li><a href="#profil"        id="menu-profil">👤 Profil</a></li>
       <li><a href="#hilfe"         id="menu-hilfe">❓ Hilfe</a></li>
+      
     </ul>
+    <div class="sidebar-footer">
+      <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
+    </div>
+
+
   </div>
 
   <!-- 🔒 Login / Registrierung -->
@@ -55,10 +61,10 @@
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
-    <div id="user-area" style="position:absolute; top:10px; right:15px; font-size:0.9rem;">
+    <div id="user-area" style="display:none;">
       <span id="user-info">Nicht angemeldet</span>
-      <button id="sign-out" style="display:none;">Abmelden</button>
     </div>
+        
 
     <div id="app-section">
       <main id="content" class="main-content"></main>
