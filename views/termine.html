@@ -1,27 +1,19 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Termine</title>
-  <link rel="stylesheet" href="termine.css" />
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="termine.css">
 </head>
 <body>
   <main class="page">
     <h1>Deine Termine</h1>
     <p class="muted">Übersicht deiner Trainings- und Reha-Termine</p>
 
-    <!-- Legende -->
-    <div class="calendar-legend">
-      <span class="key"><span class="dot upcoming"></span> anstehend</span>
-      <span class="key"><span class="dot past"></span> abgeschlossen</span>
-    </div>
-
-    <!-- Kalender -->
     <div id="calendar"></div>
 
-    <!-- Terminliste -->
     <section class="termine-liste">
       <h2>Geplante Termine</h2>
       <ul id="terminList"></ul>
