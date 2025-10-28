@@ -1,56 +1,64 @@
 :root {
-  --rot:#ef4444;
-  --gruen:#16a34a;
-  --bg:#f8fafc;
-  --line:#e5e7eb;
+  --dark-bg: #1e293b;
+  --light-bg: #334155;
+  --accent: #3b82f6;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
 }
+
 body {
   font-family: system-ui, sans-serif;
+  background: var(--dark-bg);
+  color: var(--text);
   margin: 0;
-  background: var(--bg);
-  color: #0f172a;
+  padding: 0;
 }
+
 .page {
-  max-width: 900px;
-  margin: 32px auto;
-  padding: 0 16px;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
-.muted { color: #64748b; }
 
-#calendar {
-  background: #fff;
-  border: 1px solid var(--line);
+h1 {
+  margin-bottom: .5rem;
+  color: #fff;
+}
+
+.muted {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.termine-liste {
+  display: grid;
+  gap: 16px;
+}
+
+.termin {
+  background: var(--light-bg);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 4px 14px rgba(0,0,0,.05);
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  transition: transform .15s ease, background .2s ease;
 }
 
-.calendar-legend {
-  display: flex; align-items: center; gap: 18px;
-  margin: 12px 0 20px;
-}
-.key { display: flex; align-items: center; gap: 6px; font-size: 14px; }
-.dot {
-  width: 12px; height: 12px; border-radius: 999px;
-  display: inline-block; border: 1px solid #ccc;
-}
-.dot.upcoming { background: #dcfce7; border-color: var(--gruen); }
-.dot.past { background: #fee2e2; border-color: var(--rot); }
-
-/* Terminliste */
-.termine-liste { margin-top: 24px; }
-.termine-liste ul { list-style: none; padding: 0; display: grid; gap: 10px; }
-.termine-liste li {
-  background: #fff; border: 1px solid var(--line);
-  border-radius: 10px; padding: 10px 14px;
-  display: flex; align-items: center; justify-content: space-between;
+.termin:hover {
+  background: #3b4352;
+  transform: translateY(-2px);
 }
 
-.btn {
-  padding: 6px 12px; border: none; border-radius: 8px;
-  color: #fff; font-weight: 700; cursor: pointer;
-  transition: transform .1s ease;
+.termin h3 {
+  margin-top: 0;
+  margin-bottom: .3rem;
+  color: var(--accent);
 }
-.btn:hover { transform: translateY(-1px); }
-.btn-green { background: var(--gruen); }
-.btn-red { background: var(--rot); }
+
+.termin p {
+  margin: .2rem 0;
+}
+
+.termin.past {
+  opacity: .65;
+}
