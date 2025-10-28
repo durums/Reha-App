@@ -68,31 +68,28 @@
       <section class="card pf-side-card">
         <div class="pf-card-title">Sicherheit</div>
         <button id="pf-pass" class="pf-row-btn" type="button">Passwort ändern</button>
-        <button id="pf-mfa" class="pf-row-btn" type="button" disabled>Zwei-Faktor-Authentifizierung</button>
       </section>
 
       <section class="card pf-side-card">
         <div class="pf-card-title">Einstellungen</div>
         <button id="pf-lang" class="pf-row-btn" type="button" disabled>Sprache</button>
-        <button id="pf-privacy" class="pf-row-btn" type="button" disabled>Privatsphäre</button>
+        <button id="pf-privacy" class="pf-row-btn" type="button">Privatsphäre</button>
       </section>
     </div>
   </div>
 </div>
 
-<!-- Passwort ändern Dialog (einzig gültige Instanz) -->
+<!-- Passwort ändern Dialog -->
 <div id="pf-pass-dialog" class="pf-modal" style="display:none">
   <div class="pf-modal-content" role="dialog" aria-modal="true" aria-labelledby="pf-pass-title">
     <h3 id="pf-pass-title">Passwort ändern</h3>
     <p class="subtle">Bitte bestätige dein aktuelles Passwort und gib ein neues ein.</p>
 
     <label for="pf-pass-old" class="sr-only">Aktuelles Passwort</label>
-    <input id="pf-pass-old" class="pf-input" type="password"
-           placeholder="Aktuelles Passwort" autocomplete="current-password" />
+    <input id="pf-pass-old" class="pf-input" type="password" placeholder="Aktuelles Passwort" autocomplete="current-password" />
 
     <label for="pf-pass-new" class="sr-only">Neues Passwort</label>
-    <input id="pf-pass-new" class="pf-input" type="password"
-           placeholder="Neues Passwort" autocomplete="new-password" />
+    <input id="pf-pass-new" class="pf-input" type="password" placeholder="Neues Passwort" autocomplete="new-password" />
 
     <div class="pf-actions">
       <button id="pf-pass-save" class="btn" type="button">Speichern</button>
@@ -101,6 +98,7 @@
     <span id="pf-pass-status" class="subtle" aria-live="polite"></span>
   </div>
 </div>
+
 <!-- Privatsphäre Modal -->
 <div id="pf-privacy-dialog" class="pf-modal" style="display:none">
   <div class="pf-modal-content" role="dialog" aria-modal="true" aria-labelledby="pf-privacy-title">
