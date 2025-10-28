@@ -1,45 +1,27 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Termine</title>
-  <link rel="stylesheet" href="termine.css" />
-</head>
-<body>
-  <main class="termine-page">
-    <h1>Meine Termine</h1>
-    <p class="subtitle">Hier findest du eine Übersicht deiner Reha- und Trainingstermine.</p>
+<!-- views/termine.html -->
+<main class="termine-page">
+  <h1>Meine Termine</h1>
+  <p class="subtitle">Übersicht deiner im Kalender gebuchten Termine.</p>
 
-    <div class="termine-container">
-      <div class="termin">
-        <h3>Erstuntersuchung</h3>
-        <p>📅 10. Oktober 2025</p>
-        <p>⏰ 08:00 Uhr</p>
-        <p>🏥 Physiotherapeutin Müller</p>
-      </div>
+  <div class="toolbar">
+    <button id="refreshBtn" class="btn">↻ Aktualisieren</button>
+  </div>
 
-      <div class="termin">
-        <h3>Physiotherapie – Stabilisation</h3>
-        <p>📅 25. Oktober 2025</p>
-        <p>⏰ 10:00 Uhr</p>
-        <p>🏥 Raum 2 – Gerätebereich</p>
-      </div>
+  <section>
+    <h2 class="section-title">Anstehende Termine</h2>
+    <div id="upcoming" class="termine-container"></div>
+  </section>
 
-      <div class="termin">
-        <h3>Nachuntersuchung</h3>
-        <p>📅 28. Oktober 2025</p>
-        <p>⏰ 09:00 Uhr</p>
-        <p>🏥 Dr. Schneider</p>
-      </div>
+  <section style="margin-top:28px;">
+    <h2 class="section-title">Abgeschlossene Termine</h2>
+    <div id="past" class="termine-container"></div>
+  </section>
 
-      <div class="termin past">
-        <h3>Training Beinpresse</h3>
-        <p>📅 01. Oktober 2025</p>
-        <p>⏰ 11:00 Uhr</p>
-        <p>🏋️ Raum 1 – Trainingsfläche</p>
-      </div>
+  <div id="emptyState" class="empty" hidden>
+    <div class="empty-card">
+      <div class="empty-title">Noch keine Termine gefunden</div>
+      <div class="empty-sub">Buche Termine im Kalender, sie erscheinen dann automatisch hier.</div>
     </div>
-  </main>
-</body>
-</html>
+  </div>
+</main>
+<script src="views/termine.js" defer></script>
