@@ -1,259 +1,229 @@
 // views/fortschritt.js
-(function () {
-  /* ---------- Demo-KPIs/Recent ---------- */
-  const weekCount = 4, weekTotal = 15, activeDays = 2, totalPct = 5, badges = 1;
-  byId('kpi-week-count').textContent = weekCount;
-  byId('kpi-week-bar').style.width = Math.min(100, (weekCount / weekTotal) * 100) + '%';
-  byId('kpi-days').textContent = activeDays;
-  byId('kpi-days-bar').style.width = (activeDays / 7) * 100 + '%';
-  byId('kpi-total').textContent = totalPct + '%';
-  byId('kpi-total-bar').style.width = totalPct + '%';
-  byId('kpi-badges').textContent = badges;
-  byId('kpi-badges-bar').style.width = Math.min(100, badges * 10) + '%';
+(() => {
+  const currentWeek = 4; // 🔧 Beispielpatient: befindet sich ab Woche 4
+  const maxWeeks = 12;
 
-  const recent = [
-    { name: 'Schulterkreisen', at: 'Heute, 09:16', dur: '5 Min' },
-    { name: 'Nackendehnungen', at: 'Heute, 09:11', dur: '8 Min' },
-    { name: 'Rückenstreckung', at: 'Gestern, 10:46', dur: '10 Min' },
-    { name: 'Knie-Beugungen', at: 'Gestern, 10:16', dur: '12 Min' },
-    { name: 'Beckenlift', at: 'So., 26.10., 09:16', dur: '8 Min' },
-  ];
-  const recentList = byId('recentList');
-  recent.forEach(r => {
-    const li = document.createElement('li');
-    li.innerHTML = `<div><strong>${r.name}</strong><br><small>${r.at}</small></div><small>${r.dur}</small>`;
-    recentList.appendChild(li);
-  });
-
-  /* ---------- Nachbehandlungs-Daten ---------- */
-  const PLAN_VKB = [
-    { id:'tag1',  title:'1. Tag', window:'Ruhigstellung 0–0° (1 Woche, Tag & Nacht)',
-      load:'15 kg Teilbelastung, 2 Gehstützen',
-      scope:'Passive Mobilisation, Schwellungsmanagement',
-      tasks:[
-        { id:'redon', label:'Redon-Entfernung' },
-        { id:'quad', label:'Elektrostimulation Quadrizeps (isometrisch)' },
-        { id:'pnf',  label:'Bewegungsübungen (PNF), schmerzfrei' },
-      ],
-      techniques:['Cryo-Cuff/Kühlung','Thromboseprophylaxe']
-    },
-    { id:'tag2',  title:'2. Tag', window:'weiter 15 kg Teilbelastung',
-      load:'0–0–90° (passiv, Rückenlage)',
-      scope:'Frühe Aktivierung',
-      tasks:[
-        { id:'fort-oben', label:'Forcierter Ober-in-Sitz' },
-        { id:'koko', label:'Ko-Kontraktion (Brunow)' },
-      ],
-      techniques:['Lymphdrainage bei Erguss']
-    },
-    { id:'ab1w', title:'ab 1. Woche (Hartschiene)',
-      window:'Bewegungslimit 0°→0°→90° (4 Wochen)',
-      load:'Teilbelastung; Orthese tagsüber',
-      scope:'Bewegungserweiterung & Patellagleiten',
-      tasks:[
-        { id:'passiv',   label:'Passive Beugung 0–0–90° (Rückenlage)' },
-        { id:'quad-iso', label:'Quadrizeps isometrisch (mehrmals/Tag)' },
-        { id:'patella',  label:'Patellamobilisation' },
-      ],
-      techniques:['Hochlagerung in Streckung']
-    },
-    { id:'ab2w', title:'ab 2. Woche',
-      window:'bis halbes Körpergewicht (ohne Stützen, wenn sicher)',
-      load:'Stabilisation + Gangschule',
-      scope:'Kraft & Propriozeption',
-      tasks:[
-        { id:'kette-geschl', label:'Geschlossene Kette (Mini-Squat 0–45°)' },
-        { id:'offene-kette', label:'Offene Kette (Quadrizeps, schmerzfrei)' },
-        { id:'balance',      label:'Propriozeption (Wackelbrett/Pad)' },
-      ],
-      techniques:['Lymphdrainage bei Erguss']
-    },
-    { id:'ab4w', title:'ab 4. Woche',
-      window:'Vollbelastung bei normalem Gangbild',
-      load:'Quadrizeps ≥ 80 %, Flexion > 110°',
-      scope:'Funktionelles Training & Gangbild',
-      tasks:[
-        { id:'treppe', label:'Gangschule (Treppentraining)' },
-        { id:'quad80', label:'Kraft Quadrizeps (~80 %) aufbauen' },
-        { id:'koord',  label:'Koordination (Brunow)' },
-      ],
-      techniques:[]
-    },
-    { id:'w6-8', title:'ab 6.–8. Woche',
-      window:'Trainingsintensivierung',
-      load:'Reaktion/Kraft, Laufen erlaubt (wenn frei)',
-      scope:'Return-to-Run',
-      tasks:[
-        { id:'lauf',    label:'Laufbeginn (Laufband), locker/Intervall' },
-        { id:'beinpres',label:'Beinpresse (geschlossene Kette)' },
-        { id:'sidestep',label:'Sidesteps / kleine Sprünge' },
-      ],
-      techniques:[]
-    },
-    { id:'ab20w', title:'ab 20. Woche',
-      window:'Sportspezifisches Training',
-      load:'Quadrizeps ≥ 85 %, stabil & schmerzfrei',
-      scope:'Return-to-Sport',
-      tasks:[
-        { id:'sport',    label:'Sportspezifisches Training steigern' },
-        { id:'clearance',label:'Abschluss-Check/Arzt – Freigabe' },
-      ],
-      techniques:[]
-    },
+  // Phasen-Regeln (einfach anpassen)
+  const phases = [
+    { range: [0,3],  title: "Frühphase (Woche 0–3)",  goal: "Schwellungsreduktion, schmerzfreie Mobilität starten." },
+    { range: [4,6],  title: "Aufbauphase (Woche 4–6)", goal: "Beweglichkeit steigern, leichte Belastung, Technik erlernen." },
+    { range: [7,9],  title: "Fortgeschritten (Woche 7–9)", goal: "Kraftzuwachs, funktionelle Muster, Ausdauer erhöhen." },
+    { range: [10,12],title: "Rückkehr (Woche 10–12)",  goal: "Sport-/Arbeitsfähigkeit, Belastungstests, Feinschliff." }
   ];
 
-  /* ---------- Storage für Häkchen ---------- */
-  const uid = (window.currentUserId || 'anon') + ':rehabV1';
-  const STORE_KEY = 'rehabPlan:' + uid;
-  const state = loadState();
+  // Inhalte für die drei Boxen je Phase
+  const content = {
+    bewegungsumfang: {
+      "0-3": [
+        "Pendeln, aktive Assistenz in schmerzfreiem Bereich",
+        "Ziel: 0–60° (Beispiel), täglich 3–5x mobilisieren"
+      ],
+      "4-6": [
+        "Aktive Bewegungen bis toleriert",
+        "Ziel: 0–90°+, Fokus auf sauberer Technik"
+      ],
+      "7-9": [
+        "Voller Bewegungsumfang anstreben",
+        "Gelenkspiel/Dehnung nach Verträglichkeit"
+      ],
+      "10-12": [
+        "Feinmotorik & komplexe Bewegungen",
+        "Symmetrie im Bewegungsbild"
+      ]
+    },
+    belastung: {
+      "0-3": [
+        "Teilentlastung, Alltagsaktivitäten dosiert",
+        "Eis/Lymphdrainage bei Bedarf"
+      ],
+      "4-6": [
+        "Steigerung bis mittlere Belastung",
+        "Einführung Widerstände (leicht)"
+      ],
+      "7-9": [
+        "Progressiv bis hohe Belastung",
+        "Funktionelle & kombinierte Aufgaben"
+      ],
+      "10-12": [
+        "Volle Belastung in Testszenarien",
+        "Return-to-Activity Leitfäden"
+      ]
+    },
+    techniken: {
+      "0-3": [
+        "Manuelle Techniken: Weichteil, Lymph",
+        "Neuromuskuläre Aktivierung"
+      ],
+      "4-6": [
+        "Isometrie → dynamisch, geschlossene Ketten",
+        "Tape/E-Stim nach Indikation"
+      ],
+      "7-9": [
+        "Freie Gewichte, instabile Unterlagen",
+        "Koordinations-/Propriozeptionstraining"
+      ],
+      "10-12": [
+        "Sportspezifische Drills, Agility",
+        "Belastungstests & Feintuning"
+      ]
+    }
+  };
 
-  function loadState(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); }catch(_){ return {}; } }
-  function saveState(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+  // DOM-Refs
+  const $ = (id) => document.getElementById(id);
+  const timelineEl = $("timeline");
+  const phasePill = $("phasePill");
+  const phaseDetails = $("phaseDetails");
+  const dlBtn = $("downloadPlanBtn");
 
-  /* ---------- Renderer: Checklisten-Timeline ---------- */
-  const tl = byId('rehabTimeline');
+  const bewegEl = $("bewegungsumfang");
+  const belastEl = $("belastung");
+  const technikEl = $("techniken");
 
-  function phaseHTML(p) {
-    const done = (p.tasks||[]).filter(t => state[p.id+':'+t.id]).length;
-    const total = (p.tasks||[]).length;
-    return `
-      <li class="phase" data-id="${p.id}">
-        <button class="phase-header" type="button" aria-expanded="false">
-          <div class="phase-title">${p.title}</div>
-          <div class="phase-meta">
-            <span class="pill">${p.window}</span>
-            <span class="pill">Belastung/Ziel: ${p.load}</span>
-            ${p.techniques?.length ? `<span class="pill">Techniken: ${p.techniques.join(', ')}</span>` : ''}
-            <span class="pill" data-counter>${done}/${total} erledigt</span>
-          </div>
-        </button>
-        <div class="phase-body">
-          ${(p.tasks||[]).map(t=>{
-            const id = p.id+':'+t.id, chk = state[id] ? 'checked' : '';
-            return `
-              <div class="task">
-                <input type="checkbox" id="${id}" ${chk}/>
-                <label for="${id}">${t.label}${t.detail?`<small>${t.detail}</small>`:''}</label>
-              </div>`;
-          }).join('')}
-        </div>
-      </li>
-    `;
+  function keyForWeek(w){
+    if (w <= 3) return "0-3";
+    if (w <= 6) return "4-6";
+    if (w <= 9) return "7-9";
+    return "10-12";
   }
 
-  function renderChecklist(plan){
-    if (!tl) return;
-    tl.innerHTML = plan.map(phaseHTML).join('');
-    // Toggle
-    tl.querySelectorAll('.phase-header').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const li = btn.closest('.phase');
-        const open = li.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open ? 'true':'false');
-      });
-    });
-    // Save checks
-    tl.querySelectorAll('.task input[type="checkbox"]').forEach(cb=>{
-      cb.addEventListener('change',()=>{
-        state[cb.id] = cb.checked;
-        saveState(state);
-        refreshCounter(cb.closest('.phase'));
-      });
-    });
+  function buildTimeline(){
+    timelineEl.innerHTML = "";
+    for(let w=0; w<=maxWeeks; w++){
+      const mark = document.createElement("div");
+      mark.className = "t-mark" + (w < currentWeek ? " done" : w === currentWeek ? " current" : "");
+      const dot = document.createElement("div");
+      dot.className = "t-dot";
+      const label = document.createElement("div");
+      label.className = "t-label";
+      label.textContent = `W${w}`;
+      mark.appendChild(dot);
+      mark.appendChild(label);
+      timelineEl.appendChild(mark);
+    }
   }
 
-  function refreshCounter(li){
-    const checks = [...li.querySelectorAll('.task input[type="checkbox"]')];
-    const done = checks.filter(c=>c.checked).length;
-    const total = checks.length;
-    const pill = li.querySelector('[data-counter]');
-    if (pill) pill.textContent = `${done}/${total} erledigt`;
-  }
+  function fillPhase(){
+    // Pill
+    phasePill.textContent = `Aktuelle Phase: Woche ${currentWeek}`;
 
-  /* ---------- Zahlenstrahl / Info-Kacheln ---------- */
-  const stepsUl = byId('phaseSteps');
-  const progressBar = byId('railProgress');
-  const infoBox = byId('phaseInfo');
+    // Phase Text
+    const phaseKey = keyForWeek(currentWeek);
+    const phaseMeta = phases.find(p => currentWeek >= p.range[0] && currentWeek <= p.range[1]);
 
-  // Beispiel: Patient aktuell in "ab 4. Woche"
-  let currentPhaseId = 'ab4w';
-
-  function renderTrack(plan){
-    stepsUl.innerHTML = plan.map(p => `
-      <li class="step" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.title}">
-        <div class="dot"></div>
-        <label>${p.title}</label>
-        <small>${p.window}</small>
-      </li>`).join('');
-
-    stepsUl.querySelectorAll('.step').forEach((el, idx)=>{
-      el.addEventListener('click', ()=> setCurrent(plan[idx].id));
-      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') setCurrent(plan[idx].id); });
-    });
-
-    setCurrent(currentPhaseId);
-  }
-
-  function setCurrent(phaseId){
-    currentPhaseId = phaseId;
-    const plan = PLAN_VKB;
-    const idx = plan.findIndex(p=>p.id===phaseId);
-    // Markierung
-    stepsUl.querySelectorAll('.step').forEach((el,i)=>el.classList.toggle('active', i<=idx));
-    // Progressbreite
-    const count = plan.length;
-    const percent = (idx<=0) ? 0 : (idx/(count-1))*100;
-    progressBar.style.width = `calc(${percent}% - 0px)`;
-
-    // Info-Kacheln
-    const ph = plan[idx];
-    infoBox.innerHTML = `
-      <h3>${ph.title}</h3>
-      <div class="info-grid">
-        <div class="info-tile">
-          <h4>Bewegungsumfang</h4>
-          <div>${ph.window}</div>
-        </div>
-        <div class="info-tile">
-          <h4>Belastung / Ziel</h4>
-          <div>${ph.load}</div>
-        </div>
-        <div class="info-tile">
-          <h4>Nachbehandlung & Techniken</h4>
-          <div>${(ph.techniques && ph.techniques.length)? ph.techniques.join(', ') : '—'}</div>
-        </div>
-        <div class="info-tile">
-          <h4>Schwerpunkt</h4>
-          <div>${ph.scope||'—'}</div>
-        </div>
+    phaseDetails.innerHTML = `
+      <div class="p">
+        <h4>${phaseMeta.title}</h4>
+        <p>${phaseMeta.goal}</p>
+      </div>
+      <div class="p">
+        <h4>Hinweis</h4>
+        <p>Belastung stets symptomgeführt steigern. Bei anhaltendem Schmerz/Schwellung: Dosis anpassen und Rücksprache halten.</p>
       </div>
     `;
+
+    // 3 Boxen
+    const lists = {
+      bewegungsumfang: bewegEl,
+      belastung: belastEl,
+      techniken: technikEl
+    };
+    Object.entries(lists).forEach(([k, ul]) => {
+      ul.innerHTML = "";
+      (content[k][phaseKey] || []).forEach(txt => {
+        const li = document.createElement("li");
+        li.textContent = txt;
+        ul.appendChild(li);
+      });
+    });
   }
 
-  /* ---------- Buttons & Schema ---------- */
-  byId('expandAll')?.addEventListener('click',()=>{
-    tl?.querySelectorAll('.phase').forEach(li=>{
-      li.classList.add('open'); li.querySelector('.phase-header')?.setAttribute('aria-expanded','true');
+  // KPI Balken setzen
+  function initKPI(){
+    document.querySelectorAll(".kpi").forEach(el => {
+      const v = Math.max(0, Math.min(100, parseInt(el.dataset.value || "0", 10)));
+      el.style.setProperty("--val", v.toString());
     });
-  });
-  byId('collapseAll')?.addEventListener('click',()=>{
-    tl?.querySelectorAll('.phase').forEach(li=>{
-      li.classList.remove('open'); li.querySelector('.phase-header')?.setAttribute('aria-expanded','false');
+  }
+
+  // Termine rechts (aus Kalender)
+  function loadStore(){
+    try { return JSON.parse(localStorage.getItem("kal_data") || "{}"); }
+    catch { return {}; }
+  }
+  function parseISO(tag){
+    const [y,m,d] = tag.split("-").map(x => parseInt(x,10));
+    return new Date(y, m-1, d);
+  }
+  function two(n){ return String(n).padStart(2,"0"); }
+  const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+  function fmtDate(d){
+    return `${WD[d.getDay()]}, ${two(d.getDate())}.${two(d.getMonth()+1)}.${d.getFullYear()}`;
+  }
+
+  function nextAppointments(limit=4){
+    const user = window.currentUserName || null;
+    if(!user) return [];
+    const store = loadStore();
+    const items = [];
+    Object.entries(store).forEach(([tag, slots])=>{
+      Object.entries(slots).forEach(([slot,name])=>{
+        if(name === user){
+          const date = parseISO(tag);
+          // Nur heute und Zukunft
+          const today = new Date(); today.setHours(0,0,0,0);
+          const dd = new Date(date.getFullYear(),date.getMonth(),date.getDate());
+          if (dd >= today) items.push({tag, slot, date});
+        }
+      });
     });
+    items.sort((a,b)=> a.tag.localeCompare(b.tag) || a.slot.localeCompare(b.slot));
+    return items.slice(0, limit);
+  }
+
+  function renderAppointments(){
+    const list = document.getElementById("apptList");
+    const empty = document.getElementById("apptEmpty");
+    list.innerHTML = "";
+    const appts = nextAppointments();
+    if(appts.length === 0){
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    appts.forEach(a=>{
+      const row = document.createElement("div");
+      row.className = "appt";
+      row.innerHTML = `
+        <div class="when">${fmtDate(a.date)} · ${a.slot}</div>
+        <div class="meta">
+          <span>Kalender</span>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  // Download-Button fallback (falls PDF nicht existiert)
+  function verifyDownloadLink(){
+    const a = document.getElementById("downloadPlanBtn");
+    // wir lassen den Link einfach – falls 404 liefert der Server die Seite zurück.
+    // Optional: per HEAD prüfen – in static hosting meist nicht möglich. Daher UI-Hinweis:
+    a.addEventListener("click", (e)=>{
+      // keine Blockade; Hinweis könnte man hier optional nach erfolgreichem dl einblenden
+    });
+  }
+
+  // Events
+  document.getElementById("refreshAppointments")?.addEventListener("click", renderAppointments);
+  window.addEventListener("storage", (e)=>{ if(e.key === "kal_data") renderAppointments(); });
+
+  // Init
+  document.addEventListener("DOMContentLoaded", () => {
+    buildTimeline();
+    fillPhase();
+    initKPI();
+    renderAppointments();
+    verifyDownloadLink();
   });
-
-  // PDF via Druckdialog
-  byId('downloadPdf')?.addEventListener('click', ()=> window.print());
-
-  byId('schemaSelect')?.addEventListener('change', ()=>{
-    renderChecklist(PLAN_VKB);
-    renderTrack(PLAN_VKB);
-  });
-
-  /* ---------- Initial ---------- */
-  renderChecklist(PLAN_VKB);
-  renderTrack(PLAN_VKB);
-
-  /* Helpers */
-  function byId(id){ return document.getElementById(id); }
 })();
