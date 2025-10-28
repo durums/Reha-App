@@ -178,8 +178,23 @@
 
     // --- Sidebar ---
     const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
-    menuToggle.addEventListener("click",  () => sidebar.classList.toggle("active"));
-    closeSidebar.addEventListener("click", () => sidebar.classList.remove("active"));
+    menuToggle.addEventListener("click", () => {
+      sidebar.classList.add("active");   // Sidebar sicher öffnen
+      setMenuToggleVisible(false);       // ☰ ausblenden
+    });
+    
+    closeSidebar.addEventListener("click", () => {
+      sidebar.classList.remove("active");// Sidebar schließen
+      setMenuToggleVisible(true);        // ☰ wieder einblenden
+    });
+
+    document.querySelector(".sidebar-menu").addEventListener("click", (e) => {
+      const link = e.target.closest("a");
+      if (!link) return;
+      // Sidebar schließen + ☰ einblenden
+      sidebar.classList.remove("active");
+      setMenuToggleVisible(true);
+    });
 
     // --- Views dynamisch laden ---
     async function loadView(page) {
@@ -223,6 +238,7 @@
       if (!page) page = "tagesprogramm";
       loadView(page);
       sidebar.classList.remove("active");
+      setMenuToggleVisible(true);
       document.querySelectorAll(".sidebar-menu a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
       });
