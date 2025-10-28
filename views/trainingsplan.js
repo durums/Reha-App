@@ -74,26 +74,45 @@
   });
 
   // ==== Video-Dialog ====
-  const videoBackdrop = $('#tp-video');       // <div hidden>
+  const videoBackdrop = $('#tp-video');       // <div>
   const videoEl       = $('#tp-video-el');    // <video> ohne src!
   const videoTitle    = $('#tp-video-title'); // <h3>
   const videoCloseBtn = $('#tp-video-close'); // ×
 
+  // --- HART VERSTECKEN BEIM LADEN + SICHERN, DASS KEIN SRC EXISTIERT ---
+  videoBackdrop.style.display = 'none';     // verhindert „leeren Player“
+  videoBackdrop.hidden = true;              // doppelt hält besser
+  videoEl.removeAttribute('src');
+  try { videoEl.preload = 'none'; } catch {}
+
+  function showDialog() {
+    videoBackdrop.hidden = false;
+    videoBackdrop.style.display = 'flex';   // oder 'block' je nach Layout
+  }
+  function hideDialog() {
+    videoBackdrop.hidden = true;
+    videoBackdrop.style.display = 'none';
+  }
+
   function openVideo(w) {
     if (!w?.videoUrl) { alert('Kein Video hinterlegt.'); return; }
     videoTitle.textContent = w.title;
-    videoEl.removeAttribute('src'); // sicherheitshalber
-    videoEl.src = w.videoUrl;       // src erst JETZT setzen
-    videoBackdrop.hidden = false;
-    // Autoplay nur nach Nutzerklick:
-    videoEl.play().catch(() => {}); // falls Browser blockt, kann user über Controls starten
+
+    // Quelle erst JETZT setzen
+    videoEl.removeAttribute('src');
+    videoEl.src = w.videoUrl;
+
+    showDialog();
+
+    // Autoplay nur nach Nutzeraktion; evtl. blockiert -> egal
+    videoEl.play().catch(() => {});
   }
 
   function closeVideo() {
     try { videoEl.pause(); } catch {}
-    videoEl.removeAttribute('src'); // Stream/Download stoppen
-    videoEl.load();                 // Quelle verwerfen
-    videoBackdrop.hidden = true;
+    videoEl.removeAttribute('src'); // Download/Stream abbrechen
+    videoEl.load();                 // Puffer verwerfen
+    hideDialog();
   }
 
   videoCloseBtn.addEventListener('click', closeVideo);
@@ -101,24 +120,23 @@
     if (e.target === videoBackdrop) closeVideo(); // Klick außerhalb schließt
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !videoBackdrop.hidden) closeVideo();
+    if (e.key === 'Escape' && videoBackdrop.style.display !== 'none') closeVideo();
   });
 
   // Delegation für Start/Video-Buttons
-    document.addEventListener('click', (e) => {
-      const startBtn = e.target.closest('.tp-start');
-      if (startBtn) {
-        const w = byId[startBtn.dataset.id];
-        openVideo(w);            // Video-Dialog öffnen
-        return;                  // keine Hash-Navigation
-      }
-      const vidBtn = e.target.closest('.tp-video-btn');
-      if (vidBtn) {
-        const w = byId[vidBtn.dataset.id];
-        openVideo(w);
-      }
-    });
-
+  document.addEventListener('click', (e) => {
+    const startBtn = e.target.closest('.tp-start');
+    if (startBtn) {
+      const w = byId[startBtn.dataset.id];
+      openVideo(w);            // Video-Dialog öffnen
+      return;                  // keine Hash-Navigation
+    }
+    const vidBtn = e.target.closest('.tp-video-btn');
+    if (vidBtn) {
+      const w = byId[vidBtn.dataset.id];
+      openVideo(w);
+    }
+  });
 
   // Initial-Render
   render('oberkoerper');
