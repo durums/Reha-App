@@ -1,71 +1,86 @@
-<!-- views/fortschritt.html -->
-<main class="fortschritt-page">
-  <header class="fs-header">
-    <div>
-      <h1>Fortschritt</h1>
-      <p class="subtitle">Übersicht deiner Reha–Fortschritte und aktuellen Phase.</p>
-    </div>
-    <a id="downloadPlanBtn" class="btn btn-primary" href="assets/nachbehandlung.pdf" download>
+<section class="prog-wrap">
+  <div class="prog-header">
+    <h1>Fortschritt</h1>
+    <p>Übersicht deiner Reha-Fortschritte und aktuellen Phase.</p>
+
+    <a id="btnDoc" class="btn btn-dark" href="assets/nachbehandlung.pdf" download>
       📄 Nachbehandlungs-Dokument
     </a>
-  </header>
+  </div>
 
-  <section class="fs-grid">
-    <!-- Linke Spalte -->
-    <div class="col">
-      <article class="card">
-        <div class="card-head">
-          <h2>Nachbehandlungs-Übersicht</h2>
-          <div class="phase-pill" id="phasePill">Aktuelle Phase: Woche 4</div>
-        </div>
-
-        <!-- Zahlenstrahl -->
-        <div class="timeline" id="timeline" aria-label="Zahlenstrahl Wochen 0–12"></div>
-
-        <!-- Phase-Details -->
-        <div class="phase-details" id="phaseDetails">
-          <!-- per JS gefüllt -->
-        </div>
-      </article>
-
-      <div class="subgrid">
-        <article class="card">
-          <h3>Bewegungsumfang</h3>
-          <ul class="list" id="bewegungsumfang"></ul>
-        </article>
-        <article class="card">
-          <h3>Belastung</h3>
-          <ul class="list" id="belastung"></ul>
-        </article>
-        <article class="card">
-          <h3>Nachbehandlungen & Techniken</h3>
-          <ul class="list" id="techniken"></ul>
-        </article>
+  <div class="grid grid-top">
+    <!-- Phase / Zahlenstrahl -->
+    <article class="card phase-summary">
+      <div class="phase-head">
+        <h3>Nachbehandlungs-Übersicht</h3>
+        <span id="phasePill" class="pill">Aktuelle Phase: –</span>
       </div>
-    </div>
 
-    <!-- Rechte Spalte -->
-    <div class="col">
-      <article class="card">
-        <h2>KPI-Fortschritt</h2>
-        <div class="kpi" data-label="Beweglichkeit" data-value="46"></div>
-        <div class="kpi" data-label="Kraft" data-value="32"></div>
-        <div class="kpi" data-label="Ausdauer" data-value="28"></div>
-        <div class="kpi" data-label="Schmerzreduktion" data-value="58"></div>
-        <div class="legend tiny">* Prozentwerte beispielhaft – anpassbar in <code>fortschritt.js</code></div>
-      </article>
+      <!-- Zahlenstrahl -->
+      <div id="timeline" class="timeline" aria-label="Reha-Zeitstrahl"></div>
 
-      <article class="card">
-        <div class="card-head">
-          <h2>Nächste Termine</h2>
-          <button id="refreshAppointments" class="btn btn-ghost">↻</button>
-        </div>
-        <div id="apptList" class="appt-list"></div>
-        <div id="apptEmpty" class="empty tiny" hidden>Keine anstehenden Termine gefunden.</div>
-      </article>
-    </div>
-  </section>
-</main>
+      <!-- Phase-Details (Titel/Ziel/Hinweis) -->
+      <div id="phaseDetails" class="phase-details">
+        <!-- Wird von fortschritt.js befüllt -->
+      </div>
+    </article>
 
-<link rel="stylesheet" href="views/fortschritt.css">
-<script src="views/fortschritt.js" defer></script>
+    <!-- KPI rechts -->
+    <aside class="card kpi-box">
+      <h3>KPI-Fortschritt</h3>
+
+      <div class="kpi" data-value="46">
+        <div class="kpi-title">Beweglichkeit · <strong>46%</strong></div>
+        <div class="bar"><span></span></div>
+      </div>
+
+      <div class="kpi" data-value="32">
+        <div class="kpi-title">Kraft · <strong>32%</strong></div>
+        <div class="bar"><span></span></div>
+      </div>
+
+      <div class="kpi" data-value="28">
+        <div class="kpi-title">Ausdauer · <strong>28%</strong></div>
+        <div class="bar"><span></span></div>
+      </div>
+
+      <div class="kpi" data-value="58">
+        <div class="kpi-title">Schmerzreduktion · <strong>58%</strong></div>
+        <div class="bar"><span></span></div>
+      </div>
+
+      <p class="hint">* Prozentwerte beispielhaft – anpassbar in <code>fortschritt.js</code></p>
+    </aside>
+  </div>
+
+  <!-- Drei Info-Boxen (werden aus JS befüllt) -->
+  <div class="grid grid-details">
+    <article class="card detail-box">
+      <h3>Bewegungsumfang</h3>
+      <ul id="bewegungsumfang" class="list"></ul>
+    </article>
+
+    <article class="card detail-box">
+      <h3>Belastung</h3>
+      <ul id="belastung" class="list"></ul>
+    </article>
+
+    <article class="card detail-box">
+      <h3>Nachbehandlungen &amp; Techniken</h3>
+      <ul id="techniken" class="list"></ul>
+    </article>
+  </div>
+
+  <!-- Nächste Termine (aus Kalender) -->
+  <div class="grid grid-appointments">
+    <article class="card appt-box">
+      <div class="appt-head">
+        <h3>Nächste Termine</h3>
+        <button id="refreshAppointments" class="btn btn-light" type="button" title="Aktualisieren">⟳</button>
+      </div>
+
+      <div id="apptEmpty" class="empty">Keine anstehenden Termine gefunden.</div>
+      <div id="apptList" class="appt-list"><!-- befüllt per JS --></div>
+    </article>
+  </div>
+</section>
