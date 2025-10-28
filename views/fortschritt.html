@@ -1,86 +1,57 @@
-<section class="prog-wrap">
-  <div class="prog-header">
-    <h1>Fortschritt</h1>
-    <p>Übersicht deiner Reha-Fortschritte und aktuellen Phase.</p>
-
-    <a id="btnDoc" class="btn btn-dark" href="assets/nachbehandlung.pdf" download>
+<section class="rehaprogress">
+  <div class="rp-head">
+    <a class="rp-doc btn-dark" href="assets/nachbehandlung.pdf" download>
       📄 Nachbehandlungs-Dokument
     </a>
+    <div class="rp-kpi card-dark">
+      <h3>KPI – Fortschritt</h3>
+
+      <div class="kpi-row">
+        <div class="kpi-label">Beweglichkeit – <b id="kpi-mobility-val">75%</b></div>
+        <div class="kpi-bar"><span id="kpi-mobility-bar" style="width:75%"></span></div>
+      </div>
+
+      <div class="kpi-donuts">
+        <div class="donut" data-val="25" data-caption="Kraft – 25%"></div>
+        <div class="donut" data-val="62" data-caption="Ausdauer – 62%"></div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-label">Schmerzreduktion – <b id="kpi-pain-val">85%</b></div>
+        <div class="kpi-bar"><span id="kpi-pain-bar" style="width:85%"></span></div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid grid-top">
-    <!-- Phase / Zahlenstrahl -->
-    <article class="card phase-summary">
-      <div class="phase-head">
-        <h3>Nachbehandlungs-Übersicht</h3>
-        <span id="phasePill" class="pill">Aktuelle Phase: –</span>
-      </div>
-
-      <!-- Zahlenstrahl -->
-      <div id="timeline" class="timeline" aria-label="Reha-Zeitstrahl"></div>
-
-      <!-- Phase-Details (Titel/Ziel/Hinweis) -->
-      <div id="phaseDetails" class="phase-details">
-        <!-- Wird von fortschritt.js befüllt -->
-      </div>
-    </article>
-
-    <!-- KPI rechts -->
-    <aside class="card kpi-box">
-      <h3>KPI-Fortschritt</h3>
-
-      <div class="kpi" data-value="46">
-        <div class="kpi-title">Beweglichkeit · <strong>46%</strong></div>
-        <div class="bar"><span></span></div>
-      </div>
-
-      <div class="kpi" data-value="32">
-        <div class="kpi-title">Kraft · <strong>32%</strong></div>
-        <div class="bar"><span></span></div>
-      </div>
-
-      <div class="kpi" data-value="28">
-        <div class="kpi-title">Ausdauer · <strong>28%</strong></div>
-        <div class="bar"><span></span></div>
-      </div>
-
-      <div class="kpi" data-value="58">
-        <div class="kpi-title">Schmerzreduktion · <strong>58%</strong></div>
-        <div class="bar"><span></span></div>
-      </div>
-
-      <p class="hint">* Prozentwerte beispielhaft – anpassbar in <code>fortschritt.js</code></p>
-    </aside>
+  <!-- Timeline -->
+  <div class="rp-timeline card">
+    <div class="time-head">Zeit</div>
+    <div id="rp-steps" class="steps" aria-label="Reha Timeline"></div>
+    <div class="phase-chip">Aktuelle Phase:</div>
+    <div class="phase-track"><span id="rp-progress"></span></div>
   </div>
 
-  <!-- Drei Info-Boxen (werden aus JS befüllt) -->
-  <div class="grid grid-details">
-    <article class="card detail-box">
-      <h3>Bewegungsumfang</h3>
-      <ul id="bewegungsumfang" class="list"></ul>
+  <!-- Info-Kacheln -->
+  <div class="rp-info">
+    <article class="card pill">
+      <h4>BEWEGUNGSUMFANG</h4>
+      <ul class="list">
+        <li>Abtrainieren der Hartrahmenorthese bei normalem Gangbild</li>
+      </ul>
     </article>
-
-    <article class="card detail-box">
-      <h3>Belastung</h3>
-      <ul id="belastung" class="list"></ul>
+    <article class="card pill">
+      <h4>BELASTUNG</h4>
+      <ul class="list">
+        <li>Volles Körpergewicht (ohne Gehhilfen)</li>
+      </ul>
     </article>
-
-    <article class="card detail-box">
-      <h3>Nachbehandlungen &amp; Techniken</h3>
-      <ul id="techniken" class="list"></ul>
-    </article>
-  </div>
-
-  <!-- Nächste Termine (aus Kalender) -->
-  <div class="grid grid-appointments">
-    <article class="card appt-box">
-      <div class="appt-head">
-        <h3>Nächste Termine</h3>
-        <button id="refreshAppointments" class="btn btn-light" type="button" title="Aktualisieren">⟳</button>
-      </div>
-
-      <div id="apptEmpty" class="empty">Keine anstehenden Termine gefunden.</div>
-      <div id="apptList" class="appt-list"><!-- befüllt per JS --></div>
+    <article class="card pill">
+      <h4>BEHANDLUNG</h4>
+      <ul class="list">
+        <li>passive Bewegungsübung</li>
+        <li>Gangschule (Treppen)</li>
+        <li>Lymphdrainage</li>
+      </ul>
     </article>
   </div>
 </section>
