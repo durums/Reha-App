@@ -1,87 +1,71 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Reha · Fortschritt</title>
-  <link rel="stylesheet" href="./fortschritt.css" />
-</head>
-<body>
-  <main class="page">
-    <header class="page-head">
-      <h1>Dein Fortschritt</h1>
-      <p class="muted">Verfolge deine Rehabilitation und erreiche Ziele</p>
-    </header>
+<!-- views/fortschritt.html -->
+<main class="fortschritt-page">
+  <header class="fs-header">
+    <div>
+      <h1>Fortschritt</h1>
+      <p class="subtitle">Übersicht deiner Reha–Fortschritte und aktuellen Phase.</p>
+    </div>
+    <a id="downloadPlanBtn" class="btn btn-primary" href="assets/nachbehandlung.pdf" download>
+      📄 Nachbehandlungs-Dokument
+    </a>
+  </header>
 
-    <!-- KPI-Karten -->
-    <section class="kpis">
-      <article class="kpi card">
-        <header>Übungen diese Woche</header>
-        <div class="kpi-value"><span id="kpi-week-count">0</span> <small>von 15</small></div>
-        <div class="bar"><span id="kpi-week-bar"></span></div>
-      </article>
-      <article class="kpi card">
-        <header>Aktive Tage</header>
-        <div class="kpi-value"><span id="kpi-days">0</span> <small>von 7</small></div>
-        <div class="bar"><span id="kpi-days-bar"></span></div>
-      </article>
-      <article class="kpi card">
-        <header>Gesamtfortschritt</header>
-        <div class="kpi-value"><span id="kpi-total">0%</span></div>
-        <div class="bar"><span id="kpi-total-bar"></span></div>
-      </article>
-      <article class="kpi card">
-        <header>Errungenschaften</header>
-        <div class="kpi-value"><span id="kpi-badges">0</span> <small>freigeschaltet</small></div>
-        <div class="bar"><span id="kpi-badges-bar"></span></div>
-      </article>
-    </section>
-
-    <!-- Letzte Aktivitäten -->
-    <section class="recent card">
-      <header>
-        <h2 class="h2">Letzte Aktivitäten</h2>
-        <p class="muted">Deine kürzlich absolvierten Übungen</p>
-      </header>
-      <ul id="recentList" class="recent-list"></ul>
-    </section>
-
-    <!-- Nachbehandlungs-Übersicht -->
-    <section class="rehab card">
-      <header class="rehab-header">
-        <div>
-          <h2 class="h2">Nachbehandlungs-Übersicht</h2>
-          <p class="muted">Plan zum vorderen Kreuzband (VKB) – komprimiert, abhakbar & als PDF ladbar</p>
+  <section class="fs-grid">
+    <!-- Linke Spalte -->
+    <div class="col">
+      <article class="card">
+        <div class="card-head">
+          <h2>Nachbehandlungs-Übersicht</h2>
+          <div class="phase-pill" id="phasePill">Aktuelle Phase: Woche 4</div>
         </div>
 
-        <div class="rehab-tools">
-          <label class="sel">
-            <span>Schema</span>
-            <select id="schemaSelect">
-              <option value="VKB" selected>VKB (vorderes Kreuzband)</option>
-            </select>
-          </label>
+        <!-- Zahlenstrahl -->
+        <div class="timeline" id="timeline" aria-label="Zahlenstrahl Wochen 0–12"></div>
 
-          <button id="downloadPdf" class="btn">Dokument herunterladen (PDF)</button>
-          <button id="expandAll" class="btn ghost">Alle aufklappen</button>
-          <button id="collapseAll" class="btn ghost">Alle zuklappen</button>
+        <!-- Phase-Details -->
+        <div class="phase-details" id="phaseDetails">
+          <!-- per JS gefüllt -->
         </div>
-      </header>
+      </article>
 
-      <!-- Zahlenstrahl / Phasen-Navigator -->
-      <section class="phase-track" aria-label="Phasen-Zahlenstrahl">
-        <div class="rail">
-          <div id="railProgress" class="rail-progress"></div>
-          <ul id="phaseSteps" class="steps"><!-- per JS --></ul>
+      <div class="subgrid">
+        <article class="card">
+          <h3>Bewegungsumfang</h3>
+          <ul class="list" id="bewegungsumfang"></ul>
+        </article>
+        <article class="card">
+          <h3>Belastung</h3>
+          <ul class="list" id="belastung"></ul>
+        </article>
+        <article class="card">
+          <h3>Nachbehandlungen & Techniken</h3>
+          <ul class="list" id="techniken"></ul>
+        </article>
+      </div>
+    </div>
+
+    <!-- Rechte Spalte -->
+    <div class="col">
+      <article class="card">
+        <h2>KPI-Fortschritt</h2>
+        <div class="kpi" data-label="Beweglichkeit" data-value="46"></div>
+        <div class="kpi" data-label="Kraft" data-value="32"></div>
+        <div class="kpi" data-label="Ausdauer" data-value="28"></div>
+        <div class="kpi" data-label="Schmerzreduktion" data-value="58"></div>
+        <div class="legend tiny">* Prozentwerte beispielhaft – anpassbar in <code>fortschritt.js</code></div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Nächste Termine</h2>
+          <button id="refreshAppointments" class="btn btn-ghost">↻</button>
         </div>
-        <div id="phaseInfo" class="phase-info"><!-- per JS --></div>
-      </section>
+        <div id="apptList" class="appt-list"></div>
+        <div id="apptEmpty" class="empty tiny" hidden>Keine anstehenden Termine gefunden.</div>
+      </article>
+    </div>
+  </section>
+</main>
 
-      <!-- Checklisten-Timeline -->
-      <ol id="rehabTimeline" class="timeline"><!-- per JS --></ol>
-    </section>
-  </main>
-
-  <script src="./fortschritt.js"></script>
-</body>
-</html>
+<link rel="stylesheet" href="views/fortschritt.css">
+<script src="views/fortschritt.js" defer></script>
