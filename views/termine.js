@@ -2,43 +2,41 @@
   const LIST = document.getElementById("termineList");
   const FILTER_BTNS = document.querySelectorAll('.termine-toolbar .filters button');
 
-  // aus Kalender wiederverwenden
-  const START = 8, END = 17;
-  const storageKey = "kal_data";
-  const user = window.currentUserName || "Gast";
+  const STORAGE_KEY = "kal_data";
+  const userId   = window.currentUserId   || "guest";
+  const userName = window.currentUserName || "Gast";
 
-  // --- Utilities ---
-  const pad = n => String(n).padStart(2,"0");
+  // --- Utils ---
   const dOnly = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const ymd = d => d.toISOString().slice(0,10);
   const parseYmd = s => new Date(s + "T00:00:00");
   const fmtDate = d => d.toLocaleDateString("de-DE",{weekday:"short", day:"2-digit", month:"long", year:"numeric"});
-  const fmtTime = s => s; // "08:00" etc.
 
   function loadStore(){
-    try { return JSON.parse(localStorage.getItem(storageKey)||"{}"); }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); }
     catch { return {}; }
   }
 
-  function allMyAppointments(){
+  // Alle Termine (nur eigene, es sei denn includeOthers=true)
+  function allAppointments(includeOthers=false){
     const store = loadStore();
     const out = [];
     for (const [date, slots] of Object.entries(store)) {
       for (const [slot, who] of Object.entries(slots)) {
-        if (who === user) out.push({ date, slot });
+        const uid = typeof who === "string" ? null : who?.uid;
+        const nm  = typeof who === "string" ? who : who?.name;
+        const isMine = uid ? (uid === userId) : (nm === userName);
+        if (includeOthers || isMine) out.push({ date, slot, name:nm, uid });
       }
     }
-    // sort desc by date+time
-    out.sort((a,b)=> (a.date.localeCompare(b.date)) || (a.slot.localeCompare(b.slot)));
-    return out;
+    return out.sort((a,b)=> (a.date.localeCompare(b.date)) || (a.slot.localeCompare(b.slot)));
   }
 
-  // --- Render ---
   function render(filter="upcoming"){
     if (!LIST) return;
 
     const now = dOnly(new Date());
-    const mine = allMyAppointments();
+    const mine = allAppointments(false); // nur eigene
     const filtered = mine.filter(x => {
       const d = dOnly(parseYmd(x.date));
       if (filter === "upcoming")  return d >= now;
@@ -60,7 +58,6 @@
       return;
     }
 
-    // Ausgabe in Tag-Gruppen
     [...groups.keys()].sort().forEach(date => {
       const day = parseYmd(date);
       const isPast = dOnly(day) < now;
@@ -76,7 +73,7 @@
 
         card.innerHTML = `
           <div class="termine-row">
-            <div class="termine-time">${fmtTime(ap.slot)}</div>
+            <div class="termine-time">${ap.slot}</div>
             <div class="termine-title">Reha-Termin</div>
             <div class="termine-badge ${isPast ? "past" : "upcoming"}">
               ${isPast ? "abgeschlossen" : "anstehend"}
@@ -93,47 +90,49 @@
     });
   }
 
-  // --- Actions (verschieben/absagen) ---
+  // Aktionen
   LIST?.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-act]");
-    if (!btn) return;
-    const act  = btn.dataset.act;
-    const date = btn.dataset.date;
-    const slot = btn.dataset.slot;
+    const b = e.target.closest("button[data-act]");
+    if (!b) return;
+    const act  = b.dataset.act;
+    const date = b.dataset.date;
+    const slot = b.dataset.slot;
+
+    const store = loadStore();
+    if (!store[date] || !store[date][slot]) return;
+
+    // Nur eigene Termine bearbeiten (UID bevorzugt)
+    const who = store[date][slot];
+    const uid = typeof who === "string" ? null : who?.uid;
+    const nm  = typeof who === "string" ? who : who?.name;
+    const isMine = uid ? (uid === userId) : (nm === userName);
+    if (!isMine) return alert("Du kannst nur deine eigenen Termine ändern.");
 
     if (act === "cancel") {
-      const store = loadStore();
-      if (store[date] && store[date][slot] === user) {
-        delete store[date][slot];
-        if (Object.keys(store[date]).length === 0) delete store[date];
-        localStorage.setItem(storageKey, JSON.stringify(store));
-        render(currentFilter());
-      } else {
-        alert("Termin kann nicht storniert werden.");
-      }
+      delete store[date][slot];
+      if (Object.keys(store[date]).length === 0) delete store[date];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      render(currentFilter());
     }
 
     if (act === "move") {
-      // simple: neue Zeit eingeben
       const ns = prompt("Neue Uhrzeit (z. B. 14:00)?");
       if (!ns || !/^\d{2}:\d{2}$/.test(ns)) return;
-      const store = loadStore();
-      if (!store[date]) store[date] = {};
-      if (store[date][ns]) return alert("Slot ist belegt.");
-      // alten löschen, neuen setzen
+      if (store[date] && store[date][ns]) return alert("Slot ist belegt.");
+      // verschieben
       delete store[date][slot];
-      store[date][ns] = user;
-      localStorage.setItem(storageKey, JSON.stringify(store));
+      if (!store[date]) store[date] = {};
+      store[date][ns] = { uid: userId, name: userName }; // auf neues Schema setzen
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
       render(currentFilter());
     }
   });
 
-  // --- Filter oben ---
+  // Filter-Buttons
   function currentFilter(){
     const active = document.querySelector('.termine-toolbar .filters button.active');
     return active?.dataset.filter || "upcoming";
   }
-
   FILTER_BTNS.forEach(b=>{
     b.addEventListener("click", ()=>{
       FILTER_BTNS.forEach(x=>x.classList.remove("active"));
@@ -142,8 +141,7 @@
     });
   });
 
-  // --- Start ---
-  // robust, auch wenn die View dynamisch eingefügt wurde
+  // Start
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", ()=> render("upcoming"));
   } else {
