@@ -42,6 +42,25 @@
         <span id="pf-status" class="subtle"></span>
       </div>
     </section>
+    
+    <section id="tab-profile" class="card">
+      <h2>Profil</h2>
+      <div class="avatar" id="pf-avatar">U</div>
+    
+      <label>Vorname <input id="pf-first" type="text" autocomplete="given-name"></label>
+      <label>Nachname <input id="pf-last"  type="text" autocomplete="family-name"></label>
+      <label>E-Mail   <input id="pf-email" type="email" disabled></label>
+      <label>Telefon  <input id="pf-phone" type="tel"></label>
+    
+      <fieldset>
+        <legend>Benachrichtigungen</legend>
+        <label><input id="pf-reminders" type="checkbox"> Erinnerungen</label>
+        <label><input id="pf-summary"   type="checkbox"> Tageszusammenfassung</label>
+      </fieldset>
+    
+      <button id="pf-save">Speichern</button>
+      <p id="pf-status"></p>
+    </section>
 
     <!-- RIGHT: Notifications / Security / Settings -->
     <div class="pf-side">
@@ -79,4 +98,5 @@
     </div>
   </div>
 </div>
+
 
