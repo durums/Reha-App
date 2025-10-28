@@ -151,3 +151,31 @@
     }
   });
 })();
+// =========================
+// Privatsphäre Modal
+// =========================
+const privacyBtn = document.getElementById("pf-privacy");
+const privacyDialog = document.getElementById("pf-privacy-dialog");
+const privacyClose = document.getElementById("pf-privacy-close");
+
+if (privacyBtn && privacyDialog) {
+  const openPrivacy = () => {
+    privacyDialog.style.display = "grid";
+  };
+  const closePrivacy = () => {
+    privacyDialog.style.display = "none";
+  };
+
+  privacyBtn.addEventListener("click", openPrivacy);
+  privacyClose?.addEventListener("click", closePrivacy);
+
+  // Schließen bei Klick außerhalb
+  privacyDialog.addEventListener("click", (e) => {
+    if (e.target === privacyDialog) closePrivacy();
+  });
+
+  // Schließen mit ESC-Taste
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && privacyDialog.style.display !== "none") closePrivacy();
+  });
+}
