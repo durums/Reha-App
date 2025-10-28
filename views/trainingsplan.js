@@ -124,7 +124,7 @@
     if (startBtn) {
       const id = startBtn.dataset.id;
       // bisheriger Code hier ...
-      window.location.href = `uebung.html?id=${encodeURIComponent(id)}`;
+      window.location.href = `/Reha-App/views/uebung.html?id=${encodeURIComponent(id)}`;
       return;
     }
     const vidBtn = e.target.closest('.tp-video-btn');
