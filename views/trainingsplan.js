@@ -2,7 +2,7 @@
   const $  = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
-  // --- Daten (Video-Pfade anpassen) ---
+  // --- Daten ---
   const workouts = [
     { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke',
       emoji:'🏃‍♂️', duration:5, level:'leicht', area:'oberkoerper',
@@ -66,7 +66,7 @@
     btn.addEventListener('click', () => {
       $$('.tp-tab').forEach(b => {
         b.classList.toggle('active', b === btn);
-        b.setAttribute('aria-selected', b === btn);
+        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
       });
       render(btn.dataset.filter);
       grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -79,7 +79,7 @@
   const videoTitle    = $('#tp-video-title');
   const videoCloseBtn = $('#tp-video-close');
 
-  // --- Sicherstellen, dass kein leerer Player erscheint ---
+  // Kein leerer Player
   videoBackdrop.style.display = 'none';
   videoBackdrop.hidden = true;
   videoEl.removeAttribute('src');
@@ -118,12 +118,11 @@
     if (e.key === 'Escape' && videoBackdrop.style.display !== 'none') closeVideo();
   });
 
-  // --- Delegation für Start/Video-Buttons ---
+  // Delegation für Start/Video-Buttons
   document.addEventListener('click', (e) => {
     const startBtn = e.target.closest('.tp-start');
     if (startBtn) {
       const id = startBtn.dataset.id;
-      // bisheriger Code hier ...
       window.location.href = `/Reha-App/views/uebung.html?id=${encodeURIComponent(id)}`;
       return;
     }
@@ -136,4 +135,52 @@
 
   // Initial-Render
   render('oberkoerper');
+
+  // === Add-on: KPI & Tab-Counter ==========================
+  function calcStats(arr){
+    const total = arr.length;
+    const sum = arr.reduce((a,b)=> a + (Number(b.duration)||0), 0);
+    const avg = total ? Math.round((sum/total)*10)/10 : 0;
+    return { total, sum, avg };
+  }
+
+  // KPI füllen
+  (function updateKpis(){
+    const {total, sum, avg} = calcStats(workouts);
+    const $total = document.getElementById('tp-kpi-total');
+    const $sum   = document.getElementById('tp-kpi-sum');
+    const $avg   = document.getElementById('tp-kpi-avg');
+    if($total) $total.textContent = String(total);
+    if($sum)   $sum.textContent   = `${sum} Min`;
+    if($avg)   $avg.textContent   = `${avg} Min`;
+  })();
+
+  // Tab-Zähler injizieren
+  (function addTabCounts(){
+    const countByArea = workouts.reduce((acc,w)=>{
+      acc[w.area]=(acc[w.area]||0)+1; return acc;
+    }, {});
+    $$('.tp-tab').forEach(btn=>{
+      const area = btn.dataset.filter;
+      const n = countByArea[area] || 0;
+      const existing = btn.querySelector('.tp-count');
+      if(!existing){
+        const pill = document.createElement('span');
+        pill.className = 'tp-count';
+        pill.textContent = n;
+        btn.appendChild(pill);
+      } else {
+        existing.textContent = n;
+      }
+    });
+  })();
+
+  // CTA-Button (optional)
+  (function bindCta(){
+    const btn = document.getElementById('tp-build-plan');
+    if(!btn) return;
+    btn.addEventListener('click', ()=>{
+      window.location.href = '/Reha-App/views/plan-builder.html';
+    });
+  })();
 })();
