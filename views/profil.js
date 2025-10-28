@@ -1,15 +1,11 @@
 // Erwartet: window.auth (Firebase Auth) + optional window.db (Firestore)
-// Firebase SDKs müssen bereits im Host-Projekt geladen sein.
-
 (async function () {
   const auth = window.auth, db = window.db;
 
-  // Kurzhelfer
   const $ = (id) => document.getElementById(id);
   const setVal = (id, v) => { const el = $(id); if (el) el.value = v ?? ""; };
   const setText = (id, v) => { const el = $(id); if (el) el.textContent = v ?? ""; };
 
-  // Initials für Avatar
   const initials = (nameOrMail) => {
     const s = (nameOrMail || "").trim();
     if (!s) return "U";
@@ -18,14 +14,12 @@
     return (parts[0]?.[0] || "U").toUpperCase() + (parts[1]?.[0] || "");
   };
 
-  // Aktuellen User holen
   const u = auth?.currentUser;
   if (!u) {
     setText("pf-status", "Bitte melde dich an.");
     return;
   }
 
-  // Basisdaten anzeigen
   const display = u.displayName || u.email || ("UID:" + u.uid);
   const av = $("pf-avatar"); if (av) av.textContent = initials(display);
   setVal("pf-email", u.email || "");
@@ -33,7 +27,6 @@
   setVal("pf-last", u.displayName?.split(" ")?.slice(1).join(" ") || "");
   setVal("pf-phone", u.phoneNumber || "");
 
-  // Profildaten aus Firestore (optional)
   try {
     if (db) {
       const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
@@ -49,7 +42,6 @@
     console.error("Profile load failed:", e);
   }
 
-  // Änderungen speichern (einfaches Beispiel: Namen/Telefon in Firestore)
   $("#pf-save")?.addEventListener("click", async () => {
     const status = $("pf-status");
     try {
@@ -80,7 +72,7 @@
   });
 
   // =========================
-  // Passwort ändern (Modal)
+  // Passwort ändern Modal
   // =========================
   const passBtn   = $("pf-pass");
   const dialog    = $("pf-pass-dialog");
@@ -91,38 +83,30 @@
   const newInp    = $("pf-pass-new");
 
   const openDialog = () => {
-    if (!dialog) return;
     dialog.style.display = "grid";
     if (statusEl) statusEl.textContent = "";
     if (oldInp) oldInp.value = "";
     if (newInp) newInp.value = "";
     setTimeout(()=> oldInp?.focus(), 0);
   };
-  const closeDialog = () => { if (dialog) dialog.style.display = "none"; };
+  const closeDialog = () => { dialog.style.display = "none"; };
 
   passBtn?.addEventListener("click", openDialog);
   cancelBtn?.addEventListener("click", closeDialog);
-
-  // Click außerhalb schließt
   dialog?.addEventListener("click", (ev) => { if (ev.target === dialog) closeDialog(); });
-  // ESC schließt
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "Escape" && dialog?.style.display !== "none") closeDialog();
   });
 
-  // Speichern: Reauth + Update
   saveBtn?.addEventListener("click", async () => {
-    if (!auth?.currentUser) return;
-    const oldPass = (oldInp?.value || "").trim();
-    const newPass = (newInp?.value || "").trim();
-    if (statusEl) statusEl.textContent = "";
-
+    const oldPass = oldInp.value.trim();
+    const newPass = newInp.value.trim();
     if (!oldPass || !newPass) {
-      if (statusEl) statusEl.textContent = "Bitte beide Felder ausfüllen.";
+      statusEl.textContent = "Bitte beide Felder ausfüllen.";
       return;
     }
     if (newPass.length < 6) {
-      if (statusEl) statusEl.textContent = "Das neue Passwort muss mindestens 6 Zeichen lang sein.";
+      statusEl.textContent = "Das neue Passwort muss mindestens 6 Zeichen lang sein.";
       return;
     }
 
@@ -131,51 +115,68 @@
         await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
 
       const user = auth.currentUser;
-      // Reauth mit altem Passwort
       const cred = EmailAuthProvider.credential(user.email, oldPass);
       await reauthenticateWithCredential(user, cred);
-
-      // Neues Passwort setzen
       await updatePassword(user, newPass);
 
-      if (statusEl) statusEl.textContent = "✅ Passwort erfolgreich geändert.";
+      statusEl.textContent = "✅ Passwort erfolgreich geändert.";
       setTimeout(closeDialog, 1200);
     } catch (err) {
       console.error(err);
-      // Häufige Fehlertexte etwas freundlicher machen:
-      const msg = String(err?.message || "")
-        .replace("Firebase:", "")
-        .replace(/\(auth\/[^\)]+\)/, "")
-        .trim() || "Änderung fehlgeschlagen.";
-      if (statusEl) statusEl.textContent = "❌ " + msg;
+      statusEl.textContent = "❌ Fehler: " + (err.message || "Unbekannt");
     }
   });
 })();
+
 // =========================
-// Privatsphäre Modal
+// Privatsphäre Modal mit Fokussteuerung
 // =========================
-const privacyBtn = document.getElementById("pf-privacy");
-const privacyDialog = document.getElementById("pf-privacy-dialog");
-const privacyClose = document.getElementById("pf-privacy-close");
+(() => {
+  const trigger = document.getElementById("pf-privacy");
+  const dialog  = document.getElementById("pf-privacy-dialog");
+  const closeBtn= document.getElementById("pf-privacy-close");
+  if (!trigger || !dialog) return;
 
-if (privacyBtn && privacyDialog) {
-  const openPrivacy = () => {
-    privacyDialog.style.display = "grid";
+  let lastFocus = null;
+
+  const getFocusables = (root) =>
+    Array.from(root.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea, select, [tabindex]:not([tabindex="-1"])'
+    ));
+
+  const open = () => {
+    lastFocus = document.activeElement;
+    dialog.style.display = "grid";
+    document.body.style.overflow = "hidden";
+    const f = getFocusables(dialog);
+    (f[0] || closeBtn || dialog).focus();
   };
-  const closePrivacy = () => {
-    privacyDialog.style.display = "none";
+
+  const close = () => {
+    dialog.style.display = "none";
+    document.body.style.overflow = "";
+    lastFocus?.focus();
   };
 
-  privacyBtn.addEventListener("click", openPrivacy);
-  privacyClose?.addEventListener("click", closePrivacy);
-
-  // Schließen bei Klick außerhalb
-  privacyDialog.addEventListener("click", (e) => {
-    if (e.target === privacyDialog) closePrivacy();
+  trigger.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) close();
   });
-
-  // Schließen mit ESC-Taste
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && privacyDialog.style.display !== "none") closePrivacy();
+    if (dialog.style.display === "none") return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+    } else if (e.key === "Tab") {
+      const f = getFocusables(dialog);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
   });
-}
+})();
