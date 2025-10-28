@@ -40,3 +40,29 @@
 }
 .tp-start:active{transform:translateY(1px);}
 .tp-time-icon{width:18px;height:18px;opacity:.8;}
+
+/* Video Modal */
+.tp-video-backdrop{
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: grid; place-items: center; z-index: 1100;
+}
+.tp-video-dialog{
+  width: min(920px, 92vw);
+  background: var(--surface,#fff);
+  border-radius: 16px; padding: 1rem 1rem 1.25rem;
+  box-shadow: var(--shadow,0 12px 40px rgba(0,0,0,.25));
+  position: relative;
+}
+.tp-video-close{
+  position: absolute; top: .5rem; right: .5rem;
+  width: 36px; height: 36px; border-radius: 999px;
+  border: 0; cursor: pointer; font-size: 20px;
+  background: #f3f4f6;
+}
+.tp-video-title { font-weight: 800; font-size: 1.05rem; }
+.tp-actions .tp-video-btn{
+  border:0; border-radius:12px; padding:.65rem 1rem; cursor:pointer;
+  background:#111827; color:#fff; font-weight:700;
+  box-shadow: var(--shadow,0 6px 24px rgba(0,0,0,.06));
+}
+
