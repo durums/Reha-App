@@ -178,16 +178,8 @@
 
     // --- Sidebar ---
     const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
-    
-    menuToggle.addEventListener("click", () => {
-      sidebar.classList.add("active");   // Sidebar öffnen
-      setMenuToggleVisible(false);       // Menü-Button ausblenden
-    });
-    
-    closeSidebar.addEventListener("click", () => {
-      sidebar.classList.remove("active"); // Sidebar schließen
-      setMenuToggleVisible(true);         // Menü-Button wieder zeigen
-    });
+    menuToggle.addEventListener("click",  () => sidebar.classList.toggle("active"));
+    closeSidebar.addEventListener("click", () => sidebar.classList.remove("active"));
 
     // --- Views dynamisch laden ---
     async function loadView(page) {
@@ -225,22 +217,17 @@
       }
     }
 
+    // --- Router ---
     function routeToHash() {
       let page = (location.hash || "#tagesprogramm").slice(1).trim();
       if (!page) page = "tagesprogramm";
-    
       loadView(page);
-    
-      // Sidebar schließen und Menü-Button wieder anzeigen
       sidebar.classList.remove("active");
-      setMenuToggleVisible(true);
-    
-      // Aktiven Menüpunkt hervorheben
       document.querySelectorAll(".sidebar-menu a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
       });
     }
-
+    window.addEventListener("hashchange", routeToHash);
 
     // --- Auth-State ---
     let didInitialLoad = false;
