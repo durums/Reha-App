@@ -1,48 +1,149 @@
-:root{
-  --bg:#0b0f14; /* dunkler Style wie im Screenshot */
-  --card:#171c22;
-  --muted:#9aa5b1;
-  --line:#22303d;
-  --accent:#60a5fa;
-  --past:#374151;
-  --ok:#34d399;
-  --warn:#fbbf24;
-}
-body .termine_toolbar_reset{} /* noop to avoid tree shaking */
-
-.termine-toolbar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 14px;border-bottom:1px solid var(--line);background:transparent
-}
-.termine-toolbar h2{margin:0;font-size:18px}
-.termine-toolbar .filters{display:flex;gap:8px}
-.termine-toolbar .filters button{
-  padding:6px 10px;border:1px solid var(--line);background:#11161c;color:#fff;border-radius:10px;cursor:pointer
-}
-.termine-toolbar .filters button.active{border-color:var(--accent)}
-
-.termine-list{padding:12px;display:flex;flex-direction:column;gap:10px}
-
-.termine-day{
-  color:var(--muted);font-weight:600;margin:14px 6px 6px
+:root {
+  --bg: #f9fafb;
+  --card: #ffffff;
+  --muted: #4b5563;
+  --line: #e5e7eb;
+  --accent: #2563eb;
+  --past: #f3f4f6;
+  --ok: #10b981;
+  --warn: #f59e0b;
 }
 
-.termine-card{
-  background:var(--card);color:#fff;border:1px solid var(--line);
-  border-radius:14px;padding:12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.25);
+/* Seitenlayout – gleiche Ränder wie Hauptseiten */
+body {
+  background: var(--bg);
+  color: #111827;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
 }
-.termine-row{display:flex;align-items:center;gap:10px}
-.termine-time{font-weight:700;min-width:64px}
-.termine-title{flex:1}
-.termine-meta{font-size:12px;color:var(--muted);margin-top:4px}
-.termine-badge{
-  font-size:12px;border-radius:8px;padding:2px 8px;border:1px solid var(--line)
-}
-.termine-badge.upcoming{background:#0e1a26;color:#cfe5ff;border-color:#17324a}
-.termine-badge.past{background:#11161c;color:#bcc5cf;border-color:#1b2733}
 
-.termine-actions{display:flex;gap:8px;margin-top:10px}
-.termine-actions button{
-  padding:6px 8px;border:1px solid var(--line);background:#0f151c;color:#fff;border-radius:8px;cursor:pointer
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
 }
-.termine-actions button.primary{border-color:var(--accent)}
+
+/* Toolbar */
+.termine-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.termine-toolbar h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #111827;
+}
+
+.termine-toolbar .filters {
+  display: flex;
+  gap: 8px;
+}
+
+.termine-toolbar .filters button {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  background: #f3f4f6;
+  color: #111827;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.termine-toolbar .filters button.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Terminliste */
+.termine-list {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.termine-day {
+  color: var(--muted);
+  font-weight: 600;
+  margin: 14px 4px 6px;
+}
+
+/* Termin-Karten */
+.termine-card {
+  background: var(--card);
+  color: #111827;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.termine-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.termine-time {
+  font-weight: 700;
+  min-width: 64px;
+}
+
+.termine-title {
+  flex: 1;
+}
+
+.termine-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Bubbles (Badges) im Light Mode */
+.termine-badge {
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+}
+
+.termine-badge.upcoming {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #bae6fd;
+}
+
+.termine-badge.past {
+  background: #f3f4f6;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+
+/* Buttons */
+.termine-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.termine-actions button {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: #f9fafb;
+  color: #111827;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.termine-actions button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
