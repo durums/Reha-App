@@ -1,64 +1,67 @@
 :root {
-  --dark-bg: #1e293b;
-  --light-bg: #334155;
+  --bg: #111827;
+  --card: #1f2937;
   --accent: #3b82f6;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
 }
 
 body {
   font-family: system-ui, sans-serif;
-  background: var(--dark-bg);
-  color: var(--text);
   margin: 0;
-  padding: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.page {
+.termine-page {
   max-width: 800px;
   margin: 40px auto;
   padding: 0 20px;
 }
 
 h1 {
-  margin-bottom: .5rem;
-  color: #fff;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 0.3rem;
 }
 
-.muted {
+.subtitle {
+  text-align: center;
   color: var(--muted);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.termine-liste {
+.termine-container {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .termin {
-  background: var(--light-bg);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
+  background: var(--card);
   padding: 16px 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.3);
-  transition: transform .15s ease, background .2s ease;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .termin:hover {
-  background: #3b4352;
   transform: translateY(-2px);
+  background: #2d3748;
 }
 
 .termin h3 {
   margin-top: 0;
-  margin-bottom: .3rem;
+  margin-bottom: 0.5rem;
   color: var(--accent);
 }
 
 .termin p {
-  margin: .2rem 0;
+  margin: 0.2rem 0;
+  color: var(--text);
+  font-size: 0.95rem;
 }
 
 .termin.past {
-  opacity: .65;
+  opacity: 0.65;
 }
