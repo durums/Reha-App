@@ -105,19 +105,20 @@
   });
 
   // Delegation für Start/Video-Buttons
-  document.addEventListener('click', (e) => {
-    const startBtn = e.target.closest('.tp-start');
-    if (startBtn) {
-      // dein bestehendes Verhalten: Router zu Tagesprogramm
-      location.hash = '#tagesprogramm';
-      return;
-    }
-    const vidBtn = e.target.closest('.tp-video-btn');
-    if (vidBtn) {
-      const w = byId[vidBtn.dataset.id];
-      openVideo(w);
-    }
-  });
+    document.addEventListener('click', (e) => {
+      const startBtn = e.target.closest('.tp-start');
+      if (startBtn) {
+        const w = byId[startBtn.dataset.id];
+        openVideo(w);            // Video-Dialog öffnen
+        return;                  // keine Hash-Navigation
+      }
+      const vidBtn = e.target.closest('.tp-video-btn');
+      if (vidBtn) {
+        const w = byId[vidBtn.dataset.id];
+        openVideo(w);
+      }
+    });
+
 
   // Initial-Render
   render('oberkoerper');
