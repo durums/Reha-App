@@ -1,11 +1,34 @@
-<!-- views/termine.html -->
-<section class="termine-toolbar">
-  <h2>Termine</h2>
-  <div class="filters">
-    <button data-filter="upcoming" class="active">Anstehend</button>
-    <button data-filter="past">Abgeschlossen</button>
-    <button data-filter="all">Alle</button>
-  </div>
-</section>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Termine</title>
+  <link rel="stylesheet" href="termine.css" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet">
+</head>
+<body>
+  <main class="page">
+    <h1>Deine Termine</h1>
+    <p class="muted">Übersicht deiner Trainings- und Reha-Termine</p>
 
-<section id="termineList" class="termine-list" aria-live="polite"></section>
+    <!-- Legende -->
+    <div class="calendar-legend">
+      <span class="key"><span class="dot upcoming"></span> anstehend</span>
+      <span class="key"><span class="dot past"></span> abgeschlossen</span>
+    </div>
+
+    <!-- Kalender -->
+    <div id="calendar"></div>
+
+    <!-- Terminliste mit Buttons -->
+    <section class="termine-liste">
+      <h2>Geplante Termine</h2>
+      <ul id="terminList"></ul>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+  <script src="termine.js"></script>
+</body>
+</html>
