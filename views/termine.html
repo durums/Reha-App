@@ -1,27 +1,11 @@
 <!-- views/termine.html -->
-<main class="termine-page">
-  <h1>Meine Termine</h1>
-  <p class="subtitle">Übersicht deiner im Kalender gebuchten Termine.</p>
-
-  <div class="toolbar">
-    <button id="refreshBtn" class="btn">↻ Aktualisieren</button>
+<section class="termine-toolbar">
+  <h2>Termine</h2>
+  <div class="filters">
+    <button data-filter="upcoming" class="active">Anstehend</button>
+    <button data-filter="past">Abgeschlossen</button>
+    <button data-filter="all">Alle</button>
   </div>
+</section>
 
-  <section>
-    <h2 class="section-title">Anstehende Termine</h2>
-    <div id="upcoming" class="termine-container"></div>
-  </section>
-
-  <section style="margin-top:28px;">
-    <h2 class="section-title">Abgeschlossene Termine</h2>
-    <div id="past" class="termine-container"></div>
-  </section>
-
-  <div id="emptyState" class="empty" hidden>
-    <div class="empty-card">
-      <div class="empty-title">Noch keine Termine gefunden</div>
-      <div class="empty-sub">Buche Termine im Kalender, sie erscheinen dann automatisch hier.</div>
-    </div>
-  </div>
-</main>
-<script src="views/termine.js" defer></script>
+<section id="termineList" class="termine-list" aria-live="polite"></section>
