@@ -1,3 +1,24 @@
+/* --- Header-Anpassung für Termine-Seite --- */
+.header {
+  background: var(--color-header-bg);
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;               /* kein Abstand nach außen */
+  position: relative;      /* bleibt im normalen Fluss */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+
 :root {
   --bg: #f9fafb;
   --card: #ffffff;
@@ -147,3 +168,4 @@ main {
   background: var(--accent);
   color: #fff;
 }
+
