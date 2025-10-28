@@ -123,11 +123,10 @@
     const startBtn = e.target.closest('.tp-start');
     if (startBtn) {
       const id = startBtn.dataset.id;
-      // Neue Detailseite mit Beschreibung & Timer öffnen:
-      window.location.href = `/views/uebung.html?id=${encodeURIComponent(id)}`;
+      // bisheriger Code hier ...
+      window.location.href = `uebung.html?id=${encodeURIComponent(id)}`;
       return;
     }
-
     const vidBtn = e.target.closest('.tp-video-btn');
     if (vidBtn) {
       const w = byId[vidBtn.dataset.id];
