@@ -52,29 +52,23 @@ function initAuthUI() {
     }
   });
 
-// --- Logout-Button ---
+  // --- Logout-Button ---
   signOutBtn.addEventListener('click', async () => {
-    try {
-      // Sidebar & Menü-Button sofort schließen
-      const sidebar = document.getElementById('sidebar');
-      const menuToggle = document.querySelector('.menu-toggle');
-      if (sidebar) sidebar.classList.remove('active');
-      if (menuToggle) menuToggle.classList.remove('active');
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.querySelector('.menu-toggle');
   
-      // Kurz kleine Verzögerung, damit Animation wirken kann
-      setTimeout(async () => {
-        await signOut(auth);
+    // 1️⃣ Sidebar animiert schließen – wie bei anderen Menüpunkten
+    if (sidebar) sidebar.classList.remove('active');
+    if (menuToggle) menuToggle.classList.remove('active');
   
-        // Menü-Button ausblenden
-        if (menuToggle) menuToggle.style.display = 'none';
-  
-        // Optional: zurück zur Login-/Startseite
-        window.location.hash = '';
-        // oder: window.location.href = "index.html";
-      }, 200);
-  
-    } catch (err) {
-      console.error('Sign-out error', err);
-      alert('Abmelden fehlgeschlagen — Konsole prüfen.');
-    }
+    // 2️⃣ Warte kurz, bis die Sidebar-Animation durch ist (ca. 300 ms)
+    setTimeout(async () => {
+      try {
+        await signOut(auth); // tatsächlicher Logout erst jetzt
+        console.log('✅ Erfolgreich abgemeldet.');
+      } catch (err) {
+        console.error('Sign-out error', err);
+        alert('Abmelden fehlgeschlagen — bitte erneut versuchen.');
+      }
+    }, 300);
   });
