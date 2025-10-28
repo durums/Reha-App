@@ -1,48 +1,56 @@
-:root{
-  --bg:#0b0f14; /* dunkler Style wie im Screenshot */
-  --card:#171c22;
-  --muted:#9aa5b1;
-  --line:#22303d;
-  --accent:#60a5fa;
-  --past:#374151;
-  --ok:#34d399;
-  --warn:#fbbf24;
+:root {
+  --rot:#ef4444;
+  --gruen:#16a34a;
+  --bg:#f8fafc;
+  --line:#e5e7eb;
 }
-body .termine_toolbar_reset{} /* noop to avoid tree shaking */
-
-.termine-toolbar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 14px;border-bottom:1px solid var(--line);background:transparent
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: #0f172a;
 }
-.termine-toolbar h2{margin:0;font-size:18px}
-.termine-toolbar .filters{display:flex;gap:8px}
-.termine-toolbar .filters button{
-  padding:6px 10px;border:1px solid var(--line);background:#11161c;color:#fff;border-radius:10px;cursor:pointer
+.page {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 16px;
 }
-.termine-toolbar .filters button.active{border-color:var(--accent)}
+.muted { color: #64748b; }
 
-.termine-list{padding:12px;display:flex;flex-direction:column;gap:10px}
-
-.termine-day{
-  color:var(--muted);font-weight:600;margin:14px 6px 6px
+#calendar {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.05);
 }
 
-.termine-card{
-  background:var(--card);color:#fff;border:1px solid var(--line);
-  border-radius:14px;padding:12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.25);
+.calendar-legend {
+  display: flex; align-items: center; gap: 18px;
+  margin: 12px 0 20px;
 }
-.termine-row{display:flex;align-items:center;gap:10px}
-.termine-time{font-weight:700;min-width:64px}
-.termine-title{flex:1}
-.termine-meta{font-size:12px;color:var(--muted);margin-top:4px}
-.termine-badge{
-  font-size:12px;border-radius:8px;padding:2px 8px;border:1px solid var(--line)
+.key { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.dot {
+  width: 12px; height: 12px; border-radius: 999px;
+  display: inline-block; border: 1px solid #ccc;
 }
-.termine-badge.upcoming{background:#0e1a26;color:#cfe5ff;border-color:#17324a}
-.termine-badge.past{background:#11161c;color:#bcc5cf;border-color:#1b2733}
+.dot.upcoming { background: #dcfce7; border-color: var(--gruen); }
+.dot.past { background: #fee2e2; border-color: var(--rot); }
 
-.termine-actions{display:flex;gap:8px;margin-top:10px}
-.termine-actions button{
-  padding:6px 8px;border:1px solid var(--line);background:#0f151c;color:#fff;border-radius:8px;cursor:pointer
+/* Terminliste */
+.termine-liste { margin-top: 24px; }
+.termine-liste ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+.termine-liste li {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.termine-actions button.primary{border-color:var(--accent)}
+
+.btn {
+  padding: 6px 12px; border: none; border-radius: 8px;
+  color: #fff; font-weight: 700; cursor: pointer;
+  transition: transform .1s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-green { background: var(--gruen); }
+.btn-red { background: var(--rot); }
