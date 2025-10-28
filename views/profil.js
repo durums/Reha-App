@@ -1,52 +1,153 @@
+// Erwartet: window.auth (Firebase Auth) + optional window.db (Firestore)
+// Firebase SDKs müssen bereits im Host-Projekt geladen sein.
+
 (async function () {
   const auth = window.auth, db = window.db;
-  const $ = (id)=>document.getElementById(id);
-  const set=(id,val)=>{const el=$(id); if(el) el.textContent=val??"–";};
-  const fmtDate = (v)=>{
-    if(!v) return "–";
-    try{const d=v?.toDate?v.toDate():new Date(v); return isNaN(d)? "–" : d.toLocaleDateString("de-DE");}
-    catch{ return "–"; }
-  };
-  const list=(v)=>Array.isArray(v)?(v.length?v.join(", "):"–"):(v||"–");
-  const initials=(nameOrMail)=>{
-    const s=(nameOrMail||"").trim();
-    if(!s) return "U";
-    if(s.includes("@")) return s[0].toUpperCase();
-    const parts=s.split(/\s+/); return (parts[0]?.[0]||"U").toUpperCase() + (parts[1]?.[0]||"");
+
+  // Kurzhelfer
+  const $ = (id) => document.getElementById(id);
+  const setVal = (id, v) => { const el = $(id); if (el) el.value = v ?? ""; };
+  const setText = (id, v) => { const el = $(id); if (el) el.textContent = v ?? ""; };
+
+  // Initials für Avatar
+  const initials = (nameOrMail) => {
+    const s = (nameOrMail || "").trim();
+    if (!s) return "U";
+    if (s.includes("@")) return s[0].toUpperCase();
+    const parts = s.split(/\s+/);
+    return (parts[0]?.[0] || "U").toUpperCase() + (parts[1]?.[0] || "");
   };
 
-  const u = auth.currentUser;
-  if(!u){ set("p-name","— (Bitte anmelden) —"); return; }
+  // Aktuellen User holen
+  const u = auth?.currentUser;
+  if (!u) {
+    setText("pf-status", "Bitte melde dich an.");
+    return;
+  }
 
+  // Basisdaten anzeigen
   const display = u.displayName || u.email || ("UID:" + u.uid);
-  set("p-name", display);
-  set("p-email", u.email || "–");
-  set("p-phone", u.phoneNumber || "–");
-  const av=$("p-avatar"); if(av) av.textContent = initials(display);
+  const av = $("pf-avatar"); if (av) av.textContent = initials(display);
+  setVal("pf-email", u.email || "");
+  setVal("pf-first", u.displayName?.split(" ")?.[0] || "");
+  setVal("pf-last", u.displayName?.split(" ")?.slice(1).join(" ") || "");
+  setVal("pf-phone", u.phoneNumber || "");
 
-  try{
-    const {doc,getDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const snap = await getDoc(doc(db,"profiles",u.uid));
-    const d = snap.exists()? snap.data(): {};
+  // Profildaten aus Firestore (optional)
+  try {
+    if (db) {
+      const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const snap = await getDoc(doc(db, "profiles", u.uid));
+      if (snap.exists()) {
+        const d = snap.data() || {};
+        if (!$("#pf-first").value) setVal("pf-first", d.firstName || "");
+        if (!$("#pf-last").value)  setVal("pf-last",  d.lastName  || "");
+        if (!$("#pf-phone").value) setVal("pf-phone", d.phone     || "");
+      }
+    }
+  } catch (e) {
+    console.error("Profile load failed:", e);
+  }
 
-    set("p-dob", fmtDate(d.dob));
-    set("p-emergency", d.emergencyContact || "–");
-    set("p-gender", d.gender || "–");
+  // Änderungen speichern (einfaches Beispiel: Namen/Telefon in Firestore)
+  $("#pf-save")?.addEventListener("click", async () => {
+    const status = $("pf-status");
+    try {
+      if (!db) {
+        status.textContent = "Gespeichert (lokal) – Firestore nicht konfiguriert.";
+        return;
+      }
+      const first = $("#pf-first")?.value?.trim() || "";
+      const last  = $("#pf-last")?.value?.trim()  || "";
+      const phone = $("#pf-phone")?.value?.trim() || "";
 
-    set("m-dx", list(d.diagnoses));
-    set("m-op", fmtDate(d.opDate));
-    set("m-reha", `${fmtDate(d.rehaStart)} – ${fmtDate(d.rehaEnd)}`);
-    set("m-phase", d.rehaPhase || "–");
-    set("m-comorbid", list(d.comorbidities));
-    set("m-meds", list(d.medications));
-    set("m-allergies", list(d.allergies));
+      const { doc, setDoc, serverTimestamp } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-    set("f-mobility", d.mobility || "–");
-    set("f-aids", list(d.aids));
-    set("f-strength", d.strength || "–");
-    set("f-pain", d.painLevel ?? "–");
-    set("f-adl", d.adl || "–");
-    set("f-balance", d.balance || "–");
-    set("f-cognition", d.cognition || "–");
-  }catch(e){ console.error(e); }
+      await setDoc(doc(db, "profiles", u.uid), {
+        firstName: first,
+        lastName: last,
+        phone,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      status.textContent = "✅ Änderungen gespeichert.";
+      setTimeout(()=> status.textContent = "", 1500);
+    } catch (e) {
+      console.error(e);
+      status.textContent = "❌ Konnte nicht speichern.";
+    }
+  });
+
+  // =========================
+  // Passwort ändern (Modal)
+  // =========================
+  const passBtn   = $("pf-pass");
+  const dialog    = $("pf-pass-dialog");
+  const cancelBtn = $("pf-pass-cancel");
+  const saveBtn   = $("pf-pass-save");
+  const statusEl  = $("pf-pass-status");
+  const oldInp    = $("pf-pass-old");
+  const newInp    = $("pf-pass-new");
+
+  const openDialog = () => {
+    if (!dialog) return;
+    dialog.style.display = "grid";
+    if (statusEl) statusEl.textContent = "";
+    if (oldInp) oldInp.value = "";
+    if (newInp) newInp.value = "";
+    setTimeout(()=> oldInp?.focus(), 0);
+  };
+  const closeDialog = () => { if (dialog) dialog.style.display = "none"; };
+
+  passBtn?.addEventListener("click", openDialog);
+  cancelBtn?.addEventListener("click", closeDialog);
+
+  // Click außerhalb schließt
+  dialog?.addEventListener("click", (ev) => { if (ev.target === dialog) closeDialog(); });
+  // ESC schließt
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && dialog?.style.display !== "none") closeDialog();
+  });
+
+  // Speichern: Reauth + Update
+  saveBtn?.addEventListener("click", async () => {
+    if (!auth?.currentUser) return;
+    const oldPass = (oldInp?.value || "").trim();
+    const newPass = (newInp?.value || "").trim();
+    if (statusEl) statusEl.textContent = "";
+
+    if (!oldPass || !newPass) {
+      if (statusEl) statusEl.textContent = "Bitte beide Felder ausfüllen.";
+      return;
+    }
+    if (newPass.length < 6) {
+      if (statusEl) statusEl.textContent = "Das neue Passwort muss mindestens 6 Zeichen lang sein.";
+      return;
+    }
+
+    try {
+      const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+
+      const user = auth.currentUser;
+      // Reauth mit altem Passwort
+      const cred = EmailAuthProvider.credential(user.email, oldPass);
+      await reauthenticateWithCredential(user, cred);
+
+      // Neues Passwort setzen
+      await updatePassword(user, newPass);
+
+      if (statusEl) statusEl.textContent = "✅ Passwort erfolgreich geändert.";
+      setTimeout(closeDialog, 1200);
+    } catch (err) {
+      console.error(err);
+      // Häufige Fehlertexte etwas freundlicher machen:
+      const msg = String(err?.message || "")
+        .replace("Firebase:", "")
+        .replace(/\(auth\/[^\)]+\)/, "")
+        .trim() || "Änderung fehlgeschlagen.";
+      if (statusEl) statusEl.textContent = "❌ " + msg;
+    }
+  });
 })();
