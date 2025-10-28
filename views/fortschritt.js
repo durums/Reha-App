@@ -3,6 +3,34 @@
   const currentWeek = 4; // 🔧 Beispielpatient befindet sich in Woche 4
   const maxWeeks = 12;
 
+  /* --- Beispiel-Daten aus dem Formular (werden automatisch eingelesen) --- */
+const exampleFormData = {
+  "4-6": {
+    weekKey: "4-6",
+    phase: {
+      title: "Aufbauphase (Woche 4–6) – Formular",
+      goal: "ROM steigern auf 0–100°, Technik schulen, Beginn leichter Widerstände."
+    },
+    bewegungsumfang: [
+      "Aktiv-assistiv bis Schmerzgrenze, 2–3×/Tag",
+      "Ziel: 0–100°, Fokus Endgrad-Kontrolle"
+    ],
+    belastung: [
+      "Leichte Widerstände (Theraband Stufe 1–2)",
+      "Alltag: Steigerung Gehstrecke bis 4–5k Schritte/Tag"
+    ],
+    techniken: [
+      "Closed-Chain Üb.: Mini-Squats, Step-ups niedrig",
+      "Manuelle Mobilisation Grad I–II nach Bedarf"
+    ]
+  }
+};
+
+// Diese Beispiel-Daten automatisch im LocalStorage speichern, falls leer
+if (!localStorage.getItem("phase_form_data")) {
+  localStorage.setItem("phase_form_data", JSON.stringify(exampleFormData));
+}
+
   // Default-Phasen (werden durch Formulardaten überschrieben, falls vorhanden)
   const phasesDefault = [
     { range: [0,3],  title: "Frühphase (Woche 0–3)",  goal: "Schwellungsreduktion, schmerzfreie Mobilität starten." },
