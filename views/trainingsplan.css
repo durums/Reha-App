@@ -124,6 +124,11 @@
   color: #fff;
 }
 
+.tp-hero {
+  margin-top: 2rem; /* Abstand über der Statistik */
+}
+
+
 /* Tipp-Box */
 .tp-hint{
   margin-top: 1rem;
