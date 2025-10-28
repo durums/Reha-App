@@ -1,30 +1,13 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Termine</title>
-  <link rel="stylesheet" href="styles.css"> <!-- wichtig, um den blauen Balken zu übernehmen -->
-  <link rel="stylesheet" href="termine.css">
-</head>
-<body>
-  <!-- 🔹 Einheitlicher blauer Balken oben -->
-  <header class="header">
-    <h1>Termine</h1>
-  </header>
+<!-- views/termine.html -->
+<main>
+  <section class="termine-toolbar">
+    <h2>Termine</h2>
+    <div class="filters">
+      <button data-filter="upcoming" class="active">Anstehend</button>
+      <button data-filter="past">Abgeschlossen</button>
+      <button data-filter="all">Alle</button>
+    </div>
+  </section>
 
-  <main>
-    <section class="termine-toolbar">
-      <div class="filters">
-        <button data-filter="upcoming" class="active">Anstehend</button>
-        <button data-filter="past">Abgeschlossen</button>
-        <button data-filter="all">Alle</button>
-      </div>
-    </section>
-
-    <section id="termineList" class="termine-list" aria-live="polite"></section>
-  </main>
-
-  <script src="termine.js"></script>
-</body>
-</html>
+  <section id="termineList" class="termine-list" aria-live="polite"></section>
+</main>
