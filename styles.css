@@ -816,6 +816,37 @@ body.center-auth {
   background: #3a79b5;
 }
 
+/* --- Sidebar Footer + Logout Button --- */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  justify-content: center;
+}
+
+.logout-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+  transform: scale(1.02);
+}
+
+.logout-btn:active {
+  transform: scale(0.98);
+}
+
+
 :root{
   --bg:#f5f7fb; --surface:#fff; --ink:#121417; --muted:#6b7280;
   --primary:#2b90d9; --primary-weak:#e6f3fb;
