@@ -124,7 +124,7 @@
     if (startBtn) {
       const id = startBtn.dataset.id;
       // Neue Detailseite mit Beschreibung & Timer öffnen:
-      window.location.href = `uebung.html?id=${encodeURIComponent(id)}`;
+      window.location.href = `/views/uebung.html?id=${encodeURIComponent(id)}`;
       return;
     }
 
