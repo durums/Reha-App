@@ -6,19 +6,19 @@
   const workouts = [
     { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke',
       emoji:'🏃‍♂️', duration:5, level:'leicht', area:'oberkoerper',
-      videoUrl:'Videos-Training/test_clip.mp4' },
+      videoUrl: '/views/Videos-Training/test_clip.mp4' },
     { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur',
       emoji:'🧘‍♀️', duration:8, level:'leicht', area:'oberkoerper',
-      videoUrl:'Videos-Training/test_clip.mp4' },
+      videoUrl: '/views/Videos-Training/test_clip.mp4' },
     { id:'arm-rotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
       emoji:'💪', duration:10, level:'mittel', area:'oberkoerper',
-      videoUrl:'Videos-Training/test_clip.mp4' },
+      videoUrl: '/views/Videos-Training/test_clip.mp4' },
     { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft',
       emoji:'🦵', duration:7, level:'mittel', area:'unterkoerper',
-      videoUrl:'Videos-Training/test_clip.mp4' },
+      videoUrl: '/views/Videos-Training/test_clip.mp4' },
     { id:'waage', title:'Standwaage leicht', desc:'Balance & Koordination',
       emoji:'⚖️', duration:6, level:'leicht', area:'rumpf',
-      videoUrl:'Videos-Training/test_clip.mp4' },
+      videoUrl: '/views/Videos-Training/test_clip.mp4' },
   ];
   const byId = Object.fromEntries(workouts.map(w => [w.id, w]));
 
