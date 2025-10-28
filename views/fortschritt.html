@@ -3,7 +3,9 @@
     <a class="rp-doc btn-dark" href="assets/nachbehandlung.pdf" download>
       📄 Nachbehandlungs-Dokument
     </a>
-    <div class="rp-kpi card-dark">
+
+    <!-- KPI rechts -->
+    <aside class="card-dark rp-kpi" aria-label="KPI-Fortschritt">
       <h3>KPI – Fortschritt</h3>
 
       <div class="kpi-row">
@@ -12,24 +14,57 @@
       </div>
 
       <div class="kpi-donuts">
-        <div class="donut" data-val="25" data-caption="Kraft – 25%"></div>
-        <div class="donut" data-val="62" data-caption="Ausdauer – 62%"></div>
+        <figure class="donut">
+          <svg viewBox="0 0 120 120" class="donut-svg" aria-label="Kraft 25 Prozent">
+            <circle class="donut-bg" cx="60" cy="60" r="48"></circle>
+            <circle id="donut-strength" class="donut-val" cx="60" cy="60" r="48"></circle>
+          </svg>
+          <figcaption>Kraft – <b id="kpi-strength-val">25%</b></figcaption>
+        </figure>
+
+        <figure class="donut">
+          <svg viewBox="0 0 120 120" class="donut-svg" aria-label="Ausdauer 62 Prozent">
+            <circle class="donut-bg" cx="60" cy="60" r="48"></circle>
+            <circle id="donut-endurance" class="donut-val" cx="60" cy="60" r="48"></circle>
+          </svg>
+          <figcaption>Ausdauer – <b id="kpi-endurance-val">62%</b></figcaption>
+        </figure>
       </div>
 
       <div class="kpi-row">
         <div class="kpi-label">Schmerzreduktion – <b id="kpi-pain-val">85%</b></div>
         <div class="kpi-bar"><span id="kpi-pain-bar" style="width:85%"></span></div>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <!-- Timeline -->
-  <div class="rp-timeline card">
-    <div class="time-head">Zeit</div>
-    <div id="rp-steps" class="steps" aria-label="Reha Timeline"></div>
-    <div class="phase-chip">Aktuelle Phase:</div>
-    <div class="phase-track"><span id="rp-progress"></span></div>
-  </div>
+  <!-- Zahlenstrahl -->
+  <article class="card rp-timeline">
+    <div class="slots">
+      <div class="slot">1. TAG</div>
+      <div class="slot">2. TAG</div>
+      <div class="slot">AB 7. TAG</div>
+      <div class="slot">AB 2. WOCHE</div>
+      <div class="slot current">AB 4. WOCHE</div>
+      <div class="slot">AB 6–8. WOCHE</div>
+      <div class="slot">AB 20. WOCHE</div>
+    </div>
+
+    <div class="phase-row">
+      <span class="phase-chip">Aktuelle Phase</span>
+      <div class="track">
+        <span id="track-progress"></span>
+        <!-- Marker-Bubbles -->
+        <i class="m" style="--pos: 8%"></i>
+        <i class="m" style="--pos: 22%"></i>
+        <i class="m" style="--pos: 36%"></i>
+        <i class="m" style="--pos: 50%"></i>
+        <i class="m" style="--pos: 64%"></i>
+        <i class="m" style="--pos: 78%"></i>
+        <i class="m" style="--pos: 92%"></i>
+      </div>
+    </div>
+  </article>
 
   <!-- Info-Kacheln -->
   <div class="rp-info">
