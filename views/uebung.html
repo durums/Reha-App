@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Übung – Detail</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="uebung.css">
+</head>
+<body>
+  <header class="u-header">
+    <a href="trainingsplan.html" class="u-back">← Zurück</a>
+    <h1 id="u-title">Übung</h1>
+  </header>
+
+  <main class="u-wrap">
+    <section class="u-meta">
+      <div><span id="u-emoji" class="u-emoji">🏃</span></div>
+      <div>
+        <h2 id="u-subtitle" class="u-h2"></h2>
+        <div class="u-tags">
+          <span id="u-duration" class="u-tag"></span>
+          <span id="u-level" class="u-tag"></span>
+          <span id="u-area" class="u-tag"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="u-desc">
+      <h3>Beschreibung</h3>
+      <p id="u-desc-text"></p>
+    </section>
+
+    <section class="u-timer">
+      <h3>Timer</h3>
+      <div class="u-timer-display" id="u-timer-display">00:00</div>
+      <div class="u-timer-actions">
+        <button id="u-start">Start</button>
+        <button id="u-pause">Pause</button>
+        <button id="u-reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="u-video">
+      <h3>Video</h3>
+      <video id="u-video" controls playsinline preload="none" muted style="width:100%;max-height:60vh;border-radius:12px;"></video>
+      <div class="u-hint">Das Video startet erst nach Klick auf Play.</div>
+    </section>
+  </main>
+
+  <script src="uebung.js"></script>
+</body>
+</html>
