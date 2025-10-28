@@ -1,22 +1,21 @@
-/* --- Header-Anpassung für Termine-Seite --- */
+/* --- Einheitlicher Header im Stil der Hauptseite --- */
 .header {
-  background: var(--color-header-bg);
+  background: linear-gradient(135deg, #8fc6d9, #b7e2eb); /* identisch zum App-Stil */
   color: #fff;
   text-align: center;
-  padding: 1rem 0;
-  margin: 0;               /* kein Abstand nach außen */
-  position: relative;      /* bleibt im normalen Fluss */
-  top: 0;
-  left: 0;
+  padding: 1.2rem 0;
+  margin: 0;
   width: 100%;
-  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .header h1 {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 600;
+  color: #ffffff;
 }
+
 
 
 :root {
