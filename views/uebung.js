@@ -191,8 +191,6 @@ const LONG_DESC = {
       <li>Verbessert die <strong>Körperwahrnehmung (Propriozeption)</strong>.</li>
     </ul>
   `
-
-
 };
 
 // (Pragmatisch) kleine Datenbasis lokal – später gern zentral auslagern
