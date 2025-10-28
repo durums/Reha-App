@@ -98,7 +98,7 @@ const LONG_DESC = {
     </ul>
   `,
 
-    kniebeuge: `
+  kniebeuge: `
     <h4>🦵 Übung: Kniebeuge (assistiert)</h4>
     <p><strong>Ziel:</strong> Kräftigung der Bein- und Gesäßmuskulatur bei gleichzeitiger Schonung der Gelenke.<br>
     Ideal zur Verbesserung von Stabilität, Kraft und Beweglichkeit in Hüfte, Knie und Sprunggelenken.</p>
@@ -140,7 +140,58 @@ const LONG_DESC = {
       <li>Besonders geeignet nach längeren Ruhephasen (z. B. nach OP oder Verletzung).</li>
       <li>Ideal als Vorbereitung für Alltagsbewegungen wie Treppensteigen oder Aufstehen.</li>
     </ul>
+  `,
+
+  waage: `
+    <h4>⚖️ Übung: Standwaage (leicht)</h4>
+    <p><strong>Ziel:</strong> Verbesserung von Gleichgewicht, Koordination und Stabilität der Bein- und Rumpfmuskulatur.<br>
+    Ideal zur sanften Aktivierung nach Verletzungen oder in frühen Trainingsphasen.</p>
+
+    <h5>🔹 Ausgangsposition</h5>
+    <ul>
+      <li>Stelle dich aufrecht hin, Füße etwa hüftbreit.</li>
+      <li>Halte dich bei Bedarf leicht an einer Wand, Stuhllehne oder einem Geländer fest.</li>
+      <li>Schultern sind locker, Blick nach vorne, Körper stabil.</li>
+    </ul>
+
+    <h5>🔹 Durchführung</h5>
+    <ol>
+      <li>Verlagere dein Gewicht langsam auf ein Bein (z. B. rechtes Bein).</li>
+      <li>Hebe das andere Bein langsam nach hinten, bis es etwa auf Hüfthöhe ist – so weit, wie es sich stabil und angenehm anfühlt.</li>
+      <li>Der Oberkörper neigt sich gleichzeitig leicht nach vorn, sodass Rumpf und Bein eine gerade Linie bilden.</li>
+      <li>Arme kannst du:
+        <ul>
+          <li>nach vorne strecken (mehr Gleichgewichtstraining) oder</li>
+          <li>seitlich ausbreiten (mehr Stabilität).</li>
+        </ul>
+      </li>
+      <li>Halte die Position 5–10 Sekunden, dann langsam zurückkehren.</li>
+      <li>Anschließend Bein wechseln.</li>
+    </ol>
+
+    <h5>🔹 Wiederholungen</h5>
+    <ul>
+      <li>5–10 Wiederholungen pro Seite</li>
+      <li>2–3 Durchgänge</li>
+      <li>Bei guter Balance: Haltezeit schrittweise auf 15–20 Sekunden erhöhen.</li>
+    </ul>
+
+    <h5>🔹 Wichtige Hinweise</h5>
+    <ul>
+      <li>Langsam und kontrolliert bewegen – kein Schwung.</li>
+      <li>Hüfte bleibt gerade, nicht zur Seite kippen.</li>
+      <li>Atme ruhig weiter, nicht die Luft anhalten.</li>
+      <li>Wenn das Gleichgewicht schwerfällt → leichte Fingerstütze oder beide Hände an der Wand verwenden.</li>
+    </ul>
+
+    <h5>🧠 Tipp</h5>
+    <ul>
+      <li>Stärkt die <strong>tiefe Rumpfmuskulatur</strong>.</li>
+      <li>Fördert die <strong>Beinachse</strong> (wichtig für Knie- und Hüftstabilität).</li>
+      <li>Verbessert die <strong>Körperwahrnehmung (Propriozeption)</strong>.</li>
+    </ul>
   `
+
 
 };
 
