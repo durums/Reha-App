@@ -1,50 +1,72 @@
-<div class="view view-fortschritt">
-  <h2 class="section-title">Dein Fortschritt</h2>
-  <p class="subtle" style="margin-top:-.5rem">Verfolge deine Rehabilitation und erreiche Ziele</p>
+<!-- views/fortschritt.html -->
+<section class="page-wrap">
+  <header class="page-title">
+    <h1>Dein Fortschritt</h1>
+    <p class="subtitle">Verfolge deine Rehabilitation und erreiche Ziele</p>
+  </header>
 
   <!-- KPI-Karten -->
-  <div class="fp-kpis">
-    <article class="card kpi">
-      <div class="kpi-head">
-        <div>Übungen diese Woche</div>
-        <span class="kpi-icon">🩺</span>
-      </div>
-      <div class="kpi-value"><span id="kpi-week-done">0</span> <small>von <span id="kpi-week-target">0</span></small></div>
-      <div class="kpi-bar"><div id="bar-week"></div></div>
+  <div class="kpi-grid">
+    <article class="kpi-card">
+      <div class="kpi-title">Übungen diese Woche</div>
+      <div class="kpi-value"><span id="kpi-week-count">4</span> <small>von 15</small></div>
+      <div class="kpi-bar"><div id="kpi-week-bar"></div></div>
     </article>
 
-    <article class="card kpi">
-      <div class="kpi-head">
-        <div>Aktive Tage</div>
-        <span class="kpi-icon">📅</span>
-      </div>
-      <div class="kpi-value"><span id="kpi-days-active">0</span> <small>von 7</small></div>
-      <div class="kpi-bar"><div id="bar-days"></div></div>
+    <article class="kpi-card">
+      <div class="kpi-title">Aktive Tage</div>
+      <div class="kpi-value"><span id="kpi-days">2</span> <small>von 7</small></div>
+      <div class="kpi-bar"><div id="kpi-days-bar"></div></div>
     </article>
 
-    <article class="card kpi">
-      <div class="kpi-head">
-        <div>Gesamtfortschritt</div>
-        <span class="kpi-icon">📈</span>
-      </div>
-      <div class="kpi-value"><span id="kpi-total-pct">0%</span> <small>des Programms</small></div>
-      <div class="kpi-bar"><div id="bar-total"></div></div>
+    <article class="kpi-card">
+      <div class="kpi-title">Gesamtfortschritt</div>
+      <div class="kpi-value"><span id="kpi-total">5%</span> <small>des Programms</small></div>
+      <div class="kpi-bar"><div id="kpi-total-bar" style="width:5%"></div></div>
     </article>
 
-    <article class="card kpi">
-      <div class="kpi-head">
-        <div>Errungenschaften</div>
-        <span class="kpi-icon">🏅</span>
-      </div>
-      <div class="kpi-value"><span id="kpi-achievements">0</span> <small>freigeschaltet</small></div>
-      <div class="kpi-bar"><div id="bar-achv"></div></div>
+    <article class="kpi-card">
+      <div class="kpi-title">Errungenschaften</div>
+      <div class="kpi-value"><span id="kpi-badges">1</span> <small>freigeschaltet</small></div>
+      <div class="kpi-bar"><div id="kpi-badges-bar"></div></div>
     </article>
   </div>
 
-  <!-- Aktivitätenliste -->
-  <section class="card" style="margin-top:1rem;">
-    <h3 style="margin:0 0 .25rem;">Letzte Aktivitäten</h3>
-    <p class="subtle" style="margin:0 0 1rem;">Deine kürzlich absolvierten Übungen</p>
-    <div id="fp-activities" class="fp-activities"></div>
+  <!-- Letzte Aktivitäten -->
+  <section class="recent-wrap card">
+    <h2 class="h2">Letzte Aktivitäten</h2>
+    <p class="muted">Deine kürzlich absolvierten Übungen</p>
+    <ul class="recent-list" id="recentList">
+      <!-- wird aus JS befüllt -->
+    </ul>
   </section>
-</div>
+
+  <!-- 🔹 Nachbehandlungs-Übersicht -->
+  <section class="rehab card">
+    <header class="rehab-header">
+      <div>
+        <h2 class="h2">Nachbehandlungs-Übersicht</h2>
+        <p class="muted">Plan zum vorderen Kreuzband (VKB) – komprimiert & abhakbar</p>
+      </div>
+
+      <div class="rehab-tools">
+        <label class="sel">
+          <span>Schema</span>
+          <select id="schemaSelect">
+            <option value="VKB" selected>VKB (vorderes Kreuzband)</option>
+            <!-- Platzhalter für weitere Schemata -->
+          </select>
+        </label>
+
+        <button id="expandAll" class="btn ghost">Alle aufklappen</button>
+        <button id="collapseAll" class="btn ghost">Alle zuklappen</button>
+        <button id="exportPlan" class="btn">Als PDF/Print</button>
+      </div>
+    </header>
+
+    <!-- Timeline / Phasen -->
+    <ol id="rehabTimeline" class="timeline">
+      <!-- wird aus JS gerendert -->
+    </ol>
+  </section>
+</section>
