@@ -75,6 +75,41 @@ const LONG_DESC = {
       <li>Ideal zur Entlastung nach Computerarbeit oder zur Lockerung zwischendurch.</li>
     </ul>
   `
+    arm-rotation: `
+    <h4>💪 Übung: Armrotation</h4>
+    <p><strong>Ziel:</strong> Mobilisation und Lockerung der Schulter- und Oberarmmuskulatur.<br>
+    Fördert die Beweglichkeit im Schultergelenk und stabilisiert die Rotatorenmanschette.</p>
+
+    <h5>🔹 Ausgangsposition</h5>
+    <ul>
+      <li>Stelle dich aufrecht hin, Füße etwa schulterbreit auseinander.</li>
+      <li>Arme hängen locker seitlich am Körper.</li>
+      <li>Schultern bleiben entspannt und nicht hochgezogen.</li>
+    </ul>
+
+    <h5>🔹 Durchführung</h5>
+    <ol>
+      <li>Ellenbogen auf etwa 90° beugen, Unterarme nach vorne zeigen lassen (Türrahmenhaltung).</li>
+      <li>Oberarme dicht am Körper halten.</li>
+      <li>Unterarme langsam nach außen drehen, bis du eine sanfte Dehnung in der Schulter spürst.</li>
+      <li>Dann langsam wieder nach innen drehen, bis sich die Unterarme vor dem Körper kreuzen.</li>
+      <li>Ruhig und kontrolliert bewegen — kein Schwung, kein Ziehen.</li>
+    </ol>
+
+    <h5>🔹 Wiederholungen</h5>
+    <ul>
+      <li>10–15 Wiederholungen, danach kurze Pause.</li>
+      <li>2–3 Durchgänge, je nach Wohlbefinden.</li>
+    </ul>
+
+    <h5>🔹 Wichtige Hinweise</h5>
+    <ul>
+      <li>Bewegung sanft und schmerzfrei ausführen.</li>
+      <li>Bei Schmerzen oder starkem Ziehen Bewegungsumfang verringern.</li>
+      <li>Atme gleichmäßig weiter, nicht anhalten.</li>
+      <li>Ideal zum Aufwärmen vor Schulterübungen oder zur Lockerung nach längerer Belastung.</li>
+    </ul>
+  `
 };
 
 
