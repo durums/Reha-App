@@ -75,7 +75,7 @@ const LONG_DESC = {
       <li>Ideal zur Entlastung nach Computerarbeit oder zur Lockerung zwischendurch.</li>
     </ul>
   `
-    arm-rotation: `
+  arm-rotation: `
     <h4>💪 Übung: Armrotation</h4>
     <p><strong>Ziel:</strong> Mobilisation und Lockerung der Schulter- und Oberarmmuskulatur.<br>
     Fördert die Beweglichkeit im Schultergelenk und stabilisiert die Rotatorenmanschette.</p>
