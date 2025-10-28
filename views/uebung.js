@@ -96,7 +96,52 @@ const LONG_DESC = {
       <li>Atme gleichmäßig weiter, nicht anhalten.</li>
       <li>Ideal zum Aufwärmen vor Schulterübungen oder zur Lockerung nach längerer Belastung.</li>
     </ul>
+  `,
+
+    kniebeuge: `
+    <h4>🦵 Übung: Kniebeuge (assistiert)</h4>
+    <p><strong>Ziel:</strong> Kräftigung der Bein- und Gesäßmuskulatur bei gleichzeitiger Schonung der Gelenke.<br>
+    Ideal zur Verbesserung von Stabilität, Kraft und Beweglichkeit in Hüfte, Knie und Sprunggelenken.</p>
+
+    <h5>🔹 Ausgangsposition</h5>
+    <ul>
+      <li>Stelle dich aufrecht hin, Füße etwa hüft- bis schulterbreit auseinander.</li>
+      <li>Die Fußspitzen zeigen leicht nach außen.</li>
+      <li>Halte dich leicht fest – z. B. an einer Stuhllehne, Wand oder einem Geländer.</li>
+      <li>Der Rücken bleibt gerade, Blick nach vorn.</li>
+    </ul>
+
+    <h5>🔹 Durchführung</h5>
+    <ol>
+      <li>Atme ein und beuge langsam die Knie, als würdest du dich auf einen Stuhl setzen.</li>
+      <li>Das Gewicht bleibt auf den Fersen, die Knie zeigen in Richtung der Fußspitzen, nicht darüber hinaus.</li>
+      <li>Gehe nur so tief, wie es schmerzfrei möglich ist (meist 45–90° Beugung).</li>
+      <li>Atme aus und drücke dich kontrolliert wieder nach oben in die Ausgangsposition.</li>
+      <li>Rücken und Kopf bleiben während der Bewegung in einer Linie – kein Rundrücken.</li>
+    </ol>
+
+    <h5>🔹 Wiederholungen</h5>
+    <ul>
+      <li>10–15 Wiederholungen</li>
+      <li>2–3 Sätze, je nach Belastbarkeit.</li>
+      <li>Zwischen den Sätzen kurz ausschütteln und atmen.</li>
+    </ul>
+
+    <h5>🔹 Wichtige Hinweise</h5>
+    <ul>
+      <li>Bewege dich ruhig, gleichmäßig und kontrolliert.</li>
+      <li>Kein Schwung, kein Abfedern.</li>
+      <li>Bei Schmerzen im Knie oder Rücken: Bewegungsradius verkleinern oder abbrechen.</li>
+      <li>Optional: Theraband oder Stuhl für zusätzliche Unterstützung.</li>
+    </ul>
+
+    <h5>🧠 Tipp</h5>
+    <ul>
+      <li>Besonders geeignet nach längeren Ruhephasen (z. B. nach OP oder Verletzung).</li>
+      <li>Ideal als Vorbereitung für Alltagsbewegungen wie Treppensteigen oder Aufstehen.</li>
+    </ul>
   `
+
 };
 
 // (Pragmatisch) kleine Datenbasis lokal – später gern zentral auslagern
