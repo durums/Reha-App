@@ -26,10 +26,12 @@
    ========================= */
 .view-profil { padding-bottom: 2rem; }
 
+/* Zwei-Spalten-Layout: links Infos, rechts Sidebar */
 .pf-layout {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: 1.6fr .9fr;
+  gap: 2rem;                         /* etwas mehr Luft zwischen Spalten */
+  grid-template-columns: 1.7fr 0.9fr;
+  align-items: start;
 }
 @media (max-width: 1024px) {
   .pf-layout { grid-template-columns: 1fr; }
@@ -39,10 +41,11 @@
    Karten, Titel, Zeilen
    ========================= */
 .pf-card-head { margin-bottom: 1rem; }
+
 .pf-card-title {
   font-weight: 800;
   font-size: 1.15rem;
-  margin-bottom: .15rem;
+  margin-bottom: .6rem;              /* mehr Abstand nach unten */
 }
 
 .pf-row {
@@ -101,18 +104,30 @@
 .pf-actions {
   display: flex;
   align-items: center;
-  gap: 1.2rem;          /* etwas mehr Luft */
+  gap: 1.2rem;
   margin-top: 1rem;
 }
 
 /* =========================
-   Seitenbereich (Buttons)
+   Seitenbereich (rechte Spalte)
    ========================= */
 .pf-side {
   display: grid;
-  gap: 1.5rem;          /* mehr Abstand zwischen Karten */
+  gap: 1.8rem;                        /* mehr Abstand zwischen Boxen */
 }
 
+/* Karten in der rechten Spalte */
+.pf-side-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Überschriften in den Boxen */
+.pf-side-card .pf-card-title {
+  margin-bottom: 1rem;               /* mehr Abstand zwischen Titel & Inhalt */
+}
+
+/* Buttons in den Boxen */
 .pf-side-card .pf-row-btn {
   width: 100%;
   text-align: left;
@@ -124,13 +139,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: var(--pf-transition);
-  margin-bottom: 0.6rem;   /* vertikaler Abstand zwischen Buttons */
+  margin-bottom: 0.6rem;             /* Abstand zwischen Buttons */
 }
 .pf-side-card .pf-row-btn:last-child {
-  margin-bottom: 0;        /* letzter Button bündig */
+  margin-bottom: 0;
 }
 .pf-side-card .pf-row-btn:first-of-type {
-  margin-top: .3rem;       /* kleiner Startabstand */
+  margin-top: .3rem;
 }
 
 .pf-side-card .pf-row-btn:hover:not(:disabled):not(.is-disabled) {
@@ -154,7 +169,7 @@
 }
 
 /* =========================
-   Checklisten
+   Checklisten (Benachrichtigungen)
    ========================= */
 .pf-list {
   display: grid;
@@ -173,7 +188,7 @@
 }
 
 /* =========================
-   Modal (konsolidiert)
+   Modal (z. B. Passwort & Privatsphäre)
    ========================= */
 .pf-modal {
   position: fixed;
@@ -191,7 +206,7 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
-  max-height: 80vh;          /* bei viel Text scrollbar */
+  max-height: 80vh;
   overflow-y: auto;
   scrollbar-gutter: stable;
 }
