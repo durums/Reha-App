@@ -1,72 +1,58 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fortschritt – Reha</title>
-  <link rel="stylesheet" href="fortschritt.css" />
-</head>
-<body>
-
-<section class="rehaprogress">
+<section class="rehaprogress" id="rehaprogress">
+  <!-- Kopf: Download + KPI -->
   <div class="rp-head">
-    <a class="rp-doc btn-dark" href="assets/nachbehandlung.pdf" download>
-      📄 Nachbehandlungs-Dokument
-    </a>
+    <a class="btn-dark" href="assets/nachbehandlung.pdf" download>📄 Nachbehandlungs-Dokument</a>
 
-    <!-- KPI rechts -->
-    <aside class="card-dark rp-kpi" aria-label="KPI-Fortschritt">
+    <aside class="card-dark rp-kpi">
       <h3>KPI – Fortschritt</h3>
 
       <div class="kpi-row">
-        <div class="kpi-label">Beweglichkeit – <b id="kpi-mobility-val">75%</b></div>
-        <div class="kpi-bar"><span id="kpi-mobility-bar" style="width:75%"></span></div>
+        <div class="kpi-label">Beweglichkeit – <strong>75%</strong></div>
+        <div class="kpi-bar"><span style="width:75%"></span></div>
       </div>
 
       <div class="kpi-donuts">
         <figure class="donut">
-          <svg viewBox="0 0 120 120" class="donut-svg" aria-label="Kraft 25 Prozent">
-            <circle class="donut-bg" cx="60" cy="60" r="48"></circle>
-            <circle id="donut-strength" class="donut-val" cx="60" cy="60" r="48"></circle>
+          <svg class="donut-svg" viewBox="0 0 110 110" aria-hidden="true">
+            <circle class="donut-bg" cx="55" cy="55" r="48" />
+            <circle class="donut-val" cx="55" cy="55" r="48" style="stroke-dashoffset: 301.59*(1-0.25)" />
           </svg>
-          <figcaption>Kraft – <b id="kpi-strength-val">25%</b></figcaption>
+          <figcaption>Kraft – 25%</figcaption>
         </figure>
-
         <figure class="donut">
-          <svg viewBox="0 0 120 120" class="donut-svg" aria-label="Ausdauer 62 Prozent">
-            <circle class="donut-bg" cx="60" cy="60" r="48"></circle>
-            <circle id="donut-endurance" class="donut-val" cx="60" cy="60" r="48"></circle>
+          <svg class="donut-svg" viewBox="0 0 110 110" aria-hidden="true">
+            <circle class="donut-bg" cx="55" cy="55" r="48" />
+            <circle class="donut-val" cx="55" cy="55" r="48" style="stroke-dashoffset: 301.59*(1-0.62)" />
           </svg>
-          <figcaption>Ausdauer – <b id="kpi-endurance-val">62%</b></figcaption>
+          <figcaption>Ausdauer – 62%</figcaption>
         </figure>
       </div>
 
       <div class="kpi-row">
-        <div class="kpi-label">Schmerzreduktion – <b id="kpi-pain-val">85%</b></div>
-        <div class="kpi-bar"><span id="kpi-pain-bar" style="width:85%"></span></div>
+        <div class="kpi-label">Schmerzreduktion – <strong>85%</strong></div>
+        <div class="kpi-bar"><span style="width:85%"></span></div>
       </div>
     </aside>
   </div>
 
-  <!-- Zahlenstrahl (NEU) -->
-<article class="card rp-timeline">
-  <div class="nt-head">
-    <div class="nt-title">Aktuelle Phase</div>
-  </div>
-
-  <div class="nt-scale">
-    <ul id="nt-milestones" class="nt-milestones" aria-label="Reha-Milestones"></ul>
-  </div>
-
-  <div class="nt-bar" aria-hidden="true">
-    <div id="nt-fill" class="nt-fill"></div>
-    <div id="nt-pin" class="nt-pin">
-      <i class="dot"></i>
-      <span id="nt-pin-label">AB 4. WOCHE</span>
+  <!-- Zahlenstrahl -->
+  <article class="card rp-timeline">
+    <div class="nt-head">
+      <span class="nt-title">Aktuelle Phase</span>
     </div>
-  </div>
-</article>
-  
+
+    <div class="nt-scale">
+      <ul id="ntMilestones" class="nt-milestones"></ul>
+      <div class="nt-bar">
+        <div id="ntFill" class="nt-fill"></div>
+      </div>
+      <div id="ntPin" class="nt-pin" aria-hidden="true">
+        <div class="dot"></div>
+        <span id="ntPhaseLabel">–</span>
+      </div>
+    </div>
+  </article>
+
   <!-- Info-Kacheln -->
   <div class="rp-info">
     <article class="card pill">
@@ -75,14 +61,12 @@
         <li>Abtrainieren der Hartrahmenorthese bei normalem Gangbild</li>
       </ul>
     </article>
-
     <article class="card pill">
       <h4>BELASTUNG</h4>
       <ul class="list">
         <li>Volles Körpergewicht (ohne Gehhilfen)</li>
       </ul>
     </article>
-
     <article class="card pill">
       <h4>BEHANDLUNG</h4>
       <ul class="list">
@@ -93,8 +77,3 @@
     </article>
   </div>
 </section>
-
-<script src="fortschritt.js" defer></script>
-</body>
-</html>
-
