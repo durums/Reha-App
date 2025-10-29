@@ -74,7 +74,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,sy
   box-shadow:var(--shadow)
 }
 
-/* ===== Timeline: volle Breite ===== */
+/* ===== Timeline: fixierte Höhe + Layer ===== */
+.rp-timeline{padding:18px 16px}
+
+/* Vollbreite-Card wie gehabt */
 .rp-timeline--full{
   width:100%;
   grid-column:1 / -1;
@@ -83,10 +86,66 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,sy
   padding:26px 28px;
 }
 
+.nt-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.nt-title{
+  display:inline-block;background:#0f213d;color:#fff;font-weight:900;
+  padding:4px 10px;border-radius:10px;font-size:.86rem
+}
+
+/* Der komplette Zahlenstrahl-Container hat fix Höhe:
+   oben Labels, darunter die Linie */
+.nt-scale{
+  position:relative;
+  height: 100px;         /* <- Platz für Labels + Track */
+}
+
+/* Milestones liegen OBEN und dürfen über dem Track erscheinen */
+.nt-milestones{
+  list-style:none;margin:0;padding:0;position:absolute;left:0;right:0;top:0;
+  z-index: 2;            /* über Track */
+}
+.nt-milestones li{
+  position:absolute;top:0;transform:translateX(-50%);
+  text-align:center;white-space:nowrap
+}
+.nt-pill{
+  background:#fff;border:1px solid var(--line);color:#4d5a73;
+  font-size:.8rem;padding:8px 10px;border-radius:12px;box-shadow:var(--shadow);
+}
+.nt-pill.current{background:#e6edf9;border-color:#cfe0ff;color:#0f213d;font-weight:900}
+
+/* Track liegt UNTER den Labels */
+.nt-bar{
+  position:absolute;left:0;right:0;top:58px;   /* <- Linie unter den Labels */
+  height:14px;background:#273b59;border-radius:999px;
+  z-index:1;
+}
+.nt-fill{
+  position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,#2f6dff,#6fa8ff);
+  border-radius:999px;transition:width .35s ease
+}
+
+/* Pin über allem */
+.nt-pin{
+  position:absolute;top:65px;                  /* leicht auf die Linie gesetzt */
+  transform:translate(-50%,-55%);
+  display:flex;align-items:center;gap:8px;
+  z-index:3;
+}
+.nt-pin .dot{
+  width:22px;height:22px;border-radius:50%;background:#79d5ff;
+  border:4px solid #d2f0ff;box-shadow:0 0 0 3px rgba(121,213,255,.25)
+}
+.nt-pin span{
+  background:#0f213d;color:#fff;border-radius:999px;padding:7px 12px;
+  font-weight:900;font-size:.9rem;box-shadow:var(--shadow)
+}
+
 @media (max-width:980px){
   .rp-timeline--full{max-width:none;padding:20px 16px}
-  .nt-pill{font-size:.74rem;padding:7px 9px}
-  .nt-pin span{display:none}
+  .nt-scale{height:88px}
+  .nt-pin span{display:none}   /* auf kleinen Screens nur Punkt */
 }
 
 /* Info-Kacheln */
