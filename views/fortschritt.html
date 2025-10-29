@@ -1,6 +1,4 @@
-<!-- Fortschritt / views/fortschritt.html -->
 <section class="rehaprogress">
-  <!-- Kopf: Download links + KPI rechts -->
   <div class="rp-head">
     <a class="btn-dark" href="assets/nachbehandlung.pdf" download>
       📄 Nachbehandlungs-Dokument
@@ -16,7 +14,7 @@
 
       <div class="kpi-donuts">
         <figure class="donut">
-          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <svg class="donut-svg" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
             <circle cx="60" cy="60" r="48" class="donut-val"></circle>
           </svg>
@@ -24,7 +22,7 @@
         </figure>
 
         <figure class="donut">
-          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <svg class="donut-svg" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
             <circle cx="60" cy="60" r="48" class="donut-val"></circle>
           </svg>
@@ -39,27 +37,23 @@
     </aside>
   </div>
 
-  <!-- Zahlenstrahl / Timeline -->
+  <!-- Zahlenstrahl -->
   <article class="card rp-timeline rp-timeline--full">
     <div class="nt-head">
       <span class="nt-title">Aktuelle Phase</span>
     </div>
 
     <div class="nt-scale">
-      <ul id="ntMilestones" class="nt-milestones"><!-- befüllt per JS --></ul>
-
-      <div class="nt-bar" aria-hidden="true">
-        <div id="ntFill" class="nt-fill"></div>
-      </div>
-
-      <div id="ntPin" class="nt-pin" role="img" aria-label="Aktuelle Phase:">
+      <ul id="ntMilestones" class="nt-milestones"></ul>
+      <div class="nt-bar"><div id="ntFill" class="nt-fill"></div></div>
+      <div id="ntPin" class="nt-pin">
         <div class="dot"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
   </article>
 
-  <!-- Drei Info-Kacheln -->
+  <!-- Info-Karten -->
   <div class="rp-info">
     <article class="card pill">
       <h4>BEWEGUNGSUMFANG</h4>
@@ -85,3 +79,5 @@
     </article>
   </div>
 </section>
+
+<script src="fortschritt.js"></script>
