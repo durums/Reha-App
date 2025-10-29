@@ -1,89 +1,44 @@
 (() => {
-  // Aktueller Slot im Zahlenstrahl (0..6) – Beispiel: "AB 4. WOCHE"
-  const currentIndex = 4;
-
-  // KPI Beispielwerte
-  const kpis = { mobility: 75, strength: 25, endurance: 62, pain: 85 };
-
-/* ====== Zahlenstrahl (NEU) ====== */
-(() => {
-  // Milestones in Reihenfolge (du kannst Bezeichnungen jederzeit ändern)
+  // Milestones in Prozent (0–100) entlang des Balkens
   const milestones = [
-    "1. TAG",
-    "2. TAG",
-    "AB 7. TAG",
-    "AB 2. WOCHE",
-    "AB 4. WOCHE",
-    "AB 6–8. WOCHE",
-    "AB 20. WOCHE"
+    { label: "1. TAG", pos: 5 },
+    { label: "2. TAG", pos: 20 },
+    { label: "AB 7. TAG", pos: 35 },
+    { label: "AB 2. WOCHE", pos: 50 },
+    { label: "AB 4. WOCHE", pos: 65 },          // ← aktuelle Phase
+    { label: "AB 6–8. WOCHE", pos: 82 },
+    { label: "AB 20. WOCHE", pos: 98 }
   ];
+  const currentIndex = 4; // „AB 4. WOCHE“
 
-  // Welche Phase ist aktiv? (Index 0..milestones.length-1)
-  const currentIndex = 4; // ← Beispiel: AB 4. WOCHE
+  const ul = document.getElementById("ntMilestones");
+  const fill = document.getElementById("ntFill");
+  const pin  = document.getElementById("ntPin");
+  const pinLabel = document.getElementById("ntPhaseLabel");
 
-  const list = document.getElementById("nt-milestones");
-  const fill = document.getElementById("nt-fill");
-  const pin  = document.getElementById("nt-pin");
-  const pinLabel = document.getElementById("nt-pin-label");
+  // render milestones
+  milestones.forEach((m, i) => {
+    const li = document.createElement("li");
+    li.style.left = m.pos + "%";
+    li.innerHTML = `<div class="nt-pill ${i===currentIndex?'current':''}">${m.label}</div>`;
+    ul.appendChild(li);
+  });
 
-  function buildMilestones(){
-    list.innerHTML = "";
-    const n = milestones.length - 1;
-    milestones.forEach((label, i) => {
-      const li = document.createElement("li");
-      li.style.left = (i / n * 100) + "%";
-      li.innerHTML = `<div class="nt-pill ${i===currentIndex?'current':''}">${label}</div>`;
-      list.appendChild(li);
-    });
-    pinLabel.textContent = milestones[currentIndex];
-  }
+  // set fill + pin
+  const cur = milestones[currentIndex];
+  fill.style.width = cur.pos + "%";
+  pin.style.left = cur.pos + "%";
+  pinLabel.textContent = cur.label;
 
-  function positionPinAndFill(){
-    const n = milestones.length - 1;
-    const pct = (currentIndex / n) * 100;
-    fill.style.width = pct + "%";
-
-    const bar = document.querySelector(".nt-bar");
-    const rect = bar.getBoundingClientRect();
-    const x = rect.left + rect.width * (pct / 100);
-    const leftPct = ((x - rect.left) / rect.width) * 100;
-    pin.style.left = leftPct + "%";
-  }
-
-  function initTimeline(){
-    buildMilestones();
-    positionPinAndFill();
-  }
-
-  window.addEventListener("resize", positionPinAndFill);
-  document.addEventListener("DOMContentLoaded", initTimeline);
-  if (document.readyState !== "loading") initTimeline();
-})();
-  
-  // --- KPI Balken -----------------------------------------------------------
-  const setBar = (idText, idBar, val) => {
-    const t = document.getElementById(idText);
-    const b = document.getElementById(idBar);
-    if (t) t.textContent = val + '%';
-    if (b) b.style.width = val + '%';
-  };
-
-  setBar('kpi-mobility-val', 'kpi-mobility-bar', kpis.mobility);
-  setBar('kpi-pain-val', 'kpi-pain-bar', kpis.pain);
-
-  // --- KPI Donuts -----------------------------------------------------------
-  const CIRC = 2 * Math.PI * 48; // r = 48 → Umfang ~301.59
-  function setDonut(idCircle, val, idText) {
-    const c = document.getElementById(idCircle);
-    if (!c) return;
-    const off = CIRC * (1 - val / 100);
-    c.style.strokeDashoffset = off;
-    if (idText) {
-      const t = document.getElementById(idText);
-      if (t) t.textContent = val + '%';
-    }
-  }
-
-  setDonut('donut-strength', kpis.strength, 'kpi-strength-val');
-  setDonut('donut-endurance', kpis.endurance, 'kpi-endurance-val');
+  // Donut-Kreise korrekt füllen (falls du echte Werte animieren willst)
+  document.querySelectorAll(".donut").forEach((fig) => {
+    const circle = fig.querySelector(".donut-val");
+    const text = fig.querySelector("figcaption")?.textContent || "";
+    const match = text.match(/(\d+)%/);
+    if (!circle || !match) return;
+    const p = Math.max(0, Math.min(100, parseInt(match[1], 10))) / 100;
+    const C = 2 * Math.PI * 48; // r=48
+    circle.style.strokeDasharray = C.toFixed(2);
+    circle.style.strokeDashoffset = (C * (1 - p)).toFixed(2);
+  });
 })();
