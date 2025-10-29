@@ -1,5 +1,181 @@
-/* Modal (konsolidiert) */
-.pf-modal{
+/* =========================
+   Variablen & Basiskram
+   ========================= */
+:root {
+  --pf-primary-1: #b7e3f7;
+  --pf-primary-2: #d9fff4;
+  --pf-primary-3: #a8def3;
+  --pf-primary-4: #c9fff0;
+  --pf-text-strong: #1b5f73;
+  --pf-border: #b7e3f7;
+  --pf-border-soft: #e6eaf0;
+  --pf-border-soft-2: #eef2f7;
+  --pf-hover-bg: #f0fafc;
+  --pf-shadow-inset: inset 0 0 0 2px rgba(0,0,0,.05);
+  --pf-radius: 10px;
+  --pf-transition: background .2s ease, color .2s ease, transform .1s ease, box-shadow .2s ease;
+  --pf-focus: 0 0 0 3px rgba(183, 227, 247, .75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --pf-transition: none; }
+}
+
+/* =========================
+   Layout
+   ========================= */
+.view-profil { padding-bottom: 2rem; }
+
+.pf-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1.6fr .9fr;
+}
+@media (max-width: 1024px) {
+  .pf-layout { grid-template-columns: 1fr; }
+}
+
+/* =========================
+   Karten, Titel, Zeilen
+   ========================= */
+.pf-card-head { margin-bottom: 1rem; }
+.pf-card-title {
+  font-weight: 800;
+  font-size: 1.15rem;
+  margin-bottom: .15rem;
+}
+
+.pf-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* =========================
+   Avatar
+   ========================= */
+.pf-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pf-primary-1), var(--pf-primary-2));
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--pf-text-strong);
+  box-shadow: var(--pf-shadow-inset);
+  overflow: hidden;
+}
+
+/* =========================
+   Formular-Grids & Inputs
+   ========================= */
+.pf-grid {
+  display: grid;
+  gap: .9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pf-grid .pf-colspan { grid-column: 1 / -1; }
+
+.pf-grid input,
+.pf-input {
+  width: 100%;
+  padding: .7rem .8rem;
+  border-radius: var(--pf-radius);
+  border: 1px solid var(--pf-border-soft);
+  background: #fff;
+  outline: none;
+  transition: var(--pf-transition);
+}
+.pf-grid input:focus-visible,
+.pf-input:focus-visible {
+  box-shadow: var(--pf-focus);
+  border-color: var(--pf-border);
+}
+
+/* =========================
+   Buttons & Aktionsbereiche
+   ========================= */
+.pf-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;          /* etwas mehr Luft */
+  margin-top: 1rem;
+}
+
+/* =========================
+   Seitenbereich (Buttons)
+   ========================= */
+.pf-side {
+  display: grid;
+  gap: 1.5rem;          /* mehr Abstand zwischen Karten */
+}
+
+.pf-side-card .pf-row-btn {
+  width: 100%;
+  text-align: left;
+  padding: .75rem .9rem;
+  border-radius: var(--pf-radius);
+  border: 1px solid var(--pf-border);
+  background: linear-gradient(135deg, var(--pf-primary-1), var(--pf-primary-2));
+  color: var(--pf-text-strong);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--pf-transition);
+  margin-bottom: 0.6rem;   /* vertikaler Abstand zwischen Buttons */
+}
+.pf-side-card .pf-row-btn:last-child {
+  margin-bottom: 0;        /* letzter Button bündig */
+}
+.pf-side-card .pf-row-btn:first-of-type {
+  margin-top: .3rem;       /* kleiner Startabstand */
+}
+
+.pf-side-card .pf-row-btn:hover:not(:disabled):not(.is-disabled) {
+  background: linear-gradient(135deg, var(--pf-primary-3), var(--pf-primary-4));
+}
+.pf-side-card .pf-row-btn:active:not(:disabled):not(.is-disabled) {
+  transform: translateY(1px);
+}
+.pf-side-card .pf-row-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--pf-focus);
+}
+.pf-side-card .pf-row-btn:disabled,
+.pf-side-card .pf-row-btn.is-disabled {
+  background: linear-gradient(135deg, var(--pf-primary-1), var(--pf-primary-2));
+  border-color: var(--pf-border);
+  color: var(--pf-text-strong);
+  opacity: 1;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* =========================
+   Checklisten
+   ========================= */
+.pf-list {
+  display: grid;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+.pf-check {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  cursor: pointer;
+}
+.pf-check input {
+  width: 18px;
+  height: 18px;
+}
+
+/* =========================
+   Modal (konsolidiert)
+   ========================= */
+.pf-modal {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -7,7 +183,7 @@
   place-items: center;
   z-index: 2000;
 }
-.pf-modal-content{
+.pf-modal-content {
   background: #fff;
   padding: 2rem;
   border-radius: 12px;
@@ -15,14 +191,14 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
-  max-height: 80vh;           /* Neu: bei langem Text */
-  overflow-y: auto;           /* Nur Inhalt scrollt */
-  scrollbar-gutter: stable;   /* Ruhige Scrollbar */
+  max-height: 80vh;          /* bei viel Text scrollbar */
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
-.pf-modal-content h3{ margin-bottom: .5rem; }
-.pf-modal-content p{  margin-bottom: 1rem; }
+.pf-modal-content h3 { margin-bottom: .5rem; }
+.pf-modal-content p  { margin-bottom: 1rem; }
 
-.pf-modal-content input{
+.pf-modal-content input {
   width: 100%;
   margin-bottom: 1rem;
   padding: .7rem .8rem;
@@ -31,23 +207,34 @@
   outline: none;
   transition: var(--pf-transition);
 }
-.pf-modal-content input:focus-visible{
+.pf-modal-content input:focus-visible {
   box-shadow: var(--pf-focus);
   border-color: var(--pf-border);
 }
 
-.pf-modal-actions{ display: flex; justify-content: center; gap: 1rem; }
-.pf-modal .btn{ min-width: 100px; }
+.pf-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+.pf-modal .btn { min-width: 100px; }
 
-@media (max-width: 380px){
-  .pf-modal-content{ padding: 1.5rem; }
+@media (max-width: 380px) {
+  .pf-modal-content { padding: 1.5rem; }
 }
 
-/* Screenreader-only Labels */
-.sr-only{
+/* =========================
+   Barrierefreiheit (Screenreader-only)
+   ========================= */
+.sr-only {
   position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0);
-  white-space: nowrap; border: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
 }
