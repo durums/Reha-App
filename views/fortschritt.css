@@ -42,35 +42,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,sy
 }
 .donut figcaption{text-align:center;font-size:.92rem}
 
-/* Timeline */
-.rp-timeline{padding:14px}
-.rp-timeline .slots{
-  display:grid;grid-template-columns:repeat(7,minmax(110px,1fr));gap:8px
-}
-.rp-timeline .slot{
-  background:#fff;border:1px solid var(--line);border-radius:12px;
-  padding:10px 8px;text-align:center;font-size:.82rem;color:#4d5a73;white-space:nowrap
-}
-.rp-timeline .slot.current{background:#e6edf9;border-color:#cfe0ff;font-weight:900;color:#0f213d}
-
-.rp-timeline .phase-row{margin-top:10px}
-.phase-chip{
-  display:inline-block;background:#0f213d;color:#fff;padding:4px 10px;border-radius:10px;
-  font-weight:900;font-size:.86rem
-}
-
-.rp-timeline .track{
-  position:relative;height:14px;background:#273b59;border-radius:999px;margin-top:8px;overflow:visible
-}
-#track-progress{
-  position:absolute;left:0;top:0;bottom:0;background:var(--accent2);
-  border-radius:999px;width:0;transition:width .3s ease
-}
-.rp-timeline .marks{position:absolute;inset:-8px 0 0 0;pointer-events:none}
-.rp-timeline .marks .m{
-  position:absolute;top:-2px;width:18px;height:18px;border-radius:999px;
-  background:#79d5ff;border:3px solid #d2f0ff;transform:translateX(-50%)
-}
 
 /* Info-Kacheln */
 .rp-info{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:16px}
@@ -118,3 +89,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,sy
   .nt-pill{font-size:.74rem;padding:7px 9px}
   .nt-pin span{display:none} /* auf kleineren Screens nur den Punkt zeigen */
 }
+/* FIX: Platz für die Milestone-Pills */
+.nt-scale{position:relative; margin-bottom:14px; height:46px;} /* <— neu: height */
+
+/* FIX: Pin sicher oben */
+.nt-pin{position:absolute; top:50%; transform:translate(-50%,-55%); display:flex; align-items:center; gap:8px; z-index:2;} /* <— z-index */
+
+/* OPTIONAL: alte Timeline-Regeln entfernen, wenn nicht mehr genutzt
+.rp-timeline .slots{}
+.rp-timeline .slot{}
+.rp-timeline .slot.current{}
+.rp-timeline .phase-row{}
+.phase-chip{}
+.rp-timeline .track{}
+#track-progress{}
+.rp-timeline .marks{}
+.rp-timeline .marks .m{}
+*/
