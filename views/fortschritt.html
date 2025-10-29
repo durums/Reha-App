@@ -1,11 +1,12 @@
-<section class="rehaprogress" id="fortschritt">
-  <!-- Kopf: Download + KPI rechts -->
+<!-- Fortschritt / views/fortschritt.html -->
+<section class="rehaprogress">
+  <!-- Kopf: Download links + KPI rechts -->
   <div class="rp-head">
     <a class="btn-dark" href="assets/nachbehandlung.pdf" download>
       📄 Nachbehandlungs-Dokument
     </a>
 
-    <aside class="card-dark rp-kpi" aria-label="KPI-Fortschritt">
+    <aside class="card-dark rp-kpi">
       <h3>KPI – Fortschritt</h3>
 
       <div class="kpi-row">
@@ -14,20 +15,20 @@
       </div>
 
       <div class="kpi-donuts">
-        <figure class="donut" aria-label="Kraft 25%">
-          <svg class="donut-svg" viewBox="0 0 110 110" role="img">
-            <circle class="donut-bg" cx="55" cy="55" r="48"></circle>
-            <circle class="donut-val" cx="55" cy="55" r="48" style="stroke-dashoffset: 226.19"></circle>
+        <figure class="donut">
+          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
+            <circle cx="60" cy="60" r="48" class="donut-val"></circle>
           </svg>
-          <figcaption>Kraft – <strong>25%</strong></figcaption>
+          <figcaption>Kraft – 25%</figcaption>
         </figure>
 
-        <figure class="donut" aria-label="Ausdauer 62%">
-          <svg class="donut-svg" viewBox="0 0 110 110" role="img">
-            <circle class="donut-bg" cx="55" cy="55" r="48"></circle>
-            <circle class="donut-val" cx="55" cy="55" r="48" style="stroke-dashoffset: 114.60"></circle>
+        <figure class="donut">
+          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
+            <circle cx="60" cy="60" r="48" class="donut-val"></circle>
           </svg>
-          <figcaption>Ausdauer – <strong>62%</strong></figcaption>
+          <figcaption>Ausdauer – 62%</figcaption>
         </figure>
       </div>
 
@@ -38,27 +39,27 @@
     </aside>
   </div>
 
-  <!-- Zahlenstrahl (volle Breite) -->
-  <article class="card rp-timeline rp-timeline--full" aria-label="Reha-Zahlenstrahl">
+  <!-- Zahlenstrahl / Timeline -->
+  <article class="card rp-timeline rp-timeline--full">
     <div class="nt-head">
       <span class="nt-title">Aktuelle Phase</span>
     </div>
 
     <div class="nt-scale">
-      <ul id="ntMilestones" class="nt-milestones"></ul>
+      <ul id="ntMilestones" class="nt-milestones"><!-- befüllt per JS --></ul>
 
-      <div class="nt-bar">
+      <div class="nt-bar" aria-hidden="true">
         <div id="ntFill" class="nt-fill"></div>
       </div>
 
-      <div id="ntPin" class="nt-pin" aria-hidden="true">
+      <div id="ntPin" class="nt-pin" role="img" aria-label="Aktuelle Phase:">
         <div class="dot"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
   </article>
 
-  <!-- Info-Kacheln -->
+  <!-- Drei Info-Kacheln -->
   <div class="rp-info">
     <article class="card pill">
       <h4>BEWEGUNGSUMFANG</h4>
@@ -84,6 +85,3 @@
     </article>
   </div>
 </section>
-
-<!-- JS laden -->
-<script src="views/fortschritt.js"></script>
