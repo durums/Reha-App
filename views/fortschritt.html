@@ -48,27 +48,25 @@
     </aside>
   </div>
 
-  <!-- Zahlenstrahl -->
-  <article class="card rp-timeline">
-    <div class="slots" id="tl-slots">
-      <div class="slot">1. TAG</div>
-      <div class="slot">2. TAG</div>
-      <div class="slot">AB 7. TAG</div>
-      <div class="slot">AB 2. WOCHE</div>
-      <div class="slot">AB 4. WOCHE</div>
-      <div class="slot">AB 6–8. WOCHE</div>
-      <div class="slot">AB 20. WOCHE</div>
-    </div>
+  <!-- Zahlenstrahl (NEU) -->
+<article class="card rp-timeline">
+  <div class="nt-head">
+    <div class="nt-title">Aktuelle Phase</div>
+  </div>
 
-    <div class="phase-row">
-      <span class="phase-chip">Aktuelle Phase</span>
-      <div class="track">
-        <span id="track-progress"></span>
-        <div class="marks" id="tl-marks"></div>
-      </div>
-    </div>
-  </article>
+  <div class="nt-scale">
+    <ul id="nt-milestones" class="nt-milestones" aria-label="Reha-Milestones"></ul>
+  </div>
 
+  <div class="nt-bar" aria-hidden="true">
+    <div id="nt-fill" class="nt-fill"></div>
+    <div id="nt-pin" class="nt-pin">
+      <i class="dot"></i>
+      <span id="nt-pin-label">AB 4. WOCHE</span>
+    </div>
+  </div>
+</article>
+  
   <!-- Info-Kacheln -->
   <div class="rp-info">
     <article class="card pill">
@@ -99,3 +97,4 @@
 <script src="fortschritt.js" defer></script>
 </body>
 </html>
+
