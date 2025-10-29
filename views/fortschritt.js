@@ -5,38 +5,61 @@
   // KPI Beispielwerte
   const kpis = { mobility: 75, strength: 25, endurance: 62, pain: 85 };
 
-  // --- Timeline -------------------------------------------------------------
-  const slotsWrap = document.getElementById('tl-slots');
-  const slots = [...slotsWrap.querySelectorAll('.slot')];
-  slots.forEach((el, i) => el.classList.toggle('current', i === currentIndex));
+/* ====== Zahlenstrahl (NEU) ====== */
+(() => {
+  // Milestones in Reihenfolge (du kannst Bezeichnungen jederzeit ändern)
+  const milestones = [
+    "1. TAG",
+    "2. TAG",
+    "AB 7. TAG",
+    "AB 2. WOCHE",
+    "AB 4. WOCHE",
+    "AB 6–8. WOCHE",
+    "AB 20. WOCHE"
+  ];
 
-  const progressEl = document.getElementById('track-progress');
-  const marksEl = document.getElementById('tl-marks');
+  // Welche Phase ist aktiv? (Index 0..milestones.length-1)
+  const currentIndex = 4; // ← Beispiel: AB 4. WOCHE
 
-  function updateMarksAndProgress() {
-    const wrapRect = slotsWrap.getBoundingClientRect();
-    marksEl.innerHTML = '';
+  const list = document.getElementById("nt-milestones");
+  const fill = document.getElementById("nt-fill");
+  const pin  = document.getElementById("nt-pin");
+  const pinLabel = document.getElementById("nt-pin-label");
 
-    // Marker exakt unter die Mitte jedes Slots setzen
-    slots.forEach((slot) => {
-      const r = slot.getBoundingClientRect();
-      const center = ((r.left + r.right) / 2) - wrapRect.left;
-      const m = document.createElement('i');
-      m.className = 'm';
-      m.style.left = (center / wrapRect.width * 100) + '%';
-      marksEl.appendChild(m);
+  function buildMilestones(){
+    list.innerHTML = "";
+    const n = milestones.length - 1;
+    milestones.forEach((label, i) => {
+      const li = document.createElement("li");
+      li.style.left = (i / n * 100) + "%";
+      li.innerHTML = `<div class="nt-pill ${i===currentIndex?'current':''}">${label}</div>`;
+      list.appendChild(li);
     });
-
-    // Fortschrittsbreite bis zum rechten Rand des aktuellen Slots
-    const slotRect = slots[currentIndex].getBoundingClientRect();
-    const right = slotRect.right - wrapRect.left;
-    const pct = Math.max(0, Math.min(100, (right / wrapRect.width) * 100));
-    progressEl.style.width = pct + '%';
+    pinLabel.textContent = milestones[currentIndex];
   }
 
-  updateMarksAndProgress();
-  window.addEventListener('resize', updateMarksAndProgress);
+  function positionPinAndFill(){
+    const n = milestones.length - 1;
+    const pct = (currentIndex / n) * 100;
+    fill.style.width = pct + "%";
 
+    const bar = document.querySelector(".nt-bar");
+    const rect = bar.getBoundingClientRect();
+    const x = rect.left + rect.width * (pct / 100);
+    const leftPct = ((x - rect.left) / rect.width) * 100;
+    pin.style.left = leftPct + "%";
+  }
+
+  function initTimeline(){
+    buildMilestones();
+    positionPinAndFill();
+  }
+
+  window.addEventListener("resize", positionPinAndFill);
+  document.addEventListener("DOMContentLoaded", initTimeline);
+  if (document.readyState !== "loading") initTimeline();
+})();
+  
   // --- KPI Balken -----------------------------------------------------------
   const setBar = (idText, idBar, val) => {
     const t = document.getElementById(idText);
