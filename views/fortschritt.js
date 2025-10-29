@@ -1,60 +1,51 @@
-// views/fortschritt.js
-(() => {
-  // --- Meilensteine & aktuelle Phase ---
+// fortschritt.js
+document.addEventListener("DOMContentLoaded", () => {
   const MILESTONES = [
-    { key: "1. TAG",        label: "1. TAG" },
-    { key: "2. TAG",        label: "2. TAG" },
-    { key: "AB 7. TAG",     label: "AB 7. TAG" },
-    { key: "AB 2. WOCHE",   label: "AB 2. WOCHE" },
-    { key: "AB 4. WOCHE",   label: "AB 4. WOCHE" }, // Beispiel: aktuelle Phase
-    { key: "AB 6–8. WOCHE", label: "AB 6–8. WOCHE" },
-    { key: "AB 20. WOCHE",  label: "AB 20. WOCHE" }
+    "1. TAG", "2. TAG", "AB 7. TAG", "AB 2. WOCHE",
+    "AB 4. WOCHE", "AB 6–8. WOCHE", "AB 20. WOCHE"
   ];
-  const CURRENT_KEY = "AB 4. WOCHE";
+  const CURRENT = "AB 4. WOCHE";
 
-  const $ = sel => document.querySelector(sel);
-  const positions = n => n < 2 ? [0] : Array.from({length:n},(_,i)=> +(i*(100/(n-1))).toFixed(2));
+  const ul = document.getElementById("ntMilestones");
+  const fill = document.getElementById("ntFill");
+  const pin = document.getElementById("ntPin");
+  const label = document.getElementById("ntPhaseLabel");
 
-  function buildTimeline(){
-    const ul  = $("#ntMilestones");
-    const fill= $("#ntFill");
-    const pin = $("#ntPin");
-    const pinLabel = $("#ntPhaseLabel");
-    if(!ul || !fill || !pin || !pinLabel) return;
+  if (!ul || !fill || !pin) return;
 
-    ul.innerHTML = "";
-    const pos = positions(MILESTONES.length);
-    let currentIndex = 0;
+  const step = 100 / (MILESTONES.length - 1);
+  let currentIndex = 0;
 
-    MILESTONES.forEach((m,i)=>{
-      const li = document.createElement("li");
-      li.style.left = pos[i] + "%";
+  MILESTONES.forEach((text, i) => {
+    const li = document.createElement("li");
+    li.style.left = `${i * step}%`;
 
-      const pill = document.createElement("span");
-      pill.className = "nt-pill" + (m.key===CURRENT_KEY ? " current" : "");
-      pill.textContent = m.label;
-      pill.title = m.label;
+    const pill = document.createElement("span");
+    pill.textContent = text;
+    pill.className = "nt-pill";
+    if (text === CURRENT) {
+      pill.classList.add("current");
+      currentIndex = i;
+    }
 
-      li.appendChild(pill);
-      ul.appendChild(li);
-      if(m.key===CURRENT_KEY) currentIndex = i;
-    });
+    li.appendChild(pill);
+    ul.appendChild(li);
+  });
 
-    const pct = pos[currentIndex];
-    fill.style.width = pct + "%";
-    pin.style.left = pct + "%";
-    pinLabel.textContent = CURRENT_KEY;
-  }
+  // Fortschritt + Pin
+  const width = step * currentIndex;
+  fill.style.width = `${width}%`;
+  pin.style.left = `${width}%`;
+  label.textContent = CURRENT;
 
-  function initDonuts(){
-    document.querySelectorAll(".donut").forEach(fig=>{
-      const cap = fig.querySelector("figcaption")?.textContent || "";
-      const m = cap.match(/(\d+)\s*%/);
-      const p = m ? Math.max(0,Math.min(100,parseInt(m[1],10))) : 0;
-      const c = 2*Math.PI*48; // 301.59
-      fig.querySelector(".donut-val").style.strokeDashoffset = (c*(1-p/100)).toFixed(2);
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", ()=>{ buildTimeline(); initDonuts(); });
-})();
+  // Donuts berechnen
+  const c = 2 * Math.PI * 48;
+  document.querySelectorAll(".donut").forEach(fig => {
+    const val = fig.querySelector(".donut-val");
+    const txt = fig.querySelector("figcaption")?.textContent || "";
+    const m = txt.match(/(\d+)%/);
+    const p = m ? parseInt(m[1], 10) : 0;
+    val.style.strokeDasharray = c;
+    val.style.strokeDashoffset = c * (1 - p / 100);
+  });
+});
