@@ -1,149 +1,192 @@
-:root {
-  --bg: #f9fafb;
-  --card: #ffffff;
-  --muted: #4b5563;
-  --line: #e5e7eb;
-  --accent: #2563eb;
-  --past: #f3f4f6;
-  --ok: #10b981;
-  --warn: #f59e0b;
+/* Allgemeine Styles und Layout */
+#rezepteView {
+  padding: 1rem;
+  background: #f8f9fa;  /* hellgrauer Hintergrund für Kontrast */
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 
-/* Seitenlayout – gleiche Ränder wie Hauptseiten */
-body {
-  background: var(--bg);
-  color: #111827;
-  font-family: "Inter", sans-serif;
-  margin: 0;
+/* Überschrift */
+#rezepteView h1 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+/* Filter-Buttons Leiste */
+.filter-buttons {
+  margin-bottom: 1rem;
+}
+.filter-btn {
+  border: none;
+  background: #e0e0e0;
+  color: #000;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.filter-btn.active {
+  background: #007bff;   /* blaue Hervorhebung für aktiven Filter */
+  color: #fff;
+}
+.filter-btn:hover {
+  background: #cacaca;
+}
+
+/* Grid-Layout für die Karten */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive Spaltenaufteilung */
+  gap: 1rem;
+  align-items: stretch;  /* Karten in einer Zeile gleiche Höhe (stretch) */
+}
+
+/* Kartenstil */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column; /* für flexibles Anordnen (Header oben, Aktionen unten) */
+}
+.card h3 {
+  margin: 0 0 0.5em;
+}
+.card p {
+  margin: 0 0 0.5em;
+  line-height: 1.4;
+}
+.card small.card-type {
+  display: block;
+  font-size: 0.75rem;
+  color: #6c757d; /* gedecktes Grau für Typ */
+  font-weight: 600;
+  margin-bottom: 0.3em;
+}
+.card-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+/* Farbkennzeichnung für Status */
+.status-valid { background: #28a745; }    /* grün */
+.status-expired { background: #dc3545; }  /* rot */
+.status-redeemed { background: #007bff; } /* blau (für eingelöst) */
+
+/* Bereich für Aktions-Buttons auf der Karte */
+.card-actions {
+  margin-top: auto; /* schiebt Aktionen an das Kartenende (bei flex-column) */
+}
+.card-actions button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 1rem;
   padding: 0;
 }
-
-main {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 16px;
+.card-actions button:hover {
+  text-decoration: underline;
 }
 
-/* Toolbar */
-.termine-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  background: transparent;
-}
-
-.termine-toolbar h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #111827;
-}
-
-.termine-toolbar .filters {
-  display: flex;
-  gap: 8px;
-}
-
-.termine-toolbar .filters button {
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  background: #f3f4f6;
-  color: #111827;
-  border-radius: 10px;
+/* Floating Action Button (Hinzufügen) */
+.add-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background: #007bff;
+  color: #fff;
+  font-size: 32px;
+  line-height: 56px;
+  text-align: center;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.add-btn:hover {
+  background: #0056b3;
+}
+
+/* Modal-Overlay und Modal-Box */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;        /* ausgeblendet standardmäßig */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+}
+.modal h2 {
+  margin-top: 0;
+}
+/* Formular im Modal */
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
   font-weight: 500;
 }
-
-.termine-toolbar .filters button.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-
-/* Terminliste */
-.termine-list {
-  padding: 16px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.form-group textarea {
+  resize: vertical;
 }
-
-.termine-day {
-  color: var(--muted);
-  font-weight: 600;
-  margin: 14px 4px 6px;
+.form-group div {
+  margin-left: 1.5rem; /* Einrückung der Radio-Optionen unter "Dauer" */
 }
-
-/* Termin-Karten */
-.termine-card {
-  background: var(--card);
-  color: #111827;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 12px 14px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+.form-actions {
+  text-align: right;
 }
-
-.termine-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.termine-time {
-  font-weight: 700;
-  min-width: 64px;
-}
-
-.termine-title {
-  flex: 1;
-}
-
-.termine-meta {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* Bubbles (Badges) im Light Mode */
-.termine-badge {
-  font-size: 12px;
-  border-radius: 8px;
-  padding: 2px 8px;
-  border: 1px solid var(--line);
-}
-
-.termine-badge.upcoming {
-  background: #e0f2fe;
-  color: #075985;
-  border-color: #bae6fd;
-}
-
-.termine-badge.past {
-  background: #f3f4f6;
-  color: #4b5563;
-  border-color: #e5e7eb;
-}
-
-/* Buttons */
-.termine-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.termine-actions button {
-  padding: 6px 8px;
-  border: 1px solid var(--line);
-  background: #f9fafb;
-  color: #111827;
-  border-radius: 8px;
+.form-actions button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
-
-.termine-actions button.primary {
-  border-color: var(--accent);
-  background: var(--accent);
+.form-actions #cancelBtn {
+  background: #6c757d;
   color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+.form-actions #saveBtn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+.form-actions #cancelBtn:hover {
+  background: #5a6268;
+}
+.form-actions #saveBtn:hover {
+  background: #218838;
 }
