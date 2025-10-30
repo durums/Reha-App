@@ -1,241 +1,346 @@
-(() => {
-  /* ===== Helpers ===== */
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
-  const uid = window.currentUserId || "local";
-  const KEY = `rx_store_${uid}`;
+// Firebase initialisieren (Konfiguration hier einfügen)
+const firebaseConfig = {
+  /* TODO: Firebase-Konfiguration einfügen */
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();  // Firestore-Instanz erstellen  [oai_citation:3‡firebase.google.com](https://firebase.google.com/docs/firestore/manage-data/add-data#:~:text=%2F%2F%20Initialize%20Firebase%20firebase)
 
-  const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
-  const toISO = d => d ? new Date(d).toISOString().slice(0,10) : "";
-  const parse = s => s ? new Date(s) : null;
+// Referenzen auf wichtige DOM-Elemente
+const cardsContainer = document.getElementById('cardsContainer');
+const addButton = document.getElementById('addButton');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalTitle = document.getElementById('modalTitle');
+const prescriptionForm = document.getElementById('prescriptionForm');
+const cancelBtn = document.getElementById('cancelBtn');
+const saveBtn = document.getElementById('saveBtn');
 
-  const byId = id => state.items.find(x => x.id === id);
+// Formularelemente
+const typeInput = document.getElementById('type');
+const nameInput = document.getElementById('name');
+const reasonInput = document.getElementById('reason');
+const descriptionInput = document.getElementById('description');
+const durationDateInput = document.getElementById('durationDate');
+const durationUnitsInput = document.getElementById('durationUnits');
+const durationTypeRadios = document.querySelectorAll('input[name="durationType"]');
 
-  function uid8(){ return Math.random().toString(36).slice(2,10); }
+// Status-Filter
+let currentFilter = 'all';  // aktueller Filter (all, valid, expired, redeemed)
 
-  function load(){
-    try { return JSON.parse(localStorage.getItem(KEY)) || seed(); }
-    catch { return seed(); }
+// Hilfsvariable für Editiermodus
+let editId = null;  // speichert die ID der Verordnung, die gerade bearbeitet wird (oder null für neu)
+
+// ** Status-Berechnung für eine Verordnung **
+function computeStatus(docData) {
+  // Falls als eingelöst markiert
+  if (docData.redeemed) {
+    return 'redeemed';
   }
-  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  // Falls Dauer ein Datum enthält ("bis DD.MM.YYYY")
+  const duration = docData.duration || '';
+  if (duration.startsWith('bis')) {
+    // Datum aus dem String extrahieren und vergleichen
+    const dateStr = duration.slice(4).trim();  // Teil nach "bis "
+    // dd.mm.yyyy in Date umwandeln
+    const [day, month, year] = dateStr.split('.');
+    if (day && month && year) {
+      const expiryDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 23, 59, 59);
+      if (Date.now() > expiryDate.getTime()) {
+        return 'expired';
+      }
+    }
+    return 'valid';
+  }
+  // Falls Dauer "Einheiten" enthält und noch nicht eingelöst => gültig (kein Ablaufdatum)
+  return 'valid';
+}
 
-  // kleine Beispiel-Daten beim ersten Start
-  function seed(){
-    const base = {
-      items: [
-        {
-          id: uid8(), type: "PHYSIO", title: "Krankengymnastik",
-          issued: toISO(new Date()),
-          validUntil: toISO(new Date(Date.now() + 1000*60*60*24*28)),
-          doctor: "Dr. Müller", ref: "KG-2025-001",
-          units: 6, freq: "2×/Woche", status: "OFFEN",
-          note: "Nach VKB-OP, Fokus ROM, Gangschule.",
-          file: null
-        },
-        {
-          id: uid8(), type: "MEDI", title: "Ibuprofen 400 mg",
-          issued: toISO(new Date()),
-          validUntil: toISO(new Date(Date.now() + 1000*60*60*24*10)),
-          doctor: "Klinik", ref: "RX-IBU",
-          units: 30, freq: "bei Bedarf", status: "OFFEN",
-          note: "", file: null
-        },
-        {
-          id: uid8(), type: "AU", title: "Arbeitsunfähigkeit",
-          issued: toISO(new Date(Date.now() - 1000*60*60*24*7)),
-          validUntil: toISO(new Date(Date.now() + 1000*60*60*24*7)),
-          doctor: "Orthopädie", ref: "AU-2025-10", units: null, freq: "",
-          status: "OFFEN", note: "Kontrolle in Woche 2.", file: null
+// ** Render-Funktion: Verordnungen als Karten anzeigen (mit Filter) **
+function renderPrescriptions(prescriptions) {
+  // Falls Filter aktiv, entsprechende Liste filtern
+  let filtered = prescriptions;
+  if (currentFilter !== 'all') {
+    filtered = prescriptions.filter(doc => {
+      const status = computeStatus(doc);
+      if (currentFilter === 'valid') return status === 'valid';
+      if (currentFilter === 'expired') return status === 'expired';
+      if (currentFilter === 'redeemed') return status === 'redeemed';
+      return true;
+    });
+  }
+  // HTML für alle gefilterten Verordnungen zusammenbauen
+  let html = '';
+  filtered.forEach(doc => {
+    const data = doc;  // doc enthält { id, type, name, ... duration, redeemed }
+    const statusKey = computeStatus(data);
+    // Anzeigename des Status in Deutsch
+    let statusLabel;
+    if (statusKey === 'valid') statusLabel = 'Gültig';
+    else if (statusKey === 'expired') statusLabel = 'Abgelaufen';
+    else statusLabel = 'Eingelöst';
+    // Karte HTML
+    html += `
+      <div class="card">
+        <small class="card-type">${data.type}</small>
+        <h3 class="card-name">${data.name}</h3>
+        <p><strong>Grund:</strong> ${data.reason || ''}</p>
+        <p><strong>Beschreibung:</strong> ${data.description || ''}</p>
+        <p><strong>Dauer:</strong> ${data.duration}</p>
+        <div class="card-meta">
+          <span class="card-status status-${statusKey}">${statusLabel}</span>
+        </div>
+        <div class="card-actions">
+          <button class="edit-btn" data-id="${data.id}">Bearbeiten</button>
+          <button class="delete-btn" data-id="${data.id}">Löschen</button>
+          ${(!data.redeemed && computeStatus(data) === 'valid') 
+             ? `<button class="redeem-btn" data-id="${data.id}">Einlösen</button>` 
+             : ''}
+        </div>
+      </div>`;
+  });
+  // Wenn keine Verordnungen im Filter, Hinweis anzeigen
+  if (filtered.length === 0) {
+    html = `<p>Keine Verordnungen vorhanden.</p>`;
+  }
+  cardsContainer.innerHTML = html;
+
+  // Event-Listener für dynamische Buttons (Bearbeiten/Löschen/Einlösen)
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      openEditModal(id);
+    });
+  });
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      deletePrescription(id);
+    });
+  });
+  document.querySelectorAll('.redeem-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      redeemPrescription(id);
+    });
+  });
+}
+
+// ** Firestore-Echtzeitlistener: lädt alle Verordnungen und rendert sie **
+db.collection('verordnungen').onSnapshot((querySnapshot) => {
+  const docs = [];
+  querySnapshot.forEach((doc) => {
+    // Daten des Dokuments plus ID sammeln
+    const docData = doc.data();
+    docData.id = doc.id;
+    docs.push(docData);
+  });
+  renderPrescriptions(docs);
+}); // Das UI aktualisiert sich automatisch bei jeder Änderung [oai_citation:4‡firebase.google.com](https://firebase.google.com/docs/firestore/query-data/listen#:~:text=db.collection%28,)
+
+// ** Modal anzeigen für neue Verordnung (Hinzufügen) **
+function openAddModal() {
+  editId = null;
+  modalTitle.textContent = 'Neue Verordnung';
+  prescriptionForm.reset();  // Formular leeren
+  // Standard: "Bis Datum" auswählen, Einheiten-Feld deaktivieren
+  durationTypeRadios.forEach(radio => {
+    if (radio.value === 'date') {
+      radio.checked = true;
+    }
+  });
+  durationDateInput.disabled = false;
+  durationUnitsInput.disabled = true;
+  durationDateInput.required = true;
+  durationUnitsInput.required = false;
+  modalOverlay.style.display = 'flex';
+}
+
+// ** Modal anzeigen für bestehende Verordnung (Bearbeiten) **
+function openEditModal(id) {
+  const docRef = db.collection('verordnungen').doc(id);
+  docRef.get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      editId = id;
+      modalTitle.textContent = 'Verordnung bearbeiten';
+      // Formularfelder mit vorhandenen Daten füllen
+      typeInput.value = data.type || '';
+      nameInput.value = data.name || '';
+      reasonInput.value = data.reason || '';
+      descriptionInput.value = data.description || '';
+      // Dauer je nach Typ setzen
+      if (data.duration && data.duration.includes('Einheit')) {
+        // Einheiten-Variante
+        document.querySelector('input[name="durationType"][value="sessions"]').checked = true;
+        document.querySelector('input[name="durationType"][value="date"]').checked = false;
+        durationUnitsInput.disabled = false;
+        durationDateInput.disabled = true;
+        durationUnitsInput.required = true;
+        durationDateInput.required = false;
+        // Zahl aus "X Einheiten" extrahieren
+        const num = parseInt(data.duration) || 0;
+        durationUnitsInput.value = num > 0 ? num : '';
+      } else if (data.duration && data.duration.startsWith('bis')) {
+        // Datums-Variante
+        document.querySelector('input[name="durationType"][value="date"]').checked = true;
+        document.querySelector('input[name="durationType"][value="sessions"]').checked = false;
+        durationUnitsInput.disabled = true;
+        durationDateInput.disabled = false;
+        durationUnitsInput.required = false;
+        durationDateInput.required = true;
+        // Datum "bis DD.MM.YYYY" in das Date-Input-Format (YYYY-MM-DD) umwandeln
+        const dateStr = data.duration.slice(4).trim(); // z.B. "10.12.2025"
+        const [day, month, year] = dateStr.split('.');
+        if (year && month && day) {
+          // Mit führenden Nullen sicherstellen, dass Format passt
+          const mm = month.padStart(2, '0');
+          const dd = day.padStart(2, '0');
+          durationDateInput.value = `${year}-${mm}-${dd}`;
         }
-      ],
-      last: Date.now()
-    };
-    localStorage.setItem(KEY, JSON.stringify(base));
-    return base;
-  }
-
-  function daysLeft(validUntil){
-    if (!validUntil) return null;
-    const t = today();
-    const v = new Date(validUntil); v.setHours(0,0,0,0);
-    return Math.ceil((v - t) / 86400000);
-  }
-
-  function typeLabel(t){
-    return ({
-      PHYSIO:"Physio", MT:"Manuelle Therapie", LD:"Lymphdrainage", REHA:"Reha",
-      MEDI:"Medikament", AU:"Arbeitsunfähigkeit", SONSTIGES:"Sonstiges"
-    }[t] || t);
-  }
-
-  function statusBadge(item){
-    const dl = daysLeft(item.validUntil);
-    if (item.status === "EINGELOEST")
-      return `<span class="badge ok">Eingelöst</span>`;
-    if (item.type === "AU")
-      return `<span class="badge au">AU</span>`;
-    if (dl !== null && dl < 0)
-      return `<span class="badge bad">Abgelaufen</span>`;
-    if (dl !== null && dl <= 5)
-      return `<span class="badge warn">läuft in ${Math.max(dl,0)} Tagen ab</span>`;
-    return `<span class="badge ok">Gültig</span>`;
-  }
-
-  /* ===== State & DOM ===== */
-  let state = load();
-
-  const listEl   = $("#rxList");
-  const emptyEl  = $("#rxEmpty");
-  const filterEl = $("#rxFilter");
-  const searchEl = $("#rxSearch");
-
-  const modal    = $("#rxModal");
-  const form     = $("#rxForm");
-  const titleEl  = $("#rxModalTitle");
-  const delBtn   = $("#rxDelete");
-  const closeBtn = $("#rxClose");
-  const cancelBtn= $("#rxCancel");
-
-  /* ===== Render ===== */
-  function card(item){
-    const dl = daysLeft(item.validUntil);
-    const daysTxt = item.validUntil ? (dl < 0 ? `seit ${Math.abs(dl)} Tagen abgelaufen` : `${dl} Tage verbleibend`) : "kein Ablaufdatum";
-
-    return `
-    <article class="rx-card card" data-id="${item.id}">
-      <div>
-        <div class="rx-title">${item.title || typeLabel(item.type)}</div>
-        <div class="rx-sub">${typeLabel(item.type)} • Ausgestellt: <strong>${item.issued || "–"}</strong> • Gültig bis: <strong>${item.validUntil || "–"}</strong></div>
-        <div class="rx-meta">Arzt/Stelle: <strong>${item.doctor || "–"}</strong> • Nr.: <strong>${item.ref || "–"}</strong> • Einheiten: <strong>${item.units ?? "–"}</strong> • Frequenz: <strong>${item.freq || "–"}</strong></div>
-      </div>
-      <div class="rx-badges">
-        <span class="badge type">${typeLabel(item.type)}</span>
-        ${statusBadge(item)}
-        <span class="badge">${daysTxt}</span>
-      </div>
-      <div class="rx-actions">
-        ${item.file ? `<a class="btn btn-light" href="${item.file}" target="_blank">Anhang</a>` : ""}
-        <button class="btn btn-light" data-act="edit">Bearbeiten</button>
-        <button class="btn btn-primary" data-act="toggle">${item.status==="EINGELOEST"?"Als gültig markieren":"Als eingelöst markieren"}</button>
-      </div>
-    </article>`;
-  }
-
-  function applyFilter(items){
-    const f = filterEl.value;
-    const q = (searchEl.value || "").toLowerCase();
-    let out = items;
-
-    if (f === "OFFEN") out = out.filter(i => i.status!=="EINGELOEST" && (daysLeft(i.validUntil)===null || daysLeft(i.validUntil)>=0));
-    if (f === "EINGELOEST") out = out.filter(i => i.status==="EINGELOEST");
-    if (f === "ABGELAUFEN") out = out.filter(i => (daysLeft(i.validUntil)??1) < 0);
-    if (f === "AU") out = out.filter(i => i.type==="AU");
-
-    if (q) {
-      out = out.filter(i =>
-        (i.title||"").toLowerCase().includes(q) ||
-        (i.doctor||"").toLowerCase().includes(q) ||
-        (i.ref||"").toLowerCase().includes(q) ||
-        (i.note||"").toLowerCase().includes(q) ||
-        typeLabel(i.type).toLowerCase().includes(q)
-      );
-    }
-
-    // sort: AU oben, dann Ablaufdatum, dann erstellt
-    out.sort((a,b)=>{
-      if (a.type==="AU" && b.type!=="AU") return -1;
-      if (b.type==="AU" && a.type!=="AU") return 1;
-      const da = a.validUntil ? new Date(a.validUntil).getTime() : 9e15;
-      const db = b.validUntil ? new Date(b.validUntil).getTime() : 9e15;
-      return da-db;
-    });
-
-    return out;
-  }
-
-  function render(){
-    const items = applyFilter(state.items);
-    listEl.innerHTML = items.map(card).join("");
-    emptyEl.style.display = items.length ? "none" : "block";
-  }
-
-  /* ===== CRUD ===== */
-  function openModal(item){
-    titleEl.textContent = item ? "Verordnung bearbeiten" : "Neue Verordnung";
-    delBtn.style.display = item ? "inline-flex" : "none";
-
-    form.type.value       = item?.type || "PHYSIO";
-    form.issued.value     = item?.issued || toISO(new Date());
-    form.validUntil.value = item?.validUntil || "";
-    form.doctor.value     = item?.doctor || "";
-    form.ref.value        = item?.ref || "";
-    form.units.value      = item?.units ?? "";
-    form.freq.value       = item?.freq || "";
-    form.status.value     = item?.status || "OFFEN";
-    form.note.value       = item?.note || "";
-    form.id.value         = item?.id || "";
-
-    modal.showModal();
-  }
-
-  async function readFileAsDataURL(file){
-    if (!file) return null;
-    return new Promise((res,rej)=>{
-      const rd = new FileReader();
-      rd.onload = () => res(rd.result);
-      rd.onerror = rej;
-      rd.readAsDataURL(file);
-    });
-  }
-
-  /* Events: Toolbar */
-  $("#rxAddBtn").addEventListener("click", () => openModal(null));
-  $("#rxExportBtn").addEventListener("click", () => exportCSV());
-  filterEl.addEventListener("change", render);
-  searchEl.addEventListener("input", render);
-
-  /* Events: Liste */
-  listEl.addEventListener("click", (e)=>{
-    const card = e.target.closest(".rx-card");
-    if (!card) return;
-    const id = card.dataset.id;
-    const actBtn = e.target.closest("[data-act]");
-    if (!actBtn) return;
-
-    if (actBtn.dataset.act === "edit"){
-      openModal(byId(id));
-    } else if (actBtn.dataset.act === "toggle"){
-      const it = byId(id);
-      it.status = it.status === "EINGELOEST" ? "OFFEN" : "EINGELOEST";
-      save(); render();
+      } else {
+        // Falls keine Dauer angegeben, Standard auf Datum
+        durationTypeRadios.forEach(radio => {
+          if (radio.value === 'date') radio.checked = true;
+        });
+        durationDateInput.disabled = false;
+        durationUnitsInput.disabled = true;
+        durationDateInput.required = true;
+        durationUnitsInput.required = false;
+      }
+      modalOverlay.style.display = 'flex';
     }
   });
+}
 
-  /* Modal Buttons */
-  closeBtn.addEventListener("click", ()=> modal.close());
-  cancelBtn.addEventListener("click", ()=> modal.close());
-  delBtn.addEventListener("click", ()=>{
-    const id = form.id.value;
-    if (id){
-      state.items = state.items.filter(x => x.id !== id);
-      save(); render(); modal.close();
+// ** Formular-Submit: Neue Verordnung hinzufügen oder bestehende updaten **
+prescriptionForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  // Felder auslesen
+  const typeVal = typeInput.value;
+  const nameVal = nameInput.value;
+  const reasonVal = reasonInput.value;
+  const descVal = descriptionInput.value;
+  let durationVal = '';
+  if (document.querySelector('input[name="durationType"]:checked').value === 'date') {
+    if (durationDateInput.value) {
+      // Datum ins gewünschte Format "bis DD.MM.YYYY" bringen
+      const d = new Date(durationDateInput.value);
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+      durationVal = `bis ${day}.${month}.${year}`;
+    }
+  } else {  // "sessions" gewählt
+    if (durationUnitsInput.value) {
+      const units = parseInt(durationUnitsInput.value);
+      durationVal = units ? (units === 1 ? '1 Einheit' : `${units} Einheiten`) : '';
+    }
+  }
+  // Grundlegende Validierung: mind. ein Dauer-Feld muss ausgefüllt sein
+  if (!durationVal) {
+    alert("Bitte eine Dauer angeben (Datum oder Anzahl Einheiten).");
+    return;
+  }
+  // Objekt für Firestore vorbereiten
+  const docData = {
+    type: typeVal,
+    name: nameVal,
+    reason: reasonVal,
+    description: descVal,
+    duration: durationVal
+    // 'status' wird nicht dauerhaft gespeichert, da es dynamisch berechnet wird
+  };
+  if (editId) {
+    // Bestehende Verordnung updaten (behält das Feld 'redeemed' bei)
+    db.collection('verordnungen').doc(editId).update(docData)
+      .then(() => {
+        modalOverlay.style.display = 'none';  // Modal schließen
+        editId = null;
+      })
+      .catch(err => console.error("Fehler beim Aktualisieren:", err));
+  } else {
+    // Neue Verordnung hinzufügen (mit redeemed=false initial)
+    docData.redeemed = false;
+    db.collection('verordnungen').add(docData)
+      .then(() => {
+        modalOverlay.style.display = 'none';  // Modal schließen
+      })
+      .catch(err => console.error("Fehler beim Hinzufügen:", err));
+  }
+});
+
+// ** Verordnung als eingelöst markieren **
+function redeemPrescription(id) {
+  if (!id) return;
+  // Firestore-Feld 'redeemed' auf true setzen
+  db.collection('verordnungen').doc(id).update({ redeemed: true })
+    .catch(err => console.error("Fehler beim Einlösen:", err));
+}
+
+// ** Verordnung löschen **
+function deletePrescription(id) {
+  if (!id) return;
+  const confirmDelete = confirm("Soll diese Verordnung wirklich gelöscht werden?");
+  if (confirmDelete) {
+    db.collection('verordnungen').doc(id).delete()
+      .catch(err => console.error("Fehler beim Löschen:", err));
+  }
+}
+
+// ** Modal schließen (Abbrechen) **
+function closeModal() {
+  modalOverlay.style.display = 'none';
+  editId = null;
+}
+
+// Event-Listener für Klick auf "Hinzufügen" Button
+addButton.addEventListener('click', openAddModal);
+// Event-Listener für Modal-Abbrechen (Cancel)
+cancelBtn.addEventListener('click', closeModal);
+// Klick auf Overlay außerhalb der Modal-Box schließt Modal ebenfalls
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target.id === 'modalOverlay') {
+    closeModal();
+  }
+});
+
+// Event-Listener für Wechsel zwischen Dauer-Optionen (Datum/Einheiten)
+durationTypeRadios.forEach(radio => {
+  radio.addEventListener('change', () => {
+    if (radio.value === 'date') {
+      durationDateInput.disabled = false;
+      durationDateInput.required = true;
+      durationUnitsInput.disabled = true;
+      durationUnitsInput.required = false;
+    } else if (radio.value === 'sessions') {
+      durationDateInput.disabled = true;
+      durationDateInput.required = false;
+      durationUnitsInput.disabled = false;
+      durationUnitsInput.required = true;
     }
   });
+});
 
-  /* Form Submit */
-  form.addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    const file = form.file.files?.[0] || null;
-    const fileData = file ? await readFileAsDataURL(file) : undefined;
-
-    const item = {
-      id: data.id || uid8(),
-      type: data.type,
-      title: data.type === "MEDI" ? (data.title || "Medikament") : (data.title || typeLabel(data.type)),
-      issued: data.issued || null,
-      validUntil: data.validUntil || null,
-      doctor: data.doctor || "",
-      ref: data.ref || "",
-      units: data.units ? parseInt(data.units,10) : null,
-      freq:
+// Event-Listener für Filter-Buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // aktive Klasse aktualisieren
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Filter setzen und neu rendern
+    currentFilter = btn.getAttribute('data-filter');
+    // Die Daten sind bereits via Snapshot vorhanden, daher neu rendern mit aktuellem Filter:
+    // (Wir triggern einfach onSnapshot-Handler neu, indem wir hier nichts tun – dieser läuft 
+    // automatisch bei Datenänderung. Für reines Filterwechsel ohne DB-Änderung können wir die 
+    // letzte geladene Liste zwischenspeichern und hier filtern.)
+    // Zur Vereinfachung rufen wir hier erneut die Firestore-Daten ab und rendern dann:
+    db.collection('verordnungen').get().then(querySnapshot => {
+      const docs = [];
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        data.id = doc.id;
+        docs.push(data);
+      });
+      renderPrescriptions(docs);
+    });
+  });
+});
