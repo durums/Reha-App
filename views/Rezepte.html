@@ -1,0 +1,98 @@
+<section class="rx-wrap">
+  <header class="rx-header">
+    <h1>Verordnungen</h1>
+    <p>Alle Verordnungen für Reha/Physio, Medikamente und Arbeitsunfähigkeiten im Überblick.</p>
+  </header>
+
+  <div class="rx-toolbar card">
+    <div class="left">
+      <button id="rxAddBtn" class="btn btn-primary">+ Neue Verordnung</button>
+      <button id="rxExportBtn" class="btn btn-light">↯ CSV exportieren</button>
+    </div>
+    <div class="right">
+      <input id="rxSearch" type="search" placeholder="Suchen (Typ, Arzt, Nummer, Notiz) …" />
+      <select id="rxFilter">
+        <option value="ALLE">Alle</option>
+        <option value="OFFEN">Gültig</option>
+        <option value="EINGELOEST">Eingelöst/aufgebraucht</option>
+        <option value="ABGELAUFEN">Abgelaufen</option>
+        <option value="AU">Arbeitsunfähigkeit</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="rxEmpty" class="rx-empty card">Noch keine Verordnungen. Lege mit „Neue Verordnung“ die erste an.</div>
+
+  <div id="rxList" class="rx-grid"><!-- Karten werden per JS eingefügt --></div>
+
+  <!-- Modal: Neu/Bearbeiten -->
+  <dialog id="rxModal" class="rx-modal">
+    <form method="dialog" id="rxForm" class="rx-form card">
+      <div class="modal-head">
+        <h3 id="rxModalTitle">Neue Verordnung</h3>
+        <button type="button" id="rxClose" class="btn btn-light">✕</button>
+      </div>
+
+      <div class="grid">
+        <label>Typ
+          <select name="type" required>
+            <option value="PHYSIO">Physio / Krankengymnastik</option>
+            <option value="MT">Manuelle Therapie</option>
+            <option value="LD">Lymphdrainage</option>
+            <option value="REHA">Reha / Heilmittel</option>
+            <option value="MEDI">Medikament</option>
+            <option value="AU">Arbeitsunfähigkeit</option>
+            <option value="SONSTIGES">Sonstiges</option>
+          </select>
+        </label>
+
+        <label>Ausgestellt am
+          <input type="date" name="issued" required />
+        </label>
+
+        <label>Gültig bis
+          <input type="date" name="validUntil" />
+        </label>
+
+        <label>Verordnender Arzt / Stelle
+          <input type="text" name="doctor" placeholder="z. B. Dr. Müller, Orthopädie" />
+        </label>
+
+        <label>Verordnungs-Nr.
+          <input type="text" name="ref" placeholder="optional (Rezept-/Verordnungsnummer)" />
+        </label>
+
+        <label>Einheiten
+          <input type="number" min="0" step="1" name="units" placeholder="z. B. 6" />
+        </label>
+
+        <label>Frequenz
+          <input type="text" name="freq" placeholder="z. B. 2×/Woche" />
+        </label>
+
+        <label>Status
+          <select name="status">
+            <option value="OFFEN">Gültig</option>
+            <option value="EINGELOEST">Eingelöst/aufgebraucht</option>
+          </select>
+        </label>
+
+        <label>Dokument/Foto
+          <input type="file" name="file" accept="image/*,.pdf" />
+        </label>
+
+        <label class="full">Notizen
+          <textarea name="note" rows="3" placeholder="Freitext …"></textarea>
+        </label>
+      </div>
+
+      <footer class="modal-actions">
+        <button type="button" id="rxDelete" class="btn btn-danger" style="margin-right:auto; display:none;">Löschen</button>
+        <button type="button" id="rxCancel" class="btn btn-light">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Speichern</button>
+      </footer>
+
+      <input type="hidden" name="id" />
+    </form>
+  </dialog>
+</section>
