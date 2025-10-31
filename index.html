@@ -22,6 +22,7 @@
       <h2>Menü</h2>
       <button id="closeSidebar">×</button>
     </div>
+
     <ul class="sidebar-menu">
       <li><a href="#trainingsplan" id="menu-trainingsplan">🏋️ Trainingsplan</a></li>
       <li><a href="#fortschritt"   id="menu-fortschritt">📊 Fortschritt</a></li>
@@ -32,13 +33,17 @@
       <li><a href="#feedback"      id="menu-feedback">💬 Feedback</a></li>
       <li><a href="#profil"        id="menu-profil">👤 Profil</a></li>
       <li><a href="#hilfe"         id="menu-hilfe">❓ Hilfe</a></li>
-      
     </ul>
+
+    <!-- 👉 Profil direkt über dem Footer -->
+    <div class="sidebar-profile">
+      <img src="assets/avatar.jpg" alt="Profilbild" class="sidebar-avatar" id="sidebar-avatar">
+      <span id="sidebar-username">Max Mustermann</span>
+    </div>
+
     <div class="sidebar-footer">
       <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
     </div>
-
-
   </div>
 
   <!-- 🔒 Login / Registrierung -->
@@ -65,7 +70,6 @@
     <div id="user-area" style="display:none;">
       <span id="user-info">Nicht angemeldet</span>
     </div>
-        
 
     <div id="app-section">
       <main id="content" class="main-content"></main>
@@ -186,19 +190,18 @@
     // --- Sidebar ---
     const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
     menuToggle.addEventListener("click", () => {
-      sidebar.classList.add("active");   // Sidebar sicher öffnen
-      setMenuToggleVisible(false);       // ☰ ausblenden
+      sidebar.classList.add("active");
+      setMenuToggleVisible(false);
     });
     
     closeSidebar.addEventListener("click", () => {
-      sidebar.classList.remove("active");// Sidebar schließen
-      setMenuToggleVisible(true);        // ☰ wieder einblenden
+      sidebar.classList.remove("active");
+      setMenuToggleVisible(true);
     });
 
     document.querySelector(".sidebar-menu").addEventListener("click", (e) => {
       const link = e.target.closest("a");
       if (!link) return;
-      // Sidebar schließen + ☰ einblenden
       sidebar.classList.remove("active");
       setMenuToggleVisible(true);
     });
@@ -256,30 +259,23 @@
     let didInitialLoad = false;
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // ✅ App sichtbar machen
         showApp();
         setMenuToggleVisible(true);
 
-        // ✅ Globale Variablen für Kalender & Termine
         window.currentUserId   = user.uid;
         window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
 
-        // ✅ UI
         userInfo.textContent = `Angemeldet: ${window.currentUserName}`;
         signOutBtn.style.display = "inline-block";
 
-        // ✅ App-Logik laden (nur einmal)
         loadAppJSOnce();
 
-        // ✅ Erste View laden
         if (!didInitialLoad) {
           if (!location.hash) location.hash = "#tagesprogramm";
           routeToHash();
           didInitialLoad = true;
         }
-
       } else {
-        // 🚪 Logout
         showAuth();
         setMenuToggleVisible(false);
         userInfo.textContent = "Nicht angemeldet";
