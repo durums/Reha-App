@@ -253,3 +253,32 @@
   white-space: nowrap;
   border: 0;
 }
+/* =========================
+   Sidebar-Profil unten
+   ========================= */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--pf-border-soft);
+  position: absolute;
+  bottom: 3.5rem; /* Platz über dem Abmelde-Button */
+  width: 100%;
+  background: #fff;
+}
+
+.sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: var(--pf-shadow-inset);
+}
+
+.sidebar-profile span {
+  font-weight: 600;
+  color: var(--pf-text-strong);
+  font-size: 0.95rem;
+}
+
