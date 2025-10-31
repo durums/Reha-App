@@ -14,21 +14,23 @@
     return (parts[0]?.[0] || "U").toUpperCase() + (parts[1]?.[0] || "");
   };
 
-  // ============ Sidebar-Avatar synchronisieren ============
+  // -------- Sidebar-Avatar helper (einmalig) --------
+  function updateSidebarAvatar(newUrl) {
+    const avatar = $("sidebar-avatar");
+    if (avatar && newUrl) avatar.src = newUrl;
+  }
   function applyUserToSidebar(user) {
     const avatarEl = $("sidebar-avatar");
     const nameEl   = $("sidebar-username");
     if (nameEl) nameEl.textContent = user?.displayName || user?.email || "Unbekannt";
-
     if (avatarEl) {
       const src = user?.photoURL || "assets/avatar.jpg";
       if (avatarEl.src !== src) avatarEl.src = src;
-      // Optional: title für Hover
       avatarEl.title = user?.displayName || user?.email || "";
     }
   }
 
-  // ============ Initial laden / Felder füllen ============
+  // -------- Initial laden / Felder füllen --------
   const u = auth?.currentUser;
   if (!u) {
     setText("pf-status", "Bitte melde dich an.");
@@ -39,18 +41,16 @@
     setVal("pf-first", u.displayName?.split(" ")?.[0] || "");
     setVal("pf-last",  u.displayName?.split(" ")?.slice(1).join(" ") || "");
     setVal("pf-phone", u.phoneNumber || "");
-    applyUserToSidebar(u); // <- Sidebar sofort setzen
+    applyUserToSidebar(u); // Sidebar sofort setzen
   }
 
-  // Falls sich der Auth-User ändert (Login/Logout/Profil-Update)
+  // Auth-Änderungen (Login/Logout/Profil-Update) -> Sidebar syncen
   if (auth) {
     const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-    onAuthStateChanged(auth, (user) => {
-      applyUserToSidebar(user);
-    });
+    onAuthStateChanged(auth, (user) => applyUserToSidebar(user));
   }
 
-  // ============ Profildaten aus Firestore (optional) ============
+  // -------- Profildaten aus Firestore (optional) --------
   try {
     if (db && u) {
       const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
@@ -206,11 +206,9 @@
 })();
 
 // =========================
-// Foto-Änderungen aus dem Profil erkennen
-// (funktioniert auch, wenn das Profil-View dynamisch geladen wird)
+// Foto-Änderungen aus dem Profil erkennen (delegiert, robust)
 // =========================
 (function setupProfilePhotoSync() {
-  // Delegiertes Event-Handling für dynamische DOMs
   document.addEventListener("change", (e) => {
     const input = e.target;
     if (!(input instanceof HTMLInputElement)) return;
@@ -224,19 +222,11 @@
       const newUrl = event.target?.result;
       const profileImg = document.getElementById("profile-photo");
       if (profileImg && typeof newUrl === "string") profileImg.src = newUrl;
-
-      // Sidebar sofort aktualisieren
-      updateSidebarAvatar(newUrl);
+      updateSidebarAvatar(newUrl); // Sidebar sofort aktualisieren
     };
     reader.readAsDataURL(file);
 
-    // Optional: Nach Upload zu Storage → updateProfile({ photoURL }) aufrufen
-    // und dann updateSidebarAvatar(downloadUrl);
+    // Optional: nach Upload zu Firebase Storage & updateProfile({ photoURL })
+    // -> dann ebenfalls updateSidebarAvatar(downloadUrl);
   });
 })();
-
-// Sidebar-Avatar direkt setzen (kann von überall aufgerufen werden)
-function updateSidebarAvatar(newUrl) {
-  const el = document.getElementById("sidebar-avatar");
-  if (el && newUrl) el.src = newUrl;
-}
