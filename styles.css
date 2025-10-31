@@ -26,7 +26,6 @@ html, body {
     width: 100%;
     max-width: 100vw;
 }
-
 /* === Modernes Login-Design === */
 body {
   font-family: "Segoe UI", Roboto, sans-serif;
@@ -34,6 +33,7 @@ body {
   height: 100vh;
   margin: 0;
 }
+
 
 .card {
   background: white;
@@ -103,6 +103,609 @@ details[open] summary {
   font-size: 0.9rem;
 }
 
+/* PWA/Homescreen Apps */
+@media (display-mode: standalone) {
+    .header {
+        padding-top: calc(1.5rem + env(safe-area-inset-top, 44px));
+    }
+    
+    .header h1 {
+        padding-top: 0.25rem;
+    }
+    
+    body {
+        padding-top: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+}
+
+/* Fallback für ältere iOS Versionen */
+@supports (padding: max(0px)) {
+    .header {
+        padding-top: max(calc(1rem + 44px), calc(1rem + env(safe-area-inset-top, 44px)));
+    }
+    
+    @media (display-mode: standalone) {
+        .header {
+            padding-top: max(calc(1.5rem + 44px), calc(1.5rem + env(safe-area-inset-top, 44px)));
+        }
+    }
+    
+    body {
+        padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
+    }
+}
+
+.date-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    min-width: 50px;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.nav-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+}
+
+.nav-btn:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.current-date {
+    flex: 1;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* Horizontales Scrollen verhindern */
+    padding: 1rem;
+    background: #f5f5f5;
+    width: 100%;
+}
+
+.schedule-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--color-header-bg);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+}
+
+.schedule-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.schedule-item.therapy { 
+    border-left-color: var(--color-green); 
+}
+
+.schedule-item.break { 
+    border-left-color: var(--color-orange); 
+}
+
+.schedule-item.seminar { 
+    border-left-color: var(--color-red); 
+}
+
+.schedule-time {
+    font-weight: 600;
+    color: var(--color-header-bg);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.schedule-time-text {
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.schedule-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+}
+
+.schedule-location-instructor {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.schedule-note {
+    background: #fff7e6;
+    border: 1px solid #ffd700;
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #b8860b;
+    font-style: italic;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.schedule-note.visible {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+    margin-top: 0.5rem;
+}
+
+.note-indicator {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #ffd700;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.note-indicator.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.note-indicator:hover {
+    background: #e6b800;
+    transform: scale(1.1);
+}
+
+.no-schedule {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+.sync-status {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 44px) + 80px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.sync-status.visible {
+    opacity: 1;
+}
+
+.sync-status.success {
+    background: var(--color-green);
+}
+
+.sync-status.error {
+    background: var(--color-red);
+}
+
+.edit-section {
+    display: none;
+}
+
+.edit-section.active {
+    display: block;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.edit-area {
+    display: none;
+}
+
+.edit-area.active {
+    display: block;
+}
+
+.edit-textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    resize: vertical;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.edit-textarea:focus {
+    border-color: var(--color-header-bg);
+    box-shadow: 0 0 0 1px var(--color-header-bg);
+}
+
+.save-btn {
+    background: var(--color-green);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    transition: background 0.2s;
+}
+
+.save-btn:hover {
+    background: color-mix(in srgb, var(--color-green) 90%, black);
+}
+
+.save-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(57, 127, 36, 0.5);
+}
+
+.save-btn:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+.qr-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.qr-title {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.qr-code {
+    display: inline-block;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.qr-url {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: #666;
+    word-break: break-all;
+    /* Horizontales Überlaufen verhindern */
+    overflow-wrap: break-word;
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+}
+
+/* Modal für Notizen */
+.note-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.note-modal.active {
+    display: flex;
+}
+
+.note-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.note-modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.note-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+}
+
+.note-textarea:focus {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 1px var(--color-orange);
+}
+
+.note-modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.note-save-btn {
+    flex: 1;
+    background: var(--color-orange);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.note-save-btn:hover {
+    background: #e6a833;
+}
+
+.note-cancel-btn {
+    flex: 1;
+    background: #f5f5f5;
+    color: #666;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.note-cancel-btn:hover {
+    background: #e5e5e5;
+}
+
+.note-delete-btn {
+    background: var(--color-red);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+}
+
+.note-delete-btn:hover {
+    background: #d32f1f;
+}
+
+/* === Reha App Layout schöner machen === */
+#app-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, #8fc6d9, #b7e2eb);
+  min-height: 100vh;
+  padding-top: 4rem;
+  color: #222;
+}
+
+.app-card {
+  background: #ffffffcc;
+  backdrop-filter: blur(6px);
+  padding: 2rem;
+  border-radius: 0; /* keine Rundungen */
+  box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+  transition: none;
+}
+
+
+.app-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+.app-card h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #1c3c54;
+  font-size: 1.6rem;
+}
+
+.date-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e8f3f8;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.nav-btn {
+  background: #4e8ccf;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #3a79b5;
+}
+
+.current-date {
+  font-weight: 600;
+  color: #1c3c54;
+}
+
+.schedule-item {
+  border-left: 5px solid #4e8ccf;
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.schedule-time {
+  color: #4e8ccf;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.schedule-title {
+  color: #222;
+  font-size: 1.1rem;
+  margin-top: 0.3rem;
+}
+
+.schedule-location-instructor {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+
+/* Mobile PWA Anpassungen */
+@media (max-width: 768px) {
+    .header {
+        padding: 0.75rem;
+        padding-top: calc(1rem + env(safe-area-inset-top, 44px));
+    }
+    
+    .header h1 {
+        font-size: 1.3rem;
+        padding-top: 0.5rem;
+    }
+    
+    .schedule-item {
+        padding: 0.875rem;
+    }
+    
+    .date-nav {
+        gap: 0.75rem;
+    }
+    
+    .nav-btn {
+        padding: 0.4rem;
+        font-size: 1rem;
+        min-width: 30px;
+        max-width: 30px;
+        height: 30px;
+    }
+
+    .note-indicator {
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 768px) and (display-mode: standalone) {
+    .header {
+        padding: 0.75rem;
+        padding-top: calc(1.25rem + env(safe-area-inset-top, 44px));
+    }
+    
+    .header h1 {
+        padding-top: 0.25rem;
+    }
+}
+
+/* Touch-Optimierungen */
+@media (hover: none) and (pointer: coarse) {
+    .schedule-item:hover {
+        transform: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .nav-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+}
 /* === Login zentriert nur bei Bedarf === */
 body.center-auth {
   display: flex;
@@ -122,8 +725,8 @@ body.center-auth {
   color: white;
   transition: left 0.3s ease;
   z-index: 1001;
-  display: flex;              /* wichtig: Flexbox aktiv */
-  flex-direction: column;     /* vertikales Layout */
+  display: flex;
+  flex-direction: column;
   box-shadow: 2px 0 12px rgba(0,0,0,0.3);
 }
 
@@ -155,8 +758,6 @@ body.center-auth {
 .sidebar-menu {
   list-style: none;
   padding: 1rem;
-  flex: 1 1 auto;            /* füllt den Platz zwischen Header & Footer */
-  overflow-y: auto;          /* scrollt bei Bedarf */
 }
 
 .sidebar-menu li {
@@ -177,35 +778,47 @@ body.center-auth {
   background: rgba(255,255,255,0.1);
 }
 
-/* --- Sidebar Profil direkt über Footer --- */
-.sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.8rem 1rem;
-  border-top: 1px solid rgba(255,255,255,0.15);
-  background: transparent;
+/* === Menü-Button === */
+.menu-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #4e8ccf;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  font-size: 1.3rem;
+  z-index: 1002;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.2s;
 }
 
-.sidebar-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,.05);
-}
-
-.sidebar-profile span {
-  font-weight: 600;
+/* Basis-Header für alle Unterseiten */
+.header{
+  background: var(--color-header-bg);
   color: #fff;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+  width: 100%;
+}
+
+.header h1{
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+
+.menu-toggle:hover {
+  background: #3a79b5;
 }
 
 /* --- Sidebar Footer + Logout Button --- */
 .sidebar-footer {
+  margin-top: auto;
   padding: 1rem;
   border-top: 1px solid rgba(255,255,255,0.15);
   display: flex;
@@ -233,172 +846,53 @@ body.center-auth {
   transform: scale(0.98);
 }
 
-/* === Menü-Button === */
-.menu-toggle {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background: #4e8ccf;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 0.9rem;
-  cursor: pointer;
-  font-size: 1.3rem;
-  z-index: 1002;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: background 0.2s;
+
+:root{
+  --bg:#f5f7fb; --surface:#fff; --ink:#121417; --muted:#6b7280;
+  --primary:#2b90d9; --primary-weak:#e6f3fb;
+  --radius:16px; --shadow:0 6px 24px rgba(0,0,0,.06);
+  --space-1:.5rem; --space-2:.75rem; --space-3:1rem; --space-4:1.5rem; --space-6:2rem;
+  --maxw:1200px;
 }
+html,body{background:var(--bg); color:var(--ink);}
+.container, .main-content{max-width:var(--maxw); margin:0 auto; padding:var(--space-4) var(--space-3);}
 
-.menu-toggle:hover {
-  background: #3a79b5;
+/* Cards */
+.card{
+  background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:var(--space-4); margin-bottom:var(--space-4);
 }
-
-/* === Hauptinhalte === */
-#app-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background: linear-gradient(135deg, #8fc6d9, #b7e2eb);
-  min-height: 100vh;
-  padding-top: 4rem;
-  color: #222;
+.card h3{margin:0 0 var(--space-3); font-size:1.05rem;}
+/* Labels & Werte */
+label{font-size:.85rem; color:var(--muted); display:block; margin-bottom:.25rem;}
+.val{font-weight:600; letter-spacing:.2px;}
+/* Sections */
+.section-title{
+  font-size:1.6rem; font-weight:800; margin:0 0 var(--space-3);
 }
+.subtle{color:var(--muted);}
 
-/* === App-Karten === */
-.app-card {
-  background: #ffffffcc;
-  backdrop-filter: blur(6px);
-  padding: 2rem;
-  border-radius: 0;
-  box-shadow: none;
-  width: 100%;
-  max-width: 100%;
-  transition: none;
+/* Grid */
+.grid{display:grid; gap:var(--space-3);}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr));}
+@media (min-width:1024px){ .grid.two{grid-template-columns:repeat(3,minmax(0,1fr));} }
+@media (max-width:720px){ .grid.two{grid-template-columns:1fr;} }
+
+/* Profil-Header */
+.profile-header{
+  display:grid; grid-template-columns:auto 1fr auto; gap:var(--space-4); align-items:center;
 }
-
-.app-card h1 {
-  text-align: center;
-  margin-bottom: 1rem;
-  color: #1c3c54;
-  font-size: 1.6rem;
+.avatar{
+  width:72px; height:72px; border-radius:50%; background:var(--primary-weak);
+  display:grid; place-items:center; font-weight:800; font-size:1.25rem; color:var(--primary);
+  box-shadow:inset 0 0 0 2px rgba(43,144,217,.15);
 }
-
-/* === Navigation innerhalb der App === */
-.date-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #e8f3f8;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  margin-bottom: 1rem;
+.kv{display:grid; grid-template-columns:auto 1fr; gap:.25rem var(--space-4); align-items:baseline;}
+.kv dt{color:var(--muted); font-size:.9rem;}
+.kv dd{margin:0; font-weight:600;}
+/* CTA */
+.btn{
+  appearance:none; border:0; border-radius:12px; padding:.6rem .9rem; cursor:pointer;
+  background:var(--primary); color:#fff; font-weight:600; box-shadow:var(--shadow);
 }
-
-.nav-btn {
-  background: #4e8ccf;
-  color: white;
-  border: none;
-  padding: 0.5rem 0.8rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.nav-btn:hover {
-  background: #3a79b5;
-}
-
-.current-date {
-  font-weight: 600;
-  color: #1c3c54;
-}
-
-/* === Termin-Karten === */
-.schedule-item {
-  border-left: 5px solid #4e8ccf;
-  background: white;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.schedule-time {
-  color: #4e8ccf;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.schedule-title {
-  color: #222;
-  font-size: 1.1rem;
-  margin-top: 0.3rem;
-}
-
-.schedule-location-instructor {
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 0.3rem;
-}
-
-/* === Mobile Anpassungen === */
-@media (max-width: 768px) {
-  .header {
-    padding: 0.75rem;
-    padding-top: calc(1rem + env(safe-area-inset-top, 44px));
-  }
-
-  .header h1 {
-    font-size: 1.3rem;
-    padding-top: 0.5rem;
-  }
-
-  .schedule-item {
-    padding: 0.875rem;
-  }
-
-  .date-nav {
-    gap: 0.75rem;
-  }
-
-  .nav-btn {
-    padding: 0.4rem;
-    font-size: 1rem;
-    min-width: 30px;
-    max-width: 30px;
-    height: 30px;
-  }
-
-  .note-indicator {
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 18px;
-    height: 18px;
-    font-size: 0.6rem;
-  }
-}
-
-@media (max-width: 768px) and (display-mode: standalone) {
-  .header {
-    padding: 0.75rem;
-    padding-top: calc(1.25rem + env(safe-area-inset-top, 44px));
-  }
-
-  .header h1 {
-    padding-top: 0.25rem;
-  }
-}
-
-/* === Touch-Optimierungen === */
-@media (hover: none) and (pointer: coarse) {
-  .schedule-item:hover {
-    transform: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-
-  .nav-btn:hover {
-    background: rgba(255,255,255,0.2);
-  }
-}
+.btn.ghost{background:transparent; color:var(--primary); box-shadow:none; border:1px solid var(--primary-weak);}
