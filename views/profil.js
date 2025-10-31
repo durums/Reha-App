@@ -14,28 +14,52 @@
     return (parts[0]?.[0] || "U").toUpperCase() + (parts[1]?.[0] || "");
   };
 
+  // ============ Sidebar-Avatar synchronisieren ============
+  function applyUserToSidebar(user) {
+    const avatarEl = $("sidebar-avatar");
+    const nameEl   = $("sidebar-username");
+    if (nameEl) nameEl.textContent = user?.displayName || user?.email || "Unbekannt";
+
+    if (avatarEl) {
+      const src = user?.photoURL || "assets/avatar.jpg";
+      if (avatarEl.src !== src) avatarEl.src = src;
+      // Optional: title für Hover
+      avatarEl.title = user?.displayName || user?.email || "";
+    }
+  }
+
+  // ============ Initial laden / Felder füllen ============
   const u = auth?.currentUser;
   if (!u) {
     setText("pf-status", "Bitte melde dich an.");
-    return;
+  } else {
+    const display = u.displayName || u.email || ("UID:" + u.uid);
+    const av = $("pf-avatar"); if (av) av.textContent = initials(display);
+    setVal("pf-email", u.email || "");
+    setVal("pf-first", u.displayName?.split(" ")?.[0] || "");
+    setVal("pf-last",  u.displayName?.split(" ")?.slice(1).join(" ") || "");
+    setVal("pf-phone", u.phoneNumber || "");
+    applyUserToSidebar(u); // <- Sidebar sofort setzen
   }
 
-  const display = u.displayName || u.email || ("UID:" + u.uid);
-  const av = $("pf-avatar"); if (av) av.textContent = initials(display);
-  setVal("pf-email", u.email || "");
-  setVal("pf-first", u.displayName?.split(" ")?.[0] || "");
-  setVal("pf-last", u.displayName?.split(" ")?.slice(1).join(" ") || "");
-  setVal("pf-phone", u.phoneNumber || "");
+  // Falls sich der Auth-User ändert (Login/Logout/Profil-Update)
+  if (auth) {
+    const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    onAuthStateChanged(auth, (user) => {
+      applyUserToSidebar(user);
+    });
+  }
 
+  // ============ Profildaten aus Firestore (optional) ============
   try {
-    if (db) {
+    if (db && u) {
       const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
       const snap = await getDoc(doc(db, "profiles", u.uid));
       if (snap.exists()) {
         const d = snap.data() || {};
-        if (!$("#pf-first").value) setVal("pf-first", d.firstName || "");
-        if (!$("#pf-last").value)  setVal("pf-last",  d.lastName  || "");
-        if (!$("#pf-phone").value) setVal("pf-phone", d.phone     || "");
+        if (!$("#pf-first")?.value) setVal("pf-first", d.firstName || "");
+        if (!$("#pf-last")?.value)  setVal("pf-last",  d.lastName  || "");
+        if (!$("#pf-phone")?.value) setVal("pf-phone", d.phone     || "");
       }
     }
   } catch (e) {
@@ -45,7 +69,7 @@
   $("#pf-save")?.addEventListener("click", async () => {
     const status = $("pf-status");
     try {
-      if (!db) {
+      if (!db || !auth?.currentUser) {
         status.textContent = "Gespeichert (lokal) – Firestore nicht konfiguriert.";
         return;
       }
@@ -56,7 +80,7 @@
       const { doc, setDoc, serverTimestamp } =
         await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-      await setDoc(doc(db, "profiles", u.uid), {
+      await setDoc(doc(db, "profiles", auth.currentUser.uid), {
         firstName: first,
         lastName: last,
         phone,
@@ -180,17 +204,39 @@
     }
   });
 })();
-// Sidebar-Profil dynamisch aktualisieren
-(() => {
-  const auth = window.auth;
-  const u = auth?.currentUser;
-  if (!u) return;
 
-  const avatarEl = document.getElementById("sidebar-avatar");
-  const nameEl   = document.getElementById("sidebar-username");
+// =========================
+// Foto-Änderungen aus dem Profil erkennen
+// (funktioniert auch, wenn das Profil-View dynamisch geladen wird)
+// =========================
+(function setupProfilePhotoSync() {
+  // Delegiertes Event-Handling für dynamische DOMs
+  document.addEventListener("change", (e) => {
+    const input = e.target;
+    if (!(input instanceof HTMLInputElement)) return;
+    if (input.id !== "profile-photo-input") return;
 
-  if (nameEl) nameEl.textContent = u.displayName || u.email || "Unbekannt";
-  if (avatarEl) {
-    avatarEl.src = u.photoURL || "assets/avatar.jpg"; // Fallback-Bild
-  }
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const newUrl = event.target?.result;
+      const profileImg = document.getElementById("profile-photo");
+      if (profileImg && typeof newUrl === "string") profileImg.src = newUrl;
+
+      // Sidebar sofort aktualisieren
+      updateSidebarAvatar(newUrl);
+    };
+    reader.readAsDataURL(file);
+
+    // Optional: Nach Upload zu Storage → updateProfile({ photoURL }) aufrufen
+    // und dann updateSidebarAvatar(downloadUrl);
+  });
 })();
+
+// Sidebar-Avatar direkt setzen (kann von überall aufgerufen werden)
+function updateSidebarAvatar(newUrl) {
+  const el = document.getElementById("sidebar-avatar");
+  if (el && newUrl) el.src = newUrl;
+}
