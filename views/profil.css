@@ -29,7 +29,7 @@
 /* Zwei-Spalten-Layout: links Infos, rechts Sidebar */
 .pf-layout {
   display: grid;
-  gap: 2rem;
+  gap: 2rem;                         /* etwas mehr Luft zwischen Spalten */
   grid-template-columns: 1.7fr 0.9fr;
   align-items: start;
 }
@@ -45,7 +45,7 @@
 .pf-card-title {
   font-weight: 800;
   font-size: 1.15rem;
-  margin-bottom: .6rem;
+  margin-bottom: .6rem;              /* mehr Abstand nach unten */
 }
 
 .pf-row {
@@ -113,7 +113,7 @@
    ========================= */
 .pf-side {
   display: grid;
-  gap: 1.8rem;
+  gap: 1.8rem;                        /* mehr Abstand zwischen Boxen */
 }
 
 /* Karten in der rechten Spalte */
@@ -124,7 +124,7 @@
 
 /* Überschriften in den Boxen */
 .pf-side-card .pf-card-title {
-  margin-bottom: 1rem;
+  margin-bottom: 1rem;               /* mehr Abstand zwischen Titel & Inhalt */
 }
 
 /* Buttons in den Boxen */
@@ -139,7 +139,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: var(--pf-transition);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.6rem;             /* Abstand zwischen Buttons */
 }
 .pf-side-card .pf-row-btn:last-child {
   margin-bottom: 0;
@@ -252,45 +252,4 @@
   clip: rect(0,0,0,0);
   white-space: nowrap;
   border: 0;
-}
-
-/* =========================
-   Sidebar-Profil unten (korrigiert)
-   ========================= */
-
-/* Sidebar muss relativ positioniert sein, damit das Profil korrekt am unteren Rand sitzt */
-#sidebar {
-  position: relative;
-}
-
-.sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.8rem 1rem;
-  border-top: 1px solid var(--pf-border-soft);
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3.5rem; /* Platz über dem Abmelde-Button */
-  width: 100%;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.sidebar-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: var(--pf-shadow-inset);
-}
-
-.sidebar-profile span {
-  font-weight: 600;
-  color: var(--pf-text-strong);
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
