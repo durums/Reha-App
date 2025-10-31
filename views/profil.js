@@ -180,3 +180,17 @@
     }
   });
 })();
+// Sidebar-Profil dynamisch aktualisieren
+(() => {
+  const auth = window.auth;
+  const u = auth?.currentUser;
+  if (!u) return;
+
+  const avatarEl = document.getElementById("sidebar-avatar");
+  const nameEl   = document.getElementById("sidebar-username");
+
+  if (nameEl) nameEl.textContent = u.displayName || u.email || "Unbekannt";
+  if (avatarEl) {
+    avatarEl.src = u.photoURL || "assets/avatar.jpg"; // Fallback-Bild
+  }
+})();
