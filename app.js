@@ -39,6 +39,9 @@ function initAuthUI() {
       if (!window.app) {
         window.app = new RehaScheduleApp();
       }
+      if (window.app.showView) {
+        window.app.showView('tagesprogramm');
+      }
 
     } else {
       // ❌ Benutzer ausgeloggt
@@ -82,4 +85,6 @@ function initAuthUI() {
       if (sidebar.classList.contains('active')) return; // schon offen → abbrechen
       transitionHandler();
     }, 400);
-  });
+  }); //
+
+}

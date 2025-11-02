@@ -47,13 +47,6 @@
     }
   }
 
-  // --- Fortschritt (Demo) ---
-  function loadProgress() {
-    const percent = Math.floor(Math.random() * 40) + 60; // z. B. 60–100 %
-    $("progressBar").style.width = percent + "%";
-    $("progressText").textContent = `Du hast diese Woche ${percent}% deiner Ziele erreicht.`;
-  }
-
   // --- Motivationstext ---
   function loadMotivation() {
     const texts = [
@@ -68,7 +61,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     loadTraining();
     loadAppointments();
-    loadProgress();
     loadMotivation();
   });
 })();
