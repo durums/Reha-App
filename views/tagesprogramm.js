@@ -55,12 +55,28 @@
       "🚀 Stark! Nur wer weitermacht, kommt ans Ziel.",
       "🧘‍♀️ Ruhe, Atmung und Bewegung – dein perfektes Gleichgewicht.",
     ];
-    $("motivationText").textContent = texts[Math.floor(Math.random() * texts.length)];
+    const el = $("motivationText");
+    if (el) el.textContent = texts[Math.floor(Math.random() * texts.length)];
+  }
+
+  // --- Newsletter dynamisch ---
+  function loadNewsletter() {
+    const news = [
+      "Heute geöffnet. Nächster Feiertag: 24.12.2025.<br><strong>Aktion:</strong> 10% Rabatt auf Massage-Termine im November!",
+      "Am Freitag, 10.11., bleibt die Praxis geschlossen.",
+      "Neue Rückenkurse ab Dezember – jetzt anmelden!",
+      "Praxis-Jubiläum: Gewinnspiel läuft diese Woche!",
+      "Hinweis: Neue Öffnungszeiten ab Januar.",
+      "Schon gewusst? Wir haben jetzt auch Online-Beratung!"
+    ];
+    const el = $("newsletterBox");
+    if (el) el.innerHTML = news[Math.floor(Math.random() * news.length)];
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     loadTraining();
     loadAppointments();
     loadMotivation();
+    loadNewsletter();
   });
 })();
