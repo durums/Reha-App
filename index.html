@@ -52,24 +52,25 @@
   </div>
 
 
-  <!-- 🔒 Login / Registrierung -->
   <div class="card" id="auth-forms">
     <h2>Anmeldung</h2>
     <form id="login-form">
       <input id="li-email"    type="email"    placeholder="E-Mail" required />
       <input id="li-password" type="password" placeholder="Passwort" required />
-      <button type="submit">Anmelden</button>
+  
+      <div class="login-actions" style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;margin:.5rem 0 0;">
+        <button type="submit">Anmelden</button>
+        <button type="button" id="forgotBtn" class="linklike" style="background:none;border:none;color:#2563EB;cursor:pointer;padding:.25rem .25rem;">
+          Passwort vergessen?
+        </button>
+      </div>
     </form>
-
-    <details style="margin-top:12px;">
-      <summary>Konto erstellen</summary>
-      <form id="signup-form" style="margin-top:8px;">
-        <input id="su-email"    type="email"    placeholder="E-Mail" required />
-        <input id="su-password" type="password" placeholder="Passwort" required />
-        <button type="submit">Konto erstellen</button>
-      </form>
-    </details>
+  
+    <div style="margin-top:12px;">
+      <a href="#signup" id="signupLink" style="color:#2563EB;text-decoration:underline;">Konto erstellen</a>
+    </div>
   </div>
+
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
