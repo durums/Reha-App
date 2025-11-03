@@ -64,8 +64,6 @@
           Passwort vergessen?
         </button>
       </div>
-
-      <div id="login-hint" class="form-hint" aria-live="polite"></div>
     </form>
   
     <div style="margin-top:12px;">
@@ -293,48 +291,21 @@
         return false;
       });
     }
-    const hint = document.getElementById("login-hint");
-      function showHint(text, type = "ok") {
-        if (!hint) return;
-        hint.className = `form-hint ${type}`;
-        hint.textContent = text;
-      }
-
+  
     const forgotBtn = document.getElementById("forgotBtn");
     if (forgotBtn) {
       forgotBtn.addEventListener("click", async () => {
-        const emailInput = document.getElementById("li-email");
-        const email = (emailInput?.value || "").trim();
-    
-        if (!email) {
-          showHint("Bitte geben Sie Ihre E-Mail ein.", "err");
-          emailInput?.focus();
-          return;
-        }
-    
-        // Button kurz deaktivieren, um Doppelklicks zu vermeiden
-        forgotBtn.disabled = true;
+        const email = (document.getElementById("li-email")?.value || "").trim()
+                   || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
+        if (!email) return;
         try {
           await sendPasswordResetEmail(auth, email);
-          showHint(`Passwort-Reset wurde an ${email} gesendet. Bitte auch den Spam-Ordner prüfen.`, "ok");
+          alert(`Passwort-Reset gesendet an: ${email}`);
         } catch (err) {
-          // Häufige Fehler z. B. auth/user-not-found
-          const msg = err?.code === "auth/user-not-found"
-            ? "Diese E-Mail ist bei uns nicht registriert."
-            : `Zurücksetzen fehlgeschlagen (${err.code}).`;
-          showHint(msg, "err");
-        } finally {
-          forgotBtn.disabled = false;
+          alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
         }
       });
     }
-    
-    // Optional: Hinweis nach erfolgreichem Login leeren
-    const loginForm = document.getElementById("login-form");
-    if (loginForm) {
-      loginForm.addEventListener("submit", () => showHint("", "ok"));
-    }
-
   
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
