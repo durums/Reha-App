@@ -1,79 +1,104 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rezepte-Verwaltung</title>
-  <!-- Firebase SDKs (nur einbinden, falls nicht bereits global im Projekt inkludiert) -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore-compat.js" defer></script>
-  <!-- Eigene CSS-Datei für Rezepte-Ansicht -->
-  <link rel="stylesheet" href="rezepte.css" />
-</head>
-<body>
-  <!-- Hauptcontainer der Rezepte-Ansicht -->
-  <div id="rezepteView" class="prescriptions-view">
-    <h1>Verordnungen</h1>
-    <!-- Filter-Buttons für Status -->
-    <div class="filter-buttons">
-      <button class="filter-btn active" data-filter="all">Alle</button>
-      <button class="filter-btn" data-filter="valid">Gültig</button>
-      <button class="filter-btn" data-filter="expired">Abgelaufen</button>
-      <button class="filter-btn" data-filter="redeemed">Eingelöst</button>
+<section class="rezepte-wrap">
+  <header class="rezepte-head">
+    <div>
+      <h1>Rezepte & Verordnungen</h1>
+      <p>Übersicht deiner ärztlichen Verordnungen (Reha/Physio/Medikamente/AU).</p>
     </div>
-    <!-- Container für die Karten -->
-    <div id="cardsContainer" class="card-container"><!-- Karten werden dynamisch eingefügt --></div>
-    <!-- Hinzufügen Button (Floating Action Button) -->
-    <button id="addButton" class="add-btn" title="Neue Verordnung hinzufügen">＋</button>
+    <div class="rezepte-actions">
+      <button id="btnAddRecipe" class="btn-dark">＋ Neue Verordnung</button>
+    </div>
+  </header>
+
+  <!-- Filter -->
+  <div class="rezepte-filters card">
+    <div class="filter-row">
+      <button class="filter-pill active" data-filter="all">Alle</button>
+      <button class="filter-pill" data-filter="valid">Gültig</button>
+      <button class="filter-pill" data-filter="expired">Abgelaufen</button>
+      <button class="filter-pill" data-filter="redeemed">Eingelöst</button>
+    </div>
+    <div class="search-row">
+      <input id="rezepteSearch" type="search" placeholder="Suchen (Name, Grund, Beschreibung) …" />
+    </div>
   </div>
 
-  <!-- Modal für Hinzufügen/Bearbeiten einer Verordnung -->
-  <div id="modalOverlay" class="modal-overlay">
-    <div class="modal">
-      <h2 id="modalTitle">Neue Verordnung</h2>
-      <form id="prescriptionForm">
-        <div class="form-group">
-          <label for="type">Art der Verordnung:</label>
-          <select id="type" name="type" required>
-            <option value="" disabled selected>-- Typ wählen --</option>
-            <option>Rezept</option>
-            <option>AU</option>
-            <option>Physiotherapie</option>
-            <option>Andere</option>
+  <!-- Grid -->
+  <div id="rezepteGrid" class="rezepte-grid">
+    <!-- Karten werden per JS eingefügt -->
+  </div>
+
+  <!-- Leerzustand -->
+  <div id="rezepteEmpty" class="rezepte-empty card" hidden>
+    <div>Keine Einträge gefunden.</div>
+    <button id="btnEmptyAdd" class="btn-dark" type="button">＋ Verordnung hinzufügen</button>
+  </div>
+
+  <!-- Modal: Hinzufügen / Bearbeiten -->
+  <dialog id="rezepteModal" class="rezepte-modal">
+    <form method="dialog" class="modal-card">
+      <header class="modal-head">
+        <h3 id="modalTitle">Verordnung</h3>
+        <button type="button" id="modalClose" class="modal-close">×</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <label>Art der Verordnung</label>
+          <select id="fType" required>
+            <option value="Rezept">Rezept</option>
+            <option value="Physio">Physio</option>
+            <option value="AU">AU</option>
+            <option value="Medikamente">Medikamente</option>
+            <option value="Sonstiges">Sonstiges</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="name">Name der Verordnung:</label>
-          <input type="text" id="name" name="name" placeholder="z.B. Physiotherapie" required />
-        </div>
-        <div class="form-group">
-          <label for="reason">Grund:</label>
-          <input type="text" id="reason" name="reason" placeholder="z.B. Rückenschmerzen" />
-        </div>
-        <div class="form-group">
-          <label for="description">Beschreibung:</label>
-          <textarea id="description" name="description" rows="3" placeholder="Weitere Details..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Dauer:</label>
-          <div>
-            <label><input type="radio" name="durationType" value="date" checked> Bis Datum:</label>
-            <input type="date" id="durationDate" />
-          </div>
-          <div>
-            <label><input type="radio" name="durationType" value="sessions"> Einheiten:</label>
-            <input type="number" id="durationUnits" min="1" />
-          </div>
-        </div>
-        <div class="form-group form-actions">
-          <button type="button" id="cancelBtn">Abbrechen</button>
-          <button type="submit" id="saveBtn">Speichern</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- eigene JavaScript-Datei für Rezepte-Ansicht -->
-  <script src="rezepte.js" defer></script>
-</body>
-</html>
+        <div class="form-row">
+          <label>Name / Bezeichnung</label>
+          <input id="fTitle" type="text" placeholder="z. B. KG / IBU 400 / AU" required />
+        </div>
+
+        <div class="form-row two">
+          <div>
+            <label>Grund</label>
+            <input id="fReason" type="text" placeholder="z. B. Kreuzband-OP, Rückenschmerz" />
+          </div>
+          <div>
+            <label>Gültig bis</label>
+            <input id="fValidUntil" type="date" />
+          </div>
+        </div>
+
+        <div class="form-row two">
+          <div>
+            <label>Einheiten gesamt</label>
+            <input id="fUnitsTotal" type="number" min="0" step="1" placeholder="z. B. 6" />
+          </div>
+          <div>
+            <label>Einheiten genutzt</label>
+            <input id="fUnitsUsed" type="number" min="0" step="1" placeholder="z. B. 2" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Beschreibung</label>
+          <textarea id="fDescription" rows="3" placeholder="Details, Serie, Dosierung, Hinweise …"></textarea>
+        </div>
+
+        <div class="form-row checkbox">
+          <label><input id="fRedeemed" type="checkbox" /> Bereits eingelöst / abgeschlossen</label>
+        </div>
+      </div>
+
+      <footer class="modal-foot">
+        <div class="left">
+          <button type="button" id="btnDelete" class="btn-ghost danger" hidden>🗑️ Löschen</button>
+        </div>
+        <div class="right">
+          <button type="button" id="btnCancel" class="btn-ghost">Abbrechen</button>
+          <button type="submit" id="btnSave" class="btn-dark">Speichern</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+</section>
