@@ -1,146 +1,42 @@
-/* nutzt vorhandene :root Variablen + card/btn-dark aus deiner App */
+.rezepte-wrap { padding: 16px clamp(16px,4vw,28px); }
+.rezepte-head { display:flex; align-items:end; justify-content:space-between; gap:16px; margin-bottom:12px; }
+.btn-dark { background:#162d54; color:#fff; padding:10px 14px; border-radius:12px; font-weight:800; border:0; cursor:pointer; }
+.btn-dark:hover { filter:brightness(1.06); }
 
-.rezepte-wrap{padding:16px clamp(12px,4vw,28px)}
+.rezepte-filters.card { padding:12px; margin-bottom:12px; border-radius:16px; }
+.filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+.filter-pill { background:#eef2f8; border:1px solid #dde3ee; padding:6px 10px; border-radius:999px; font-weight:700; cursor:pointer; }
+.filter-pill.active { background:#162d54; color:#fff; border-color:#162d54; }
+.search-row { margin-top:10px; }
+.search-row input { width:100%; padding:10px 12px; border:1px solid #dde3ee; border-radius:10px; }
 
-.rezepte-head{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px
-}
-.rezepte-head h1{margin:0}
-.rezepte-head p{margin:.25rem 0 0;color:var(--muted)}
+.rezepte-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+.rx-card { padding:14px; border-radius:16px; }
+.rx-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.rx-type { font-weight:800; color:#162d54; background:#e7eefc; border:1px solid #cfe0ff; padding:2px 8px; border-radius:999px; }
+.rx-status { font-weight:800; }
+.rx-valid { color:#16855b; }
+.rx-expired { color:#b94a48; }
+.rx-redeemed { color:#6a778e; }
+.rx-title { margin:6px 0 8px; }
+.rx-meta { font-size:.95rem; display:grid; gap:4px; }
+.rx-bar { height:8px; background:#eef2f8; border-radius:999px; overflow:hidden; }
+.rx-bar span { display:block; height:100%; background:#6fa8ff; }
 
-.rezepte-actions{display:flex;gap:8px;flex-wrap:wrap}
+.rx-desc { margin:8px 0 0; color:#4d5a73; }
+.rx-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:10px; }
+.btn-ghost { background:#fff; border:1px solid #dde3ee; padding:8px 10px; border-radius:10px; cursor:pointer; }
+.btn-ghost.danger { border-color:#f3c7c7; color:#b94a48; }
 
-.rezepte-filters{padding:12px;border-radius:var(--radius);margin-bottom:12px}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap}
-.filter-pill{
-  appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);
-  padding:8px 12px;border-radius:999px;font-weight:800;cursor:pointer
-}
-.filter-pill.active{background:#e8f0ff;border-color:#cfe0ff;color:var(--primary)}
-.search-row{margin-top:10px}
-.search-row input{
-  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px
-}
+.rezepte-empty { padding:18px; text-align:center; border-radius:16px; }
+.rezepte-empty .btn-dark { margin-top:8px; }
 
-/* Grid */
-.rezepte-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:14px
-}
-@media (max-width:1100px){.rezepte-grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:680px){.rezepte-grid{grid-template-columns:1fr}}
-
-.recipe-card{
-  background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
-  padding:14px;display:flex;flex-direction:column;gap:10px
-}
-.recipe-head{display:flex;justify-content:space-between;gap:10px}
-.recipe-title{font-weight:900}
-.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.badge{
-  display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;
-  padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted)
-}
-.badge.type{color:var(--primary);border-color:#cfe0ff;background:#e8f0ff}
-.badge.status-valid{background:#e9f7ee;border-color:#cbead7;color:#1d7b3a}
-.badge.status-expired{background:#fdeaea;border-color:#f5caca;color:#b3261e}
-.badge.status-redeemed{background:#f2f2f2;border-color:#e6e6e6;color:#666}
-
-.recipe-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.meta-item{background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px}
-.meta-item .label{font-size:.78rem;color:var(--muted)}
-.meta-item .value{font-weight:800;margin-top:2px}
-
-.recipe-desc{color:var(--muted);font-size:.95rem}
-
-.recipe-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px}
-.progress-wrap{flex:1;background:#f6f8fb;border:1px solid var(--line);border-radius:999px;height:10px;overflow:hidden}
-.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .3s ease}
-.card-actions{display:flex;gap:8px}
-.btn-ghost{
-  background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:800;cursor:pointer
-}
-.btn-ghost:hover{background:#f3f6fb}
-.btn-ghost.danger{color:#b3261e;border-color:#f5caca}
-.btn-ghost.small{padding:6px 8px;font-size:.9rem}
-
-.rezepte-empty{display:grid;place-items:center;padding:24px;border-radius:16px;text-align:center;color:var(--muted)}
-
-/* Modal */
-.rezepte-modal{border:0;padding:0;background:transparent}
-.rezepte-modal::backdrop{background:rgba(0,0,0,.35)}
-.modal-card{
-  background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
-  min-width:min(840px,92vw)
-}
-.modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
-.modal-head h3{margin:0}
-.modal-close{background:#fff;border:1px solid var(--line);border-radius:10px;width:36px;height:36px;cursor:pointer}
-
-.modal-body{padding:14px;display:grid;gap:12px}
-.form-row{display:grid;gap:6px}
-.form-row.two{grid-template-columns:1fr 1fr;gap:12px}
-.form-row.checkbox{align-items:center}
-.modal-body input, .modal-body select, .modal-body textarea{
-  border:1px solid var(--line);border-radius:12px;padding:10px
-}
-
-.modal-foot{
-  display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:1px solid var(--line)
-}
-/* Layout-Anpassung: Rezepte-Bereich zentrieren und in voller Breite anzeigen */
-.rezepte-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: calc(100vh - 120px); /* sorgt für mittige Höhe */
-  width: 100%;
-}
-
-.rezepte-head,
-.rezepte-filters,
-.rezepte-grid,
-.rezepte-empty {
-  width: 100%;
-  max-width: 1100px; /* begrenzt die Breite schön mittig */
-}
-
-.rezepte-head {
-  text-align: center;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.rezepte-head h1 {
-  font-size: 1.8rem;
-  text-align: center;
-}
-
-.rezepte-actions {
-  margin-top: 12px;
-}
-/* Modal */
-.rx-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:1000}
-.rx-modal.open{display:flex}
-.rx-modal-card{width:min(900px,92vw);padding:16px 18px}
-.rx-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.rx-form .rx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.rx-form .rx-grid .span-2{grid-column:span 2}
-.rx-form label{display:flex;flex-direction:column;gap:6px;font-weight:700}
-.rx-form input, .rx-form select, .rx-form textarea{border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
-.rx-form .chk{align-items:center;flex-direction:row;gap:8px;font-weight:700}
-.rx-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
-
-/* Karten-Grid */
-.rezepte-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.rx-card{padding:12px}
-.rx-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.rx-type{font-weight:800;color:#41567a}
-.rx-badge{padding:4px 8px;border-radius:999px;font-weight:800;font-size:.82rem}
-.badge-ok{background:#e8f6eb;color:#1d6f2e}
-.badge-expired{background:#fff1f0;color:#a31e1e}
-.badge-done{background:#eef2ff;color:#2f4fbf}
-.rx-name{margin:.2rem 0 .4rem}
-.rx-meta{font-size:.92rem;color:#51617d;display:grid;gap:2px;margin-bottom:.4rem}
-.rx-actions{display:flex;gap:8px;flex-wrap:wrap}
+.rezepte-modal::backdrop { background: rgba(0,0,0,.35); }
+.modal-card { width:min(720px,92vw); border:1px solid #dde3ee; border-radius:16px; padding:0; background:#fff; }
+.modal-head { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid #eef2f8; }
+.modal-body { padding:12px 14px; display:grid; gap:10px; }
+.modal-foot { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-top:1px solid #eef2f8; }
+.form-row { display:grid; gap:6px; }
+.form-row.two { grid-template-columns:1fr 1fr; gap:10px; }
+.form-row input, .form-row select, .form-row textarea { padding:10px 12px; border:1px solid #dde3ee; border-radius:10px; }
+.modal-close { background:#fff; border:1px solid #dde3ee; border-radius:8px; padding:6px 10px; cursor:pointer; }
