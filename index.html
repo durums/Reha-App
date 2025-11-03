@@ -112,6 +112,39 @@
   <script src="schedule-data.js"></script>
 
   <script type="module">
+    // Login
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("li-email")?.value.trim();
+        const pw    = document.getElementById("li-password")?.value;
+        if (!email || !pw) return;
+        try {
+          await signInWithEmailAndPassword(auth, email, pw);
+        } catch (err) {
+          alert(`Login fehlgeschlagen: ${err.code}`);
+        }
+        return false; // extra-Fallschutz
+      });
+    }
+
+// Passwort vergessen
+const forgotBtn = document.getElementById("forgotBtn");
+if (forgotBtn) {
+  forgotBtn.addEventListener("click", async () => {
+    const email = (document.getElementById("li-email")?.value || "").trim()
+               || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
+    if (!email) return;
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert(`Passwort-Reset gesendet an: ${email}`);
+    } catch (err) {
+      alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
+    }
+  });
+}
+
     import {
       getAuth, onAuthStateChanged,
       createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
