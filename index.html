@@ -199,12 +199,13 @@
       setMenuToggleVisible(true);
     });
 
-    document.querySelector(".sidebar-menu").addEventListener("click", (e) => {
+    document.querySelector("#sidebar nav.sidebar").addEventListener("click", (e) => {
       const link = e.target.closest("a");
       if (!link) return;
       sidebar.classList.remove("active");
       setMenuToggleVisible(true);
     });
+
 
     // --- Views dynamisch laden ---
     async function loadView(page) {
@@ -249,7 +250,7 @@
       loadView(page);
       sidebar.classList.remove("active");
       setMenuToggleVisible(true);
-      document.querySelectorAll(".sidebar-menu a").forEach(a => {
+      document.querySelectorAll("#sidebar nav.sidebar a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
       });
     }
