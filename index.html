@@ -112,6 +112,11 @@
   <script src="schedule-data.js"></script>
 
   <script type="module">
+    import {
+      getAuth, onAuthStateChanged,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+      sendPasswordResetEmail              // ⬅️ HIER dazufügen
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getAuth, onAuthStateChanged,
@@ -166,6 +171,23 @@
     const menuToggle  = document.getElementById("menuToggle");
     const closeSidebar= document.getElementById("closeSidebar");
 
+    const forgotBtn = document.getElementById("forgotBtn");
+    forgotBtn.addEventListener("click", async () => {
+      const emailInput = document.getElementById("li-email");
+      let email = (emailInput?.value || "").trim();
+      if (!email) {
+        email = prompt("Bitte E-Mail für das Zurücksetzen eingeben:");
+        if (!email) return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert(`Passwort-Reset gesendet an: ${email}`);
+      } catch (err) {
+        alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
+      }
+    });
+
+    
     const showAuth = () => {
       document.body.classList.add("center-auth");
       authForms.style.display="block";
