@@ -806,6 +806,32 @@ body.center-auth {
   border-left: 4px solid #1E3A8A; /* dunklerer Balken links */
   padding-left: calc(1rem - 4px);
 }
+/* Kontozeile unten */
+#sidebar .sidebar-account {
+  padding: .75rem 1rem .25rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: .5rem;
+}
+#sidebar .account-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #fff;
+  opacity: .95;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#sidebar .avatar-icon {
+  flex: 0 0 auto;
+  color: #fff;
+  opacity: .9;
+}
+#sidebar #sidebar-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 
 /* === Menü-Button === */
