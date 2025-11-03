@@ -1,48 +1,148 @@
+/* Layout */
 .day-overview {
-  max-width: 700px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 2rem 2.5rem;
+  color: #111827;
 }
 
-.day-overview h2 {
-  text-align: center;
+.day-header .day-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.day-header h2 {
+  font-size: 1.75rem; /* ~28px */
+  font-weight: 700;
+  margin: 0;
+}
+
+.day-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  background: #A8D0E6;    /* Header-Blau aus deinem Schema */
+  color: #111827;
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+/* Grid für Top-Karten */
+.day-grid {
+  display: grid;
+  grid-template-columns: 1.5fr .5fr;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
-
-.day-section {
-  margin-bottom: 1.5rem;
-  background: #f9fafb;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 1rem;
+@media (max-width: 900px) {
+  .day-grid { grid-template-columns: 1fr; }
 }
 
-.day-list {
-  list-style: none;
-  padding: 0;
+/* Cards */
+.card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: 1rem 1.1rem;
 }
 
-.day-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+.day-section + .day-section { margin-top: 1rem; }
+
+.card h3 {
+  font-size: 1.1rem; /* ~18px */
+  font-weight: 600;
+  margin: 0 0 .5rem 0;
 }
 
-.progress-box {
-  text-align: center;
-}
+/* Mini-Card */
+.mini-card p { margin: .2rem 0 0 0; }
+.muted { color: #6B7280; }
 
+/* Progress */
+.progress-box { margin-top: .25rem; }
 .progress-box .bar {
   width: 100%;
-  height: 20px;
-  background: #ddd;
-  border-radius: 10px;
+  height: 14px;
+  background: #E5E7EB;
+  border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  position: relative;
 }
-
-.progress-box #progressBar {
+#progressBar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #4CAF50, #66bb6a);
-  transition: width 0.5s;
+  background: #2563EB; /* Primärblau */
+  transition: width .25s ease;
 }
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: .5rem;
+  font-size: .9rem;
+  color: #6B7280;
+}
+
+/* Training: checkbare Liste */
+.checklist {
+  display: grid;
+  gap: .5rem;
+}
+.checklist .item {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: .6rem;
+  padding: .6rem .7rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #F9FAFB;
+}
+.checklist .item input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: #2563EB;
+  cursor: pointer;
+}
+.checklist .item .title { font-weight: 600; }
+.checklist .item .meta  { color: #6B7280; font-size: .9rem; }
+
+/* Termine */
+.day-list {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: grid;
+  gap: .5rem;
+}
+.day-list li {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .6rem .7rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #F9FAFB;
+}
+.badge-time {
+  font-variant-numeric: tabular-nums;
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  background: #1E3A8A; /* dunkles Blau */
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+/* Newsletter */
+.newsletter {
+  background: #F9FAFB;
+  border: 1px dashed #E5E7EB;
+  border-radius: 12px;
+  padding: .8rem;
+  color: #111827;
+}
+.newsletter strong { color: #1E3A8A; }
