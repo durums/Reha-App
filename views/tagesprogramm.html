@@ -1,28 +1,50 @@
 <!-- views/tagesprogramm.html -->
 <div class="day-overview">
-  <h2>🗓️ Reha Tagesprogramm</h2>
-  <p id="dayDate"></p>
 
-  <section class="day-section">
-    <h3>🏋️‍♂️ Trainingseinheit</h3>
-    <div id="trainingToday">Lade Trainingsplan…</div>
+  <!-- Header-Zeile -->
+  <header class="day-header">
+    <div class="day-title">
+      <h2>🗓️ Tagesprogramm</h2>
+      <span class="day-pill" id="dayDate"></span>
+    </div>
+  </header>
+
+  <!-- Fortschritt / Quick-Stats -->
+  <section class="day-grid">
+    <div class="card progress-card">
+      <h3>📈 Fortschritt heute</h3>
+      <div class="progress-box">
+        <div class="bar">
+          <div id="progressBar"></div>
+        </div>
+        <div class="progress-meta">
+          <span id="progressLabel">0% erledigt</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mini-card">
+      <h3>🏷️ Stimmung</h3>
+      <p id="motivationText" class="muted"></p>
+    </div>
   </section>
 
-  <section class="day-section">
+  <!-- Training (checkbar) -->
+  <section class="card day-section">
+    <h3>🏋️‍♂️ Trainingseinheit</h3>
+    <div id="trainingToday" class="checklist">Lade Trainingsplan…</div>
+  </section>
+
+  <!-- Termine -->
+  <section class="card day-section">
     <h3>📅 Heutige Termine</h3>
     <ul id="todayAppointments" class="day-list"></ul>
   </section>
 
-  <section class="day-section">
-    <h3>💬 Motivation</h3>
-    <p id="motivationText"></p>
+  <!-- Praxis-Infos -->
+  <section class="card day-section">
+    <h3>📰 Neuigkeiten & Praxis-Infos</h3>
+    <div id="newsletterBox" class="newsletter"></div>
   </section>
 
-<section class="day-section">
-    <h3>📰 Neuigkeiten & Praxis-Infos</h3>
-    <div id="newsletterBox">
-      <p>Heute geöffnet. Nächster Feiertag: 24.12.2025.<br>
-      <strong>Aktion:</strong> 10% Rabatt auf Massage-Termine im November!</p>
-    </div>
-  </section>
 </div>
