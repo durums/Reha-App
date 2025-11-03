@@ -1,53 +1,89 @@
-:root{
-  --rx-ink:#0f213d; --rx-muted:#6a778e;
-  --rx-bg:#f3f5f8;  --rx-card:#fff; --rx-line:#e6eaf1;
-  --rx-ok:#1e9e6e;  --rx-warn:#e5a100; --rx-bad:#d7425b; --rx-pill:#142b52;
-  --rx-shadow:0 10px 28px rgba(15,33,61,.08); --rx-r:16px;
+/* nutzt vorhandene :root Variablen + card/btn-dark aus deiner App */
+
+.rezepte-wrap{padding:16px clamp(12px,4vw,28px)}
+
+.rezepte-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px
+}
+.rezepte-head h1{margin:0}
+.rezepte-head p{margin:.25rem 0 0;color:var(--muted)}
+
+.rezepte-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.rezepte-filters{padding:12px;border-radius:var(--radius);margin-bottom:12px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-pill{
+  appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);
+  padding:8px 12px;border-radius:999px;font-weight:800;cursor:pointer
+}
+.filter-pill.active{background:#e8f0ff;border-color:#cfe0ff;color:var(--primary)}
+.search-row{margin-top:10px}
+.search-row input{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px
 }
 
-.rx-wrap{padding:16px clamp(12px,4vw,36px)}
-.rx-header h1{margin:.25rem 0}
-.rx-header p{color:var(--rx-muted);margin:0 0 .5rem}
-
-.card{background:var(--rx-card);border:1px solid var(--rx-line);border-radius:var(--rx-r);box-shadow:var(--rx-shadow)}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
-.btn-primary{background:#142b52;color:#fff}
-.btn-light{background:#eef2f8;color:var(--rx-ink)}
-.btn-danger{background:var(--rx-bad);color:#fff}
-
-.rx-toolbar{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin:.75rem 0}
-.rx-toolbar .right{display:flex;gap:8px;align-items:center}
-.rx-toolbar input[type="search"]{padding:10px 12px;border:1px solid var(--rx-line);border-radius:10px;width:min(340px,46vw)}
-
-.rx-empty{padding:16px;text-align:center;color:var(--rx-muted);margin:.5rem 0}
-.rx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media (max-width:1100px){.rx-grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:700px){.rx-grid{grid-template-columns:1fr}}
-
-.rx-card{padding:14px;border-radius:14px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
-.rx-title{font-weight:900}
-.rx-sub{color:var(--rx-muted);font-size:.92rem}
-.rx-badges{display:flex;gap:6px;flex-wrap:wrap}
-.badge{border-radius:999px;padding:4px 8px;font-size:.78rem;font-weight:900}
-.badge.type{background:#eef2f8;color:#22324c;border:1px solid var(--rx-line)}
-.badge.ok{background:#e9faf4;color:#0d7c56}
-.badge.warn{background:#fff7e6;color:#a06a00}
-.badge.bad{background:#ffecee;color:#9e2037}
-.badge.au{background:#e6eaff;color:#22307a}
-
-.rx-actions{display:flex;gap:6px}
-.rx-actions .btn{padding:8px 10px;font-weight:800}
-
-.rx-meta{grid-column:1/-1;color:var(--rx-muted);font-size:.9rem}
-.rx-meta strong{color:var(--rx-ink)}
-
-.rx-modal{border:0;padding:0;background:transparent}
-.rx-form{padding:14px;max-width:min(860px,92vw)}
-.rx-form .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.rx-form .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.rx-form .grid .full{grid-column:1/-1}
-.rx-form label{display:grid;gap:6px;font-weight:700;font-size:.92rem}
-.rx-form input, .rx-form select, .rx-form textarea{
-  border:1px solid var(--rx-line);border-radius:10px;padding:10px 12px;font:inherit
+/* Grid */
+.rezepte-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px
 }
-.rx-form .modal-actions{margin-top:12px;display:flex;gap:10px;justify-content:flex-end}
+@media (max-width:1100px){.rezepte-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:680px){.rezepte-grid{grid-template-columns:1fr}}
+
+.recipe-card{
+  background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+  padding:14px;display:flex;flex-direction:column;gap:10px
+}
+.recipe-head{display:flex;justify-content:space-between;gap:10px}
+.recipe-title{font-weight:900}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;
+  padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted)
+}
+.badge.type{color:var(--primary);border-color:#cfe0ff;background:#e8f0ff}
+.badge.status-valid{background:#e9f7ee;border-color:#cbead7;color:#1d7b3a}
+.badge.status-expired{background:#fdeaea;border-color:#f5caca;color:#b3261e}
+.badge.status-redeemed{background:#f2f2f2;border-color:#e6e6e6;color:#666}
+
+.recipe-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item{background:#fafcff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.meta-item .label{font-size:.78rem;color:var(--muted)}
+.meta-item .value{font-weight:800;margin-top:2px}
+
+.recipe-desc{color:var(--muted);font-size:.95rem}
+
+.recipe-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:2px}
+.progress-wrap{flex:1;background:#f6f8fb;border:1px solid var(--line);border-radius:999px;height:10px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .3s ease}
+.card-actions{display:flex;gap:8px}
+.btn-ghost{
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:800;cursor:pointer
+}
+.btn-ghost:hover{background:#f3f6fb}
+.btn-ghost.danger{color:#b3261e;border-color:#f5caca}
+.btn-ghost.small{padding:6px 8px;font-size:.9rem}
+
+.rezepte-empty{display:grid;place-items:center;padding:24px;border-radius:16px;text-align:center;color:var(--muted)}
+
+/* Modal */
+.rezepte-modal{border:0;padding:0;background:transparent}
+.rezepte-modal::backdrop{background:rgba(0,0,0,.35)}
+.modal-card{
+  background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  min-width:min(840px,92vw)
+}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.modal-head h3{margin:0}
+.modal-close{background:#fff;border:1px solid var(--line);border-radius:10px;width:36px;height:36px;cursor:pointer}
+
+.modal-body{padding:14px;display:grid;gap:12px}
+.form-row{display:grid;gap:6px}
+.form-row.two{grid-template-columns:1fr 1fr;gap:12px}
+.form-row.checkbox{align-items:center}
+.modal-body input, .modal-body select, .modal-body textarea{
+  border:1px solid var(--line);border-radius:12px;padding:10px
+}
+
+.modal-foot{
+  display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:1px solid var(--line)
+}
