@@ -1,192 +1,113 @@
-/* Allgemeine Styles und Layout */
-#rezepteView {
-  padding: 1rem;
-  background: #f8f9fa;  /* hellgrauer Hintergrund für Kontrast */
-  min-height: 100vh;
-  box-sizing: border-box;
-  font-family: sans-serif;
-}
-
-/* Überschrift */
-#rezepteView h1 {
-  font-size: 1.5rem;
+/* Toolbar */
+.termine-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin: 0 0 1rem;
 }
-
-/* Filter-Buttons Leiste */
-.filter-buttons {
-  margin-bottom: 1rem;
-}
-.filter-btn {
-  border: none;
-  background: #e0e0e0;
-  color: #000;
-  padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.filter-btn.active {
-  background: #007bff;   /* blaue Hervorhebung für aktiven Filter */
-  color: #fff;
-}
-.filter-btn:hover {
-  background: #cacaca;
+.termine-toolbar h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
-/* Grid-Layout für die Karten */
-.card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive Spaltenaufteilung */
-  gap: 1rem;
-  align-items: stretch;  /* Karten in einer Zeile gleiche Höhe (stretch) */
-}
-
-/* Kartenstil */
-.card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+/* Filter-Buttons */
+.termine-toolbar .filters {
   display: flex;
-  flex-direction: column; /* für flexibles Anordnen (Header oben, Aktionen unten) */
+  gap: .5rem;
 }
-.card h3 {
-  margin: 0 0 0.5em;
-}
-.card p {
-  margin: 0 0 0.5em;
-  line-height: 1.4;
-}
-.card small.card-type {
-  display: block;
-  font-size: 0.75rem;
-  color: #6c757d; /* gedecktes Grau für Typ */
-  font-weight: 600;
-  margin-bottom: 0.3em;
-}
-.card-status {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.2em 0.5em;
-  border-radius: 4px;
-  color: #fff;
-  display: inline-block;
-  margin-left: 0.5rem;
-}
-/* Farbkennzeichnung für Status */
-.status-valid { background: #28a745; }    /* grün */
-.status-expired { background: #dc3545; }  /* rot */
-.status-redeemed { background: #007bff; } /* blau (für eingelöst) */
-
-/* Bereich für Aktions-Buttons auf der Karte */
-.card-actions {
-  margin-top: auto; /* schiebt Aktionen an das Kartenende (bei flex-column) */
-}
-.card-actions button {
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-right: 1rem;
-  padding: 0;
-}
-.card-actions button:hover {
-  text-decoration: underline;
-}
-
-/* Floating Action Button (Hinzufügen) */
-.add-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border: none;
-  border-radius: 50%;
-  background: #007bff;
-  color: #fff;
-  font-size: 32px;
-  line-height: 56px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-.add-btn:hover {
-  background: #0056b3;
-}
-
-/* Modal-Overlay und Modal-Box */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;        /* ausgeblendet standardmäßig */
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-.modal {
-  background: #fff;
-  padding: 1.5rem;
+.termine-toolbar .filters button {
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #111827;
+  padding: .5rem .8rem;
   border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-}
-.modal h2 {
-  margin-top: 0;
-}
-/* Formular im Modal */
-.form-group {
-  margin-bottom: 1rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.3rem;
+  cursor: pointer;
   font-weight: 500;
 }
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 0.4rem;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.termine-toolbar .filters button:hover {
+  background: #eef2ff;
 }
-.form-group textarea {
-  resize: vertical;
+.termine-toolbar .filters button.active {
+  background: #2563EB;
+  color: #fff;
+  border-color: #1E3A8A;
 }
-.form-group div {
-  margin-left: 1.5rem; /* Einrückung der Radio-Optionen unter "Dauer" */
+
+/* Liste / Gruppen */
+.termine-list {
+  display: grid;
+  gap: .75rem;
 }
-.form-actions {
-  text-align: right;
+.termine-day {
+  font-weight: 700;
+  color: #1E3A8A;
+  margin-top: .5rem;
 }
-.form-actions button {
-  margin-left: 0.5rem;
-  padding: 0.5rem 0.8rem;
-  font-size: 0.9rem;
+
+/* Karten */
+.termine-card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: .9rem 1rem;
+}
+.termine-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: .75rem;
+}
+.termine-time {
+  font-variant-numeric: tabular-nums;
+  background: #1E3A8A;
+  color: #fff;
+  border-radius: 999px;
+  padding: .2rem .55rem;
+  font-weight: 600;
+  justify-self: start;
+}
+.termine-title {
+  font-weight: 600;
+}
+
+/* Badges */
+.termine-badge {
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+  justify-self: end;
+}
+.termine-badge.upcoming { background: #A8D0E6; color: #111827; }
+.termine-badge.past     { background: #E5E7EB; color: #6B7280; }
+
+/* Meta + Actions */
+.termine-meta {
+  margin-top: .35rem;
+  color: #6B7280;
+  font-size: .9rem;
+}
+.termine-actions {
+  display: flex;
+  gap: .5rem;
+  margin-top: .6rem;
+}
+.termine-actions button {
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #111827;
+  padding: .45rem .7rem;
+  border-radius: 8px;
   cursor: pointer;
 }
-.form-actions #cancelBtn {
-  background: #6c757d;
+.termine-actions button.primary {
+  background: #2563EB;
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  border-color: #1E3A8A;
 }
-.form-actions #saveBtn {
-  background: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-}
-.form-actions #cancelBtn:hover {
-  background: #5a6268;
-}
-.form-actions #saveBtn:hover {
-  background: #218838;
+.termine-actions button:hover {
+  filter: brightness(0.98);
 }
