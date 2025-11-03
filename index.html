@@ -23,7 +23,18 @@
       <button id="closeSidebar">×</button>
     </div>
   
-    <!-- ⬇️ Neu: Hash-Links für den Router -->
+    <!-- 👤 Konto jetzt OBEN -->
+    <div class="sidebar-account">
+      <a class="account-row" href="#profil" title="Profil öffnen">
+        <svg class="avatar-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.9"/>
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="currentColor" opacity="0.5"/>
+        </svg>
+        <span id="sidebar-email">—</span>
+      </a>
+    </div>
+  
+    <!-- Navi bleibt darunter -->
     <nav class="sidebar">
       <a href="#trainingsplan" data-match="trainingsplan">🏋️ Trainingsplan</a>
       <a href="#fortschritt"   data-match="fortschritt">📊 Fortschritt</a>
@@ -34,25 +45,12 @@
       <a href="#profil"        data-match="profil">👤 Profil</a>
       <a href="#hilfe"         data-match="hilfe">❓ Hilfe</a>
     </nav>
-
-  
-    <!-- 👤 Konto unten, nur Icon + E-Mail -->
-    <div class="sidebar-account">
-      <div class="account-row">
-        <!-- minimalistisches Avatar-Icon (SVG, kein Bild nötig) -->
-        <svg class="avatar-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.9"/>
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="currentColor" opacity="0.5"/>
-        </svg>
-        <span id="sidebar-email">—</span>
-      </div>
-    </div>
-
   
     <div class="sidebar-footer">
       <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
     </div>
   </div>
+
 
   <!-- 🔒 Login / Registrierung -->
   <div class="card" id="auth-forms">
