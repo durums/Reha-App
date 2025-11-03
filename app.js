@@ -1,3 +1,6 @@
+const sidebarEmail = document.getElementById("sidebar-email");
+
+
 // --- Auth-UI (Login/Logout-Steuerung) ---
 function initAuthUI() {
   const userInfo   = document.getElementById('user-info');
@@ -13,6 +16,13 @@ function initAuthUI() {
   // Beobachte Auth-Status
   onAuthStateChanged(auth, (user) => {
     if (user) {
+      const email = user.email || "(ohne E-Mail)";
+      userInfo.textContent = `Angemeldet: ${email}`;
+      if (sidebarEmail) {
+        sidebarEmail.textContent = email;
+        sidebarEmail.title = email; // Tooltip zeigt vollständige Adresse
+      }
+
       const name = user.displayName || user.email || ("UID: " + user.uid);
       userInfo.textContent = `Angemeldet: ${name}`;
       signOutBtn.style.display = 'inline-block';
@@ -48,6 +58,7 @@ function initAuthUI() {
       userInfo.textContent = 'Nicht angemeldet';
       signOutBtn.style.display = 'none';
       window.currentUser = null;
+      if (sidebarEmail) sidebarEmail.textContent = "Nicht angemeldet";
 
       // Menü-Button & Sidebar ausblenden
       if (menuToggle) menuToggle.style.display = 'none';
