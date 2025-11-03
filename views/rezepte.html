@@ -2,7 +2,7 @@
   <header class="rezepte-head">
     <div>
       <h1>Rezepte & Verordnungen</h1>
-      <p>Übersicht deiner ärztlichen Verordnungen (Reha/Physio/Medikamente/AU).</p>
+      <p>Übersicht deiner ärztlichen Verordnungen (Reha / Physio / Medikamente / AU).</p>
     </div>
     <div class="rezepte-actions">
       <button id="btnAddRecipe" class="btn-dark">＋ Neue Verordnung</button>
@@ -18,14 +18,12 @@
       <button class="filter-pill" data-filter="redeemed">Eingelöst</button>
     </div>
     <div class="search-row">
-      <input id="rezepteSearch" type="search" placeholder="Suchen (Name, Grund, Beschreibung) …" />
+      <input id="rezepteSearch" type="search" placeholder="Suchen (Name, Grund, Beschreibung)…" />
     </div>
   </div>
 
   <!-- Grid -->
-  <div id="rezepteGrid" class="rezepte-grid">
-    <!-- Karten werden per JS eingefügt -->
-  </div>
+  <div id="rezepteGrid" class="rezepte-grid"></div>
 
   <!-- Leerzustand -->
   <div id="rezepteEmpty" class="rezepte-empty card" hidden>
@@ -33,7 +31,7 @@
     <button id="btnEmptyAdd" class="btn-dark" type="button">＋ Verordnung hinzufügen</button>
   </div>
 
-  <!-- Modal: Hinzufügen / Bearbeiten -->
+  <!-- Modal -->
   <dialog id="rezepteModal" class="rezepte-modal">
     <form method="dialog" class="modal-card">
       <header class="modal-head">
@@ -61,7 +59,7 @@
         <div class="form-row two">
           <div>
             <label>Grund</label>
-            <input id="fReason" type="text" placeholder="z. B. Kreuzband-OP, Rückenschmerz" />
+            <input id="fReason" type="text" placeholder="z. B. Kreuzband-OP / Rückenschmerz" />
           </div>
           <div>
             <label>Gültig bis</label>
@@ -82,7 +80,8 @@
 
         <div class="form-row">
           <label>Beschreibung</label>
-          <textarea id="fDescription" rows="3" placeholder="Details, Serie, Dosierung, Hinweise …"></textarea>
+          <textarea id="fDescription" rows="3"
+            placeholder="Details, Serie, Dosierung, Hinweise …"></textarea>
         </div>
 
         <div class="form-row checkbox">
