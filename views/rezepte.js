@@ -1,355 +1,261 @@
+/* views/rezepte.js */
 (() => {
-  // Dynamisch Firestore-Funktionen laden (nutzt window.db aus index)
-  let fs = {};
-  const loadFS = async () => {
-    if (fs.collection) return fs;
-    fs = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    return fs;
+  // ---- Guard: Firebase + User vorhanden? ----
+  const auth = window.auth;
+  const db   = window.db;
+  const uid  = window.currentUserId;
+
+  if (!auth || !db) {
+    console.warn("Rezepte: Firebase nicht bereit.");
+    return;
+  }
+  if (!uid) {
+    console.warn("Rezepte: kein User eingeloggt.");
+    return;
+  }
+
+  // ---- Firestore (v10 modular) ----
+  const {
+    collection, addDoc, updateDoc, deleteDoc, doc,
+    getDocs, query, orderBy, where, serverTimestamp
+  } = window.firebaseFirestore || await (async () => {
+    const m = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    // Kleiner Adapter, damit wir obige Namen leicht nutzen können
+    window.firebaseFirestore = m;
+    return m;
+  })();
+
+  // ---- DOM refs ----
+  const wrap         = document.querySelector(".rezepte-wrap");
+  const grid         = document.getElementById("rxGrid");
+  const emptyBox     = document.getElementById("rxEmpty");
+  const addBtn       = document.getElementById("rxAddBtn");
+  const modal        = document.getElementById("rxModal");
+  const modalTitle   = document.getElementById("rxModalTitle");
+  const form         = document.getElementById("rxForm");
+  const closeBtns    = modal?.querySelectorAll("[data-close]");
+  const filterBar    = document.getElementById("rxFilters");
+  const searchInput  = document.getElementById("rxSearch");
+
+  // Formularfelder
+  const fId         = document.getElementById("rxId");          // hidden
+  const fType       = document.getElementById("rxType");        // Rezept / AU / …
+  const fName       = document.getElementById("rxName");
+  const fReason     = document.getElementById("rxReason");
+  const fDesc       = document.getElementById("rxDesc");
+  const fStart      = document.getElementById("rxStart");       // yyyy-mm-dd
+  const fEnd        = document.getElementById("rxEnd");         // yyyy-mm-dd (optional)
+  const fUnits      = document.getElementById("rxUnits");       // z.B. 6 Einheiten
+  const fRedeemed   = document.getElementById("rxRedeemed");    // checkbox „eingelöst“
+
+  // Datenpuffer
+  let ALL = [];            // alle Datensätze aus DB
+  let currentFilter = "alle";
+  let searchTerm = "";
+
+  // ---- Hilfen ----
+  const colRef = collection(db, `users/${uid}/prescriptions`);
+
+  const fmt = (dstr) => {
+    if (!dstr) return "";
+    const d = new Date(dstr + "T00:00:00");
+    return d.toLocaleDateString("de-DE", { day:"2-digit", month:"2-digit", year:"numeric" });
   };
 
-  const q = (sel, root = document) => root.querySelector(sel);
-  const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const grid = q("#rezepteGrid");
-  const empty = q("#rezepteEmpty");
-  const searchInput = q("#rezepteSearch");
-  const filterPills = qa(".filter-pill");
-
-  const modal = q("#rezepteModal");
-  const modalTitle = q("#modalTitle");
-  const btnAdd = q("#btnAddRecipe");
-  const btnEmptyAdd = q("#btnEmptyAdd");
-  const btnDelete = q("#btnDelete");
-  const btnCancel = q("#btnCancel");
-  const btnSave = q("#btnSave");
-  const btnClose = q("#modalClose");
-
-  // Form-Felder
-  const fType = q("#fType");
-  const fTitle = q("#fTitle");
-  const fReason = q("#fReason");
-  const fValidUntil = q("#fValidUntil");
-  const fUnitsTotal = q("#fUnitsTotal");
-  const fUnitsUsed = q("#fUnitsUsed");
-  const fDescription = q("#fDescription");
-  const fRedeemed = q("#fRedeemed");
-
-  // State
-  let currentId = null;
-  let items = [];   // rohe Daten aus Firestore
-  let filter = "all";
-  let search = "";
-
-  function todayMidnight() {
-    const d = new Date(); d.setHours(0,0,0,0); return d;
-  }
-  function parseDateInput(v) {
-    if (!v) return null;
-    const [y,m,d] = v.split("-").map(n=>parseInt(n,10));
-    return new Date(y, m-1, d);
-  }
-  function fmtDate(d) {
-    if (!d) return "—";
-    const dd = (n) => String(n).padStart(2,"0");
-    return `${dd(d.getDate())}.${dd(d.getMonth()+1)}.${d.getFullYear()}`;
-  }
-
-  // Statusberechnung:
-  // - redeemed -> "redeemed"
-  // - sonst, wenn validUntil in Vergangenheit ODER unitsTotal>0 && unitsUsed>=unitsTotal -> "expired"
-  // - sonst -> "valid"
-  function computeStatus(doc) {
-    if (doc.redeemed) return "redeemed";
-    const now = todayMidnight();
-    const expiredByDate = doc.validUntil ? (doc.validUntil < now) : false;
-    const expiredByUnits = (doc.unitsTotal ?? 0) > 0 && (doc.unitsUsed ?? 0) >= (doc.unitsTotal ?? 0);
-    if (expiredByDate || expiredByUnits) return "expired";
-    return "valid";
-  }
-
-  function computeProgress(doc) {
-    const total = Math.max(0, parseInt(doc.unitsTotal ?? 0, 10));
-    const used  = Math.max(0, Math.min(total, parseInt(doc.unitsUsed ?? 0, 10)));
-    if (!total) return 0;
-    return Math.round((used / total) * 100);
-  }
-
-  function matchesFilterStatus(doc) {
-    const st = computeStatus(doc);
-    if (filter === "all") return true;
-    return st === filter;
-  }
-
-  function matchesSearch(doc) {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return [
-      doc.title, doc.reason, doc.description, doc.type
-    ].filter(Boolean).some(v => String(v).toLowerCase().includes(s));
-  }
-
-  function render() {
-    const view = items
-      .filter(matchesFilterStatus)
-      .filter(matchesSearch)
-      .sort((a,b) => {
-        // Sortierung: gültig zuerst, dann redeemed, expired am Ende, danach gültig-bis aufsteigend
-        const rank = (d) => ({valid:0, redeemed:1, expired:2})[computeStatus(d)] ?? 3;
-        const r = rank(a) - rank(b);
-        if (r !== 0) return r;
-        const da = a.validUntil?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
-        const db = b.validUntil?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
-        return da - db;
-      });
-
-    grid.innerHTML = "";
-    if (view.length === 0) {
-      empty.hidden = false;
-      return;
+  function computeStatus(item) {
+    if (item.redeemed) return "eingeloest";
+    if (item.endDate) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const end   = new Date(item.endDate + "T00:00:00");
+      if (end < today) return "abgelaufen";
     }
-    empty.hidden = true;
-
-    view.forEach(doc => {
-      const st = computeStatus(doc);
-      const prog = computeProgress(doc);
-      const daysLeft = doc.validUntil ? Math.ceil((doc.validUntil - todayMidnight()) / (24*3600*1000)) : null;
-
-      const card = document.createElement("article");
-      card.className = "recipe-card";
-
-      const head = document.createElement("div");
-      head.className = "recipe-head";
-      head.innerHTML = `
-        <div class="recipe-title">${escapeHTML(doc.title || "(ohne Titel)")}</div>
-        <div class="badges">
-          <span class="badge type">${escapeHTML(doc.type || "—")}</span>
-          ${st === "valid" ? `<span class="badge status-valid">Gültig${daysLeft!==null ? ` · ${daysLeft} Tage` : ""}</span>` : ""}
-          ${st === "expired" ? `<span class="badge status-expired">Abgelaufen</span>` : ""}
-          ${st === "redeemed" ? `<span class="badge status-redeemed">Eingelöst</span>` : ""}
-        </div>
-      `;
-
-      const meta = document.createElement("div");
-      meta.className = "recipe-meta";
-      meta.innerHTML = `
-        <div class="meta-item">
-          <div class="label">Grund</div>
-          <div class="value">${escapeHTML(doc.reason || "—")}</div>
-        </div>
-        <div class="meta-item">
-          <div class="label">Gültig bis</div>
-          <div class="value">${doc.validUntil ? fmtDate(doc.validUntil) : "—"}</div>
-        </div>
-      `;
-
-      const desc = document.createElement("div");
-      desc.className = "recipe-desc";
-      desc.textContent = doc.description || "—";
-
-      const foot = document.createElement("div");
-      foot.className = "recipe-foot";
-      foot.innerHTML = `
-        <div class="progress-wrap"><div class="progress-fill" style="width:${prog}%"></div></div>
-        <div class="card-actions">
-          <button class="btn-ghost small" data-act="edit">Bearbeiten</button>
-          <button class="btn-ghost small" data-act="toggleRedeemed">${doc.redeemed ? "Als offen markieren" : "Als eingelöst markieren"}</button>
-        </div>
-      `;
-
-      card.append(head, meta, desc, foot);
-      grid.appendChild(card);
-
-      // Actions
-      card.querySelector('[data-act="edit"]').addEventListener("click", () => openForEdit(doc.id));
-      card.querySelector('[data-act="toggleRedeemed"]').addEventListener("click", () => toggleRedeemed(doc.id, !doc.redeemed));
-    });
-  }
-
-  function escapeHTML(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  }
-
-  /* ---------- Modal-Logik ---------- */
-  function resetForm() {
-    fType.value = "Rezept";
-    fTitle.value = "";
-    fReason.value = "";
-    fValidUntil.value = "";
-    fUnitsTotal.value = "";
-    fUnitsUsed.value = "";
-    fDescription.value = "";
-    fRedeemed.checked = false;
-  }
-
-  function setFormFromDoc(doc) {
-    fType.value = doc.type || "Rezept";
-    fTitle.value = doc.title || "";
-    fReason.value = doc.reason || "";
-    fValidUntil.value = doc.validUntil ? toInputDate(doc.validUntil) : "";
-    fUnitsTotal.value = doc.unitsTotal ?? "";
-    fUnitsUsed.value = doc.unitsUsed ?? "";
-    fDescription.value = doc.description ?? "";
-    fRedeemed.checked = !!doc.redeemed;
-  }
-
-  function toInputDate(d) {
-    if (!d) return "";
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function openForCreate() {
-    currentId = null;
-    modalTitle.textContent = "Neue Verordnung";
-    btnDelete.hidden = true;
-    resetForm();
-    modal.showModal();
-  }
-
-  async function openForEdit(id) {
-    const doc = items.find(x => x.id === id);
-    if (!doc) return;
-    currentId = id;
-    modalTitle.textContent = "Verordnung bearbeiten";
-    btnDelete.hidden = false;
-    setFormFromDoc(doc);
-    modal.showModal();
+    return "gueltig";
   }
 
   function closeModal() {
-    modal.close();
+    modal?.classList.remove("open");
+    form?.reset();
+    fId.value = "";
   }
 
-  /* ---------- Datenhaltung (Firestore) ---------- */
-  async function fetchAll() {
-    const uid = window.currentUserId;
-    if (!uid || !window.db) return;
-
-    await loadFS();
-    const { collection, query, orderBy, getDocs } = fs;
-
-    const col = collection(window.db, "users", uid, "rezepte");
-    // Sortierung: nach redeemed, dann validUntil
-    const qy = query(col, orderBy("redeemed","asc"), orderBy("validUntil","asc"));
-    const snap = await getDocs(qy);
-
-    items = snap.docs.map(d => {
-      const data = d.data() || {};
-      return {
-        id: d.id,
-        type: data.type || "Rezept",
-        title: data.title || "",
-        reason: data.reason || "",
-        description: data.description || "",
-        unitsTotal: (data.unitsTotal ?? null),
-        unitsUsed: (data.unitsUsed ?? null),
-        validUntil: data.validUntil ? new Date(data.validUntil) : null,
-        redeemed: !!data.redeemed,
-        createdAt: data.createdAt ? new Date(data.createdAt) : null
-      };
-    });
-
-    render();
+  function openModal(mode, values = null) {
+    modal?.classList.add("open");
+    modalTitle.textContent = (mode === "edit") ? "Verordnung bearbeiten" : "Neue Verordnung";
+    if (values) {
+      fId.value       = values.id || "";
+      fType.value     = values.type || "Rezept";
+      fName.value     = values.name || "";
+      fReason.value   = values.reason || "";
+      fDesc.value     = values.description || "";
+      fStart.value    = values.startDate || "";
+      fEnd.value      = values.endDate || "";
+      fUnits.value    = values.units || "";
+      fRedeemed.checked = !!values.redeemed;
+    } else {
+      form.reset();
+      fId.value = "";
+      fType.value = "Rezept";
+    }
   }
 
-  async function saveCurrent() {
-    const uid = window.currentUserId;
-    if (!uid || !window.db) { alert("Nicht angemeldet."); return; }
+  function cardHTML(x) {
+    const status = computeStatus(x);
+    const badge = {
+      gueltig:     "badge-ok",
+      abgelaufen:  "badge-expired",
+      eingelöst:   "badge-done",
+      eingelost:   "badge-done",     // falls ohne Umlaut gespeichert
+      eingeloest:  "badge-done"
+    }[status] || "badge-ok";
 
-    await loadFS();
-    const { collection, addDoc, doc, updateDoc, serverTimestamp } = fs;
+    const statusLabel = {
+      gueltig: "Gültig",
+      abgelaufen: "Abgelaufen",
+      eingelöst: "Eingelöst",
+      eingelost: "Eingelöst",
+      eingeloest: "Eingelöst"
+    }[status] || "Gültig";
 
-    const payload = {
-      type: fType.value.trim() || "Rezept",
-      title: fTitle.value.trim(),
-      reason: fReason.value.trim(),
-      description: fDescription.value.trim(),
-      unitsTotal: fUnitsTotal.value ? parseInt(fUnitsTotal.value, 10) : null,
-      unitsUsed: fUnitsUsed.value ? parseInt(fUnitsUsed.value, 10) : null,
-      validUntil: fValidUntil.value ? parseDateInput(fValidUntil.value).toISOString() : null,
-      redeemed: !!fRedeemed.checked,
-      updatedAt: serverTimestamp()
-    };
+    return `
+      <article class="rx-card card">
+        <div class="rx-top">
+          <span class="rx-type">${x.type || "Rezept"}</span>
+          <span class="rx-badge ${badge}">${statusLabel}</span>
+        </div>
+        <h4 class="rx-name">${x.name || "—"}</h4>
+        <div class="rx-meta">
+          <div><strong>Grund:</strong> ${x.reason || "—"}</div>
+          <div><strong>Zeitraum:</strong> ${fmt(x.startDate)} ${x.endDate ? "– " + fmt(x.endDate) : ""}</div>
+          <div><strong>Länge:</strong> ${x.units || "—"}</div>
+        </div>
+        <p class="rx-desc">${x.description ? x.description : ""}</p>
+        <div class="rx-actions">
+          <button class="btn btn-light" data-edit="${x.id}">Bearbeiten</button>
+          <button class="btn btn-light" data-redeem="${x.id}" ${x.redeemed ? "disabled" : ""}>Einlösen</button>
+          <button class="btn btn-outline" data-delete="${x.id}">Löschen</button>
+        </div>
+      </article>
+    `;
+  }
 
-    // kleine Plausis
-    if (!payload.title) { alert("Name/Bezeichnung ist erforderlich."); return; }
-    if ((payload.unitsTotal ?? 0) < (payload.unitsUsed ?? 0)) {
-      alert("Einheiten genutzt darf Einheiten gesamt nicht überschreiten.");
+  function applyFilterAndSearch(list) {
+    let out = list;
+    if (currentFilter !== "alle") {
+      out = out.filter(x => computeStatus(x) === currentFilter);
+    }
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      out = out.filter(x =>
+        (x.name || "").toLowerCase().includes(q) ||
+        (x.reason || "").toLowerCase().includes(q) ||
+        (x.description || "").toLowerCase().includes(q)
+      );
+    }
+    return out;
+  }
+
+  function render() {
+    const items = applyFilterAndSearch(ALL);
+    if (!items.length) {
+      emptyBox.style.display = "flex";
+      grid.innerHTML = "";
       return;
     }
+    emptyBox.style.display = "none";
+    grid.innerHTML = items.map(cardHTML).join("");
+  }
 
-    if (currentId) {
-      const ref = fs.doc(window.db, "users", uid, "rezepte", currentId);
-      await updateDoc(ref, payload);
-    } else {
-      const col = collection(window.db, "users", uid, "rezepte");
-      await addDoc(col, {
-        ...payload,
-        createdAt: serverTimestamp()
-      });
+  async function loadAll() {
+    const qy = query(colRef, orderBy("createdAt", "desc"));
+    const snap = await getDocs(qy);
+    ALL = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+  }
+
+  // ---- Events ----
+  addBtn?.addEventListener("click", () => openModal("new"));
+  closeBtns?.forEach(btn => btn.addEventListener("click", closeModal));
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  filterBar?.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-filter]");
+    if (!b) return;
+    document.querySelectorAll("#rxFilters [data-filter]").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    currentFilter = b.dataset.filter;   // 'alle' | 'gueltig' | 'abgelaufen' | 'eingeloest'
+    render();
+  });
+
+  searchInput?.addEventListener("input", (e) => {
+    searchTerm = e.target.value || "";
+    render();
+  });
+
+  grid?.addEventListener("click", async (e) => {
+    const btnEdit = e.target.closest("[data-edit]");
+    const btnDel  = e.target.closest("[data-delete]");
+    const btnRed  = e.target.closest("[data-redeem]");
+
+    if (btnEdit) {
+      const id = btnEdit.dataset.edit;
+      const item = ALL.find(x => x.id === id);
+      if (item) openModal("edit", item);
+      return;
     }
-    closeModal();
-    await fetchAll();
-  }
+    if (btnDel) {
+      const id = btnDel.dataset.delete;
+      if (confirm("Verordnung wirklich löschen?")) {
+        await deleteDoc(doc(db, `users/${uid}/prescriptions/${id}`));
+        await loadAll();
+      }
+      return;
+    }
+    if (btnRed) {
+      const id = btnRed.dataset.redeem;
+      const ref = doc(db, `users/${uid}/prescriptions/${id}`);
+      await updateDoc(ref, { redeemed: true, updatedAt: serverTimestamp() });
+      await loadAll();
+      return;
+    }
+  });
 
-  async function removeCurrent() {
-    if (!currentId) return;
-    const uid = window.currentUserId;
-    if (!uid || !window.db) return;
-
-    if (!confirm("Diese Verordnung wirklich löschen?")) return;
-
-    await loadFS();
-    const { doc, deleteDoc } = fs;
-    const ref = doc(window.db, "users", uid, "rezepte", currentId);
-    await deleteDoc(ref);
-    closeModal();
-    await fetchAll();
-  }
-
-  async function toggleRedeemed(id, to) {
-    const uid = window.currentUserId;
-    if (!uid || !window.db) return;
-    await loadFS();
-    const { doc, updateDoc, serverTimestamp } = fs;
-    await updateDoc(doc(window.db, "users", uid, "rezepte", id), {
-      redeemed: !!to, updatedAt: serverTimestamp()
-    });
-    await fetchAll();
-  }
-
-  /* ---------- Events ---------- */
-  btnAdd?.addEventListener("click", openForCreate);
-  btnEmptyAdd?.addEventListener("click", openForCreate);
-  btnClose?.addEventListener("click", closeModal);
-  btnCancel?.addEventListener("click", closeModal);
-  btnDelete?.addEventListener("click", removeCurrent);
-
-  // Formular speichern (submit)
-  q("#rezepteModal form")?.addEventListener("submit", (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    saveCurrent();
+
+    // einfache Validierung
+    if (!fName.value.trim()) { alert("Bitte Name der Verordnung angeben."); return; }
+
+    const payload = {
+      type:        fType.value || "Rezept",
+      name:        fName.value.trim(),
+      reason:      fReason.value.trim(),
+      description: fDesc.value.trim(),
+      startDate:   fStart.value || null,
+      endDate:     fEnd.value || null,
+      units:       fUnits.value.trim(),
+      redeemed:    !!fRedeemed.checked,
+      updatedAt:   serverTimestamp()
+    };
+
+    const id = fId.value;
+
+    try {
+      if (id) {
+        const ref = doc(db, `users/${uid}/prescriptions/${id}`);
+        await updateDoc(ref, payload);
+      } else {
+        await addDoc(colRef, { ...payload, createdAt: serverTimestamp() });
+      }
+      closeModal();
+      await loadAll();
+    } catch (err) {
+      console.error(err);
+      alert("Speichern fehlgeschlagen.");
+    }
   });
 
-  // Filter
-  filterPills.forEach(p => p.addEventListener("click", () => {
-    filterPills.forEach(x => x.classList.remove("active"));
-    p.classList.add("active");
-    filter = p.dataset.filter || "all";
-    render();
-  }));
-
-  // Suche
-  searchInput?.addEventListener("input", () => {
-    search = searchInput.value.trim();
-    render();
-  });
-
-  // Beim Laden Daten ziehen
-  document.addEventListener("DOMContentLoaded", fetchAll);
-  window.addEventListener("hashchange", () => {
-    // Wenn man von anderer View zurückkommt und #rezepte aktiv ist: refresh
-    if (location.hash === "#rezepte") fetchAll();
-  });
+  // Init
+  loadAll().catch(console.error);
 })();
