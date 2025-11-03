@@ -5,9 +5,10 @@ function nicePhaseLabel(raw) {
   // alles klein, dann gezielt formatieren
   const s = String(raw || "").toLowerCase().trim();
 
-  // "1. tag" / "2. tag" -> "Ab Tag 1" / "Ab Tag 2"
+  // "1. tag" / "2. tag" -> "Ab 1. Tag" / "Ab 2. Tag"
   const mTag = s.match(/^(\d+)\.\s*tag$/i);
-  if (mTag) return `Ab Tag ${mTag[1]}`;
+  if (mTag) return `Ab ${mTag[1]}. Tag`;
+
 
   // "ab 7. tag" -> "Ab 7. Tag"
   const mAbTag = s.match(/^ab\s+(\d+)\.\s*tag$/i);
