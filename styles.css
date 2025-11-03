@@ -846,6 +846,32 @@ body.center-auth {
   transform: scale(0.98);
 }
 
+/* Sidebar-Basis */
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+/* Hover */
+.sidebar a:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+/* Aktiv */
+.sidebar a.active,
+.sidebar a[aria-current="page"] {
+  background: rgba(37, 99, 235, 0.10);
+  color: #1E3A8A;
+  font-weight: 600;
+  border-left: 4px solid #2563EB;
+  padding-left: calc(1rem - 4px); /* gleicht die Border aus */
+}
+
 
 :root{
   --bg:#f5f7fb; --surface:#fff; --ink:#121417; --muted:#6b7280;
