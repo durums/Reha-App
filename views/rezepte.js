@@ -1,346 +1,355 @@
-// Firebase initialisieren (Konfiguration hier einfügen)
-const firebaseConfig = {
-  /* TODO: Firebase-Konfiguration einfügen */
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();  // Firestore-Instanz erstellen  [oai_citation:3‡firebase.google.com](https://firebase.google.com/docs/firestore/manage-data/add-data#:~:text=%2F%2F%20Initialize%20Firebase%20firebase)
-
-// Referenzen auf wichtige DOM-Elemente
-const cardsContainer = document.getElementById('cardsContainer');
-const addButton = document.getElementById('addButton');
-const modalOverlay = document.getElementById('modalOverlay');
-const modalTitle = document.getElementById('modalTitle');
-const prescriptionForm = document.getElementById('prescriptionForm');
-const cancelBtn = document.getElementById('cancelBtn');
-const saveBtn = document.getElementById('saveBtn');
-
-// Formularelemente
-const typeInput = document.getElementById('type');
-const nameInput = document.getElementById('name');
-const reasonInput = document.getElementById('reason');
-const descriptionInput = document.getElementById('description');
-const durationDateInput = document.getElementById('durationDate');
-const durationUnitsInput = document.getElementById('durationUnits');
-const durationTypeRadios = document.querySelectorAll('input[name="durationType"]');
-
-// Status-Filter
-let currentFilter = 'all';  // aktueller Filter (all, valid, expired, redeemed)
-
-// Hilfsvariable für Editiermodus
-let editId = null;  // speichert die ID der Verordnung, die gerade bearbeitet wird (oder null für neu)
-
-// ** Status-Berechnung für eine Verordnung **
-function computeStatus(docData) {
-  // Falls als eingelöst markiert
-  if (docData.redeemed) {
-    return 'redeemed';
-  }
-  // Falls Dauer ein Datum enthält ("bis DD.MM.YYYY")
-  const duration = docData.duration || '';
-  if (duration.startsWith('bis')) {
-    // Datum aus dem String extrahieren und vergleichen
-    const dateStr = duration.slice(4).trim();  // Teil nach "bis "
-    // dd.mm.yyyy in Date umwandeln
-    const [day, month, year] = dateStr.split('.');
-    if (day && month && year) {
-      const expiryDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 23, 59, 59);
-      if (Date.now() > expiryDate.getTime()) {
-        return 'expired';
-      }
-    }
-    return 'valid';
-  }
-  // Falls Dauer "Einheiten" enthält und noch nicht eingelöst => gültig (kein Ablaufdatum)
-  return 'valid';
-}
-
-// ** Render-Funktion: Verordnungen als Karten anzeigen (mit Filter) **
-function renderPrescriptions(prescriptions) {
-  // Falls Filter aktiv, entsprechende Liste filtern
-  let filtered = prescriptions;
-  if (currentFilter !== 'all') {
-    filtered = prescriptions.filter(doc => {
-      const status = computeStatus(doc);
-      if (currentFilter === 'valid') return status === 'valid';
-      if (currentFilter === 'expired') return status === 'expired';
-      if (currentFilter === 'redeemed') return status === 'redeemed';
-      return true;
-    });
-  }
-  // HTML für alle gefilterten Verordnungen zusammenbauen
-  let html = '';
-  filtered.forEach(doc => {
-    const data = doc;  // doc enthält { id, type, name, ... duration, redeemed }
-    const statusKey = computeStatus(data);
-    // Anzeigename des Status in Deutsch
-    let statusLabel;
-    if (statusKey === 'valid') statusLabel = 'Gültig';
-    else if (statusKey === 'expired') statusLabel = 'Abgelaufen';
-    else statusLabel = 'Eingelöst';
-    // Karte HTML
-    html += `
-      <div class="card">
-        <small class="card-type">${data.type}</small>
-        <h3 class="card-name">${data.name}</h3>
-        <p><strong>Grund:</strong> ${data.reason || ''}</p>
-        <p><strong>Beschreibung:</strong> ${data.description || ''}</p>
-        <p><strong>Dauer:</strong> ${data.duration}</p>
-        <div class="card-meta">
-          <span class="card-status status-${statusKey}">${statusLabel}</span>
-        </div>
-        <div class="card-actions">
-          <button class="edit-btn" data-id="${data.id}">Bearbeiten</button>
-          <button class="delete-btn" data-id="${data.id}">Löschen</button>
-          ${(!data.redeemed && computeStatus(data) === 'valid') 
-             ? `<button class="redeem-btn" data-id="${data.id}">Einlösen</button>` 
-             : ''}
-        </div>
-      </div>`;
-  });
-  // Wenn keine Verordnungen im Filter, Hinweis anzeigen
-  if (filtered.length === 0) {
-    html = `<p>Keine Verordnungen vorhanden.</p>`;
-  }
-  cardsContainer.innerHTML = html;
-
-  // Event-Listener für dynamische Buttons (Bearbeiten/Löschen/Einlösen)
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-id');
-      openEditModal(id);
-    });
-  });
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-id');
-      deletePrescription(id);
-    });
-  });
-  document.querySelectorAll('.redeem-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-id');
-      redeemPrescription(id);
-    });
-  });
-}
-
-// ** Firestore-Echtzeitlistener: lädt alle Verordnungen und rendert sie **
-db.collection('verordnungen').onSnapshot((querySnapshot) => {
-  const docs = [];
-  querySnapshot.forEach((doc) => {
-    // Daten des Dokuments plus ID sammeln
-    const docData = doc.data();
-    docData.id = doc.id;
-    docs.push(docData);
-  });
-  renderPrescriptions(docs);
-}); // Das UI aktualisiert sich automatisch bei jeder Änderung [oai_citation:4‡firebase.google.com](https://firebase.google.com/docs/firestore/query-data/listen#:~:text=db.collection%28,)
-
-// ** Modal anzeigen für neue Verordnung (Hinzufügen) **
-function openAddModal() {
-  editId = null;
-  modalTitle.textContent = 'Neue Verordnung';
-  prescriptionForm.reset();  // Formular leeren
-  // Standard: "Bis Datum" auswählen, Einheiten-Feld deaktivieren
-  durationTypeRadios.forEach(radio => {
-    if (radio.value === 'date') {
-      radio.checked = true;
-    }
-  });
-  durationDateInput.disabled = false;
-  durationUnitsInput.disabled = true;
-  durationDateInput.required = true;
-  durationUnitsInput.required = false;
-  modalOverlay.style.display = 'flex';
-}
-
-// ** Modal anzeigen für bestehende Verordnung (Bearbeiten) **
-function openEditModal(id) {
-  const docRef = db.collection('verordnungen').doc(id);
-  docRef.get().then(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-      editId = id;
-      modalTitle.textContent = 'Verordnung bearbeiten';
-      // Formularfelder mit vorhandenen Daten füllen
-      typeInput.value = data.type || '';
-      nameInput.value = data.name || '';
-      reasonInput.value = data.reason || '';
-      descriptionInput.value = data.description || '';
-      // Dauer je nach Typ setzen
-      if (data.duration && data.duration.includes('Einheit')) {
-        // Einheiten-Variante
-        document.querySelector('input[name="durationType"][value="sessions"]').checked = true;
-        document.querySelector('input[name="durationType"][value="date"]').checked = false;
-        durationUnitsInput.disabled = false;
-        durationDateInput.disabled = true;
-        durationUnitsInput.required = true;
-        durationDateInput.required = false;
-        // Zahl aus "X Einheiten" extrahieren
-        const num = parseInt(data.duration) || 0;
-        durationUnitsInput.value = num > 0 ? num : '';
-      } else if (data.duration && data.duration.startsWith('bis')) {
-        // Datums-Variante
-        document.querySelector('input[name="durationType"][value="date"]').checked = true;
-        document.querySelector('input[name="durationType"][value="sessions"]').checked = false;
-        durationUnitsInput.disabled = true;
-        durationDateInput.disabled = false;
-        durationUnitsInput.required = false;
-        durationDateInput.required = true;
-        // Datum "bis DD.MM.YYYY" in das Date-Input-Format (YYYY-MM-DD) umwandeln
-        const dateStr = data.duration.slice(4).trim(); // z.B. "10.12.2025"
-        const [day, month, year] = dateStr.split('.');
-        if (year && month && day) {
-          // Mit führenden Nullen sicherstellen, dass Format passt
-          const mm = month.padStart(2, '0');
-          const dd = day.padStart(2, '0');
-          durationDateInput.value = `${year}-${mm}-${dd}`;
-        }
-      } else {
-        // Falls keine Dauer angegeben, Standard auf Datum
-        durationTypeRadios.forEach(radio => {
-          if (radio.value === 'date') radio.checked = true;
-        });
-        durationDateInput.disabled = false;
-        durationUnitsInput.disabled = true;
-        durationDateInput.required = true;
-        durationUnitsInput.required = false;
-      }
-      modalOverlay.style.display = 'flex';
-    }
-  });
-}
-
-// ** Formular-Submit: Neue Verordnung hinzufügen oder bestehende updaten **
-prescriptionForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  // Felder auslesen
-  const typeVal = typeInput.value;
-  const nameVal = nameInput.value;
-  const reasonVal = reasonInput.value;
-  const descVal = descriptionInput.value;
-  let durationVal = '';
-  if (document.querySelector('input[name="durationType"]:checked').value === 'date') {
-    if (durationDateInput.value) {
-      // Datum ins gewünschte Format "bis DD.MM.YYYY" bringen
-      const d = new Date(durationDateInput.value);
-      const day = d.getDate().toString().padStart(2, '0');
-      const month = (d.getMonth() + 1).toString().padStart(2, '0');
-      const year = d.getFullYear();
-      durationVal = `bis ${day}.${month}.${year}`;
-    }
-  } else {  // "sessions" gewählt
-    if (durationUnitsInput.value) {
-      const units = parseInt(durationUnitsInput.value);
-      durationVal = units ? (units === 1 ? '1 Einheit' : `${units} Einheiten`) : '';
-    }
-  }
-  // Grundlegende Validierung: mind. ein Dauer-Feld muss ausgefüllt sein
-  if (!durationVal) {
-    alert("Bitte eine Dauer angeben (Datum oder Anzahl Einheiten).");
-    return;
-  }
-  // Objekt für Firestore vorbereiten
-  const docData = {
-    type: typeVal,
-    name: nameVal,
-    reason: reasonVal,
-    description: descVal,
-    duration: durationVal
-    // 'status' wird nicht dauerhaft gespeichert, da es dynamisch berechnet wird
+(() => {
+  // Dynamisch Firestore-Funktionen laden (nutzt window.db aus index)
+  let fs = {};
+  const loadFS = async () => {
+    if (fs.collection) return fs;
+    fs = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    return fs;
   };
-  if (editId) {
-    // Bestehende Verordnung updaten (behält das Feld 'redeemed' bei)
-    db.collection('verordnungen').doc(editId).update(docData)
-      .then(() => {
-        modalOverlay.style.display = 'none';  // Modal schließen
-        editId = null;
-      })
-      .catch(err => console.error("Fehler beim Aktualisieren:", err));
-  } else {
-    // Neue Verordnung hinzufügen (mit redeemed=false initial)
-    docData.redeemed = false;
-    db.collection('verordnungen').add(docData)
-      .then(() => {
-        modalOverlay.style.display = 'none';  // Modal schließen
-      })
-      .catch(err => console.error("Fehler beim Hinzufügen:", err));
+
+  const q = (sel, root = document) => root.querySelector(sel);
+  const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const grid = q("#rezepteGrid");
+  const empty = q("#rezepteEmpty");
+  const searchInput = q("#rezepteSearch");
+  const filterPills = qa(".filter-pill");
+
+  const modal = q("#rezepteModal");
+  const modalTitle = q("#modalTitle");
+  const btnAdd = q("#btnAddRecipe");
+  const btnEmptyAdd = q("#btnEmptyAdd");
+  const btnDelete = q("#btnDelete");
+  const btnCancel = q("#btnCancel");
+  const btnSave = q("#btnSave");
+  const btnClose = q("#modalClose");
+
+  // Form-Felder
+  const fType = q("#fType");
+  const fTitle = q("#fTitle");
+  const fReason = q("#fReason");
+  const fValidUntil = q("#fValidUntil");
+  const fUnitsTotal = q("#fUnitsTotal");
+  const fUnitsUsed = q("#fUnitsUsed");
+  const fDescription = q("#fDescription");
+  const fRedeemed = q("#fRedeemed");
+
+  // State
+  let currentId = null;
+  let items = [];   // rohe Daten aus Firestore
+  let filter = "all";
+  let search = "";
+
+  function todayMidnight() {
+    const d = new Date(); d.setHours(0,0,0,0); return d;
   }
-});
-
-// ** Verordnung als eingelöst markieren **
-function redeemPrescription(id) {
-  if (!id) return;
-  // Firestore-Feld 'redeemed' auf true setzen
-  db.collection('verordnungen').doc(id).update({ redeemed: true })
-    .catch(err => console.error("Fehler beim Einlösen:", err));
-}
-
-// ** Verordnung löschen **
-function deletePrescription(id) {
-  if (!id) return;
-  const confirmDelete = confirm("Soll diese Verordnung wirklich gelöscht werden?");
-  if (confirmDelete) {
-    db.collection('verordnungen').doc(id).delete()
-      .catch(err => console.error("Fehler beim Löschen:", err));
+  function parseDateInput(v) {
+    if (!v) return null;
+    const [y,m,d] = v.split("-").map(n=>parseInt(n,10));
+    return new Date(y, m-1, d);
   }
-}
-
-// ** Modal schließen (Abbrechen) **
-function closeModal() {
-  modalOverlay.style.display = 'none';
-  editId = null;
-}
-
-// Event-Listener für Klick auf "Hinzufügen" Button
-addButton.addEventListener('click', openAddModal);
-// Event-Listener für Modal-Abbrechen (Cancel)
-cancelBtn.addEventListener('click', closeModal);
-// Klick auf Overlay außerhalb der Modal-Box schließt Modal ebenfalls
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target.id === 'modalOverlay') {
-    closeModal();
+  function fmtDate(d) {
+    if (!d) return "—";
+    const dd = (n) => String(n).padStart(2,"0");
+    return `${dd(d.getDate())}.${dd(d.getMonth()+1)}.${d.getFullYear()}`;
   }
-});
 
-// Event-Listener für Wechsel zwischen Dauer-Optionen (Datum/Einheiten)
-durationTypeRadios.forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value === 'date') {
-      durationDateInput.disabled = false;
-      durationDateInput.required = true;
-      durationUnitsInput.disabled = true;
-      durationUnitsInput.required = false;
-    } else if (radio.value === 'sessions') {
-      durationDateInput.disabled = true;
-      durationDateInput.required = false;
-      durationUnitsInput.disabled = false;
-      durationUnitsInput.required = true;
-    }
-  });
-});
+  // Statusberechnung:
+  // - redeemed -> "redeemed"
+  // - sonst, wenn validUntil in Vergangenheit ODER unitsTotal>0 && unitsUsed>=unitsTotal -> "expired"
+  // - sonst -> "valid"
+  function computeStatus(doc) {
+    if (doc.redeemed) return "redeemed";
+    const now = todayMidnight();
+    const expiredByDate = doc.validUntil ? (doc.validUntil < now) : false;
+    const expiredByUnits = (doc.unitsTotal ?? 0) > 0 && (doc.unitsUsed ?? 0) >= (doc.unitsTotal ?? 0);
+    if (expiredByDate || expiredByUnits) return "expired";
+    return "valid";
+  }
 
-// Event-Listener für Filter-Buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    // aktive Klasse aktualisieren
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Filter setzen und neu rendern
-    currentFilter = btn.getAttribute('data-filter');
-    // Die Daten sind bereits via Snapshot vorhanden, daher neu rendern mit aktuellem Filter:
-    // (Wir triggern einfach onSnapshot-Handler neu, indem wir hier nichts tun – dieser läuft 
-    // automatisch bei Datenänderung. Für reines Filterwechsel ohne DB-Änderung können wir die 
-    // letzte geladene Liste zwischenspeichern und hier filtern.)
-    // Zur Vereinfachung rufen wir hier erneut die Firestore-Daten ab und rendern dann:
-    db.collection('verordnungen').get().then(querySnapshot => {
-      const docs = [];
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        docs.push(data);
+  function computeProgress(doc) {
+    const total = Math.max(0, parseInt(doc.unitsTotal ?? 0, 10));
+    const used  = Math.max(0, Math.min(total, parseInt(doc.unitsUsed ?? 0, 10)));
+    if (!total) return 0;
+    return Math.round((used / total) * 100);
+  }
+
+  function matchesFilterStatus(doc) {
+    const st = computeStatus(doc);
+    if (filter === "all") return true;
+    return st === filter;
+  }
+
+  function matchesSearch(doc) {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return [
+      doc.title, doc.reason, doc.description, doc.type
+    ].filter(Boolean).some(v => String(v).toLowerCase().includes(s));
+  }
+
+  function render() {
+    const view = items
+      .filter(matchesFilterStatus)
+      .filter(matchesSearch)
+      .sort((a,b) => {
+        // Sortierung: gültig zuerst, dann redeemed, expired am Ende, danach gültig-bis aufsteigend
+        const rank = (d) => ({valid:0, redeemed:1, expired:2})[computeStatus(d)] ?? 3;
+        const r = rank(a) - rank(b);
+        if (r !== 0) return r;
+        const da = a.validUntil?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
+        const db = b.validUntil?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
+        return da - db;
       });
-      renderPrescriptions(docs);
+
+    grid.innerHTML = "";
+    if (view.length === 0) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+
+    view.forEach(doc => {
+      const st = computeStatus(doc);
+      const prog = computeProgress(doc);
+      const daysLeft = doc.validUntil ? Math.ceil((doc.validUntil - todayMidnight()) / (24*3600*1000)) : null;
+
+      const card = document.createElement("article");
+      card.className = "recipe-card";
+
+      const head = document.createElement("div");
+      head.className = "recipe-head";
+      head.innerHTML = `
+        <div class="recipe-title">${escapeHTML(doc.title || "(ohne Titel)")}</div>
+        <div class="badges">
+          <span class="badge type">${escapeHTML(doc.type || "—")}</span>
+          ${st === "valid" ? `<span class="badge status-valid">Gültig${daysLeft!==null ? ` · ${daysLeft} Tage` : ""}</span>` : ""}
+          ${st === "expired" ? `<span class="badge status-expired">Abgelaufen</span>` : ""}
+          ${st === "redeemed" ? `<span class="badge status-redeemed">Eingelöst</span>` : ""}
+        </div>
+      `;
+
+      const meta = document.createElement("div");
+      meta.className = "recipe-meta";
+      meta.innerHTML = `
+        <div class="meta-item">
+          <div class="label">Grund</div>
+          <div class="value">${escapeHTML(doc.reason || "—")}</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Gültig bis</div>
+          <div class="value">${doc.validUntil ? fmtDate(doc.validUntil) : "—"}</div>
+        </div>
+      `;
+
+      const desc = document.createElement("div");
+      desc.className = "recipe-desc";
+      desc.textContent = doc.description || "—";
+
+      const foot = document.createElement("div");
+      foot.className = "recipe-foot";
+      foot.innerHTML = `
+        <div class="progress-wrap"><div class="progress-fill" style="width:${prog}%"></div></div>
+        <div class="card-actions">
+          <button class="btn-ghost small" data-act="edit">Bearbeiten</button>
+          <button class="btn-ghost small" data-act="toggleRedeemed">${doc.redeemed ? "Als offen markieren" : "Als eingelöst markieren"}</button>
+        </div>
+      `;
+
+      card.append(head, meta, desc, foot);
+      grid.appendChild(card);
+
+      // Actions
+      card.querySelector('[data-act="edit"]').addEventListener("click", () => openForEdit(doc.id));
+      card.querySelector('[data-act="toggleRedeemed"]').addEventListener("click", () => toggleRedeemed(doc.id, !doc.redeemed));
     });
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  }
+
+  /* ---------- Modal-Logik ---------- */
+  function resetForm() {
+    fType.value = "Rezept";
+    fTitle.value = "";
+    fReason.value = "";
+    fValidUntil.value = "";
+    fUnitsTotal.value = "";
+    fUnitsUsed.value = "";
+    fDescription.value = "";
+    fRedeemed.checked = false;
+  }
+
+  function setFormFromDoc(doc) {
+    fType.value = doc.type || "Rezept";
+    fTitle.value = doc.title || "";
+    fReason.value = doc.reason || "";
+    fValidUntil.value = doc.validUntil ? toInputDate(doc.validUntil) : "";
+    fUnitsTotal.value = doc.unitsTotal ?? "";
+    fUnitsUsed.value = doc.unitsUsed ?? "";
+    fDescription.value = doc.description ?? "";
+    fRedeemed.checked = !!doc.redeemed;
+  }
+
+  function toInputDate(d) {
+    if (!d) return "";
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function openForCreate() {
+    currentId = null;
+    modalTitle.textContent = "Neue Verordnung";
+    btnDelete.hidden = true;
+    resetForm();
+    modal.showModal();
+  }
+
+  async function openForEdit(id) {
+    const doc = items.find(x => x.id === id);
+    if (!doc) return;
+    currentId = id;
+    modalTitle.textContent = "Verordnung bearbeiten";
+    btnDelete.hidden = false;
+    setFormFromDoc(doc);
+    modal.showModal();
+  }
+
+  function closeModal() {
+    modal.close();
+  }
+
+  /* ---------- Datenhaltung (Firestore) ---------- */
+  async function fetchAll() {
+    const uid = window.currentUserId;
+    if (!uid || !window.db) return;
+
+    await loadFS();
+    const { collection, query, orderBy, getDocs } = fs;
+
+    const col = collection(window.db, "users", uid, "rezepte");
+    // Sortierung: nach redeemed, dann validUntil
+    const qy = query(col, orderBy("redeemed","asc"), orderBy("validUntil","asc"));
+    const snap = await getDocs(qy);
+
+    items = snap.docs.map(d => {
+      const data = d.data() || {};
+      return {
+        id: d.id,
+        type: data.type || "Rezept",
+        title: data.title || "",
+        reason: data.reason || "",
+        description: data.description || "",
+        unitsTotal: (data.unitsTotal ?? null),
+        unitsUsed: (data.unitsUsed ?? null),
+        validUntil: data.validUntil ? new Date(data.validUntil) : null,
+        redeemed: !!data.redeemed,
+        createdAt: data.createdAt ? new Date(data.createdAt) : null
+      };
+    });
+
+    render();
+  }
+
+  async function saveCurrent() {
+    const uid = window.currentUserId;
+    if (!uid || !window.db) { alert("Nicht angemeldet."); return; }
+
+    await loadFS();
+    const { collection, addDoc, doc, updateDoc, serverTimestamp } = fs;
+
+    const payload = {
+      type: fType.value.trim() || "Rezept",
+      title: fTitle.value.trim(),
+      reason: fReason.value.trim(),
+      description: fDescription.value.trim(),
+      unitsTotal: fUnitsTotal.value ? parseInt(fUnitsTotal.value, 10) : null,
+      unitsUsed: fUnitsUsed.value ? parseInt(fUnitsUsed.value, 10) : null,
+      validUntil: fValidUntil.value ? parseDateInput(fValidUntil.value).toISOString() : null,
+      redeemed: !!fRedeemed.checked,
+      updatedAt: serverTimestamp()
+    };
+
+    // kleine Plausis
+    if (!payload.title) { alert("Name/Bezeichnung ist erforderlich."); return; }
+    if ((payload.unitsTotal ?? 0) < (payload.unitsUsed ?? 0)) {
+      alert("Einheiten genutzt darf Einheiten gesamt nicht überschreiten.");
+      return;
+    }
+
+    if (currentId) {
+      const ref = fs.doc(window.db, "users", uid, "rezepte", currentId);
+      await updateDoc(ref, payload);
+    } else {
+      const col = collection(window.db, "users", uid, "rezepte");
+      await addDoc(col, {
+        ...payload,
+        createdAt: serverTimestamp()
+      });
+    }
+    closeModal();
+    await fetchAll();
+  }
+
+  async function removeCurrent() {
+    if (!currentId) return;
+    const uid = window.currentUserId;
+    if (!uid || !window.db) return;
+
+    if (!confirm("Diese Verordnung wirklich löschen?")) return;
+
+    await loadFS();
+    const { doc, deleteDoc } = fs;
+    const ref = doc(window.db, "users", uid, "rezepte", currentId);
+    await deleteDoc(ref);
+    closeModal();
+    await fetchAll();
+  }
+
+  async function toggleRedeemed(id, to) {
+    const uid = window.currentUserId;
+    if (!uid || !window.db) return;
+    await loadFS();
+    const { doc, updateDoc, serverTimestamp } = fs;
+    await updateDoc(doc(window.db, "users", uid, "rezepte", id), {
+      redeemed: !!to, updatedAt: serverTimestamp()
+    });
+    await fetchAll();
+  }
+
+  /* ---------- Events ---------- */
+  btnAdd?.addEventListener("click", openForCreate);
+  btnEmptyAdd?.addEventListener("click", openForCreate);
+  btnClose?.addEventListener("click", closeModal);
+  btnCancel?.addEventListener("click", closeModal);
+  btnDelete?.addEventListener("click", removeCurrent);
+
+  // Formular speichern (submit)
+  q("#rezepteModal form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    saveCurrent();
   });
-});
+
+  // Filter
+  filterPills.forEach(p => p.addEventListener("click", () => {
+    filterPills.forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    filter = p.dataset.filter || "all";
+    render();
+  }));
+
+  // Suche
+  searchInput?.addEventListener("input", () => {
+    search = searchInput.value.trim();
+    render();
+  });
+
+  // Beim Laden Daten ziehen
+  document.addEventListener("DOMContentLoaded", fetchAll);
+  window.addEventListener("hashchange", () => {
+    // Wenn man von anderer View zurückkommt und #rezepte aktiv ist: refresh
+    if (location.hash === "#rezepte") fetchAll();
+  });
+})();
