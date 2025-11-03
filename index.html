@@ -135,6 +135,20 @@
     window.auth = auth;
     window.db   = db;
 
+    function updateSidebarAccount(user) {
+      const el = document.getElementById("sidebar-email");
+      if (!el) return;
+      // Email aus Firebase-User ziehen, mit Fallbacks
+      const email =
+        (user && (user.email || (user.providerData && user.providerData[0] && user.providerData[0].email))) ||
+        window.currentUserName || // falls du das woanders setzt
+        "Unbekannt";
+    
+      el.textContent = email;
+      el.title = email; // Tooltip mit kompletter Adresse
+    }
+
+
     // --- App.js nur einmal laden ---
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
@@ -270,15 +284,19 @@
       if (user) {
         showApp();
         setMenuToggleVisible(true);
-
+    
         window.currentUserId   = user.uid;
         window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
-
-        userInfo.textContent = `Angemeldet: ${window.currentUserName}`;
+    
+        const email = user.email || user.displayName || ("UID: " + user.uid);
+        userInfo.textContent = `Angemeldet: ${email}`;
         signOutBtn.style.display = "inline-block";
-
+    
+        // ⬇️ WICHTIG: Sidebar-Email aktualisieren
+        updateSidebarAccount(user);
+    
         loadAppJSOnce();
-
+    
         if (!didInitialLoad) {
           if (!location.hash) location.hash = "#tagesprogramm";
           routeToHash();
@@ -289,11 +307,16 @@
         setMenuToggleVisible(false);
         userInfo.textContent = "Nicht angemeldet";
         signOutBtn.style.display = "none";
+    
         window.currentUserId = null;
         window.currentUserName = null;
         didInitialLoad = false;
+    
+        // ⬇️ Sidebar leeren
+        updateSidebarAccount(null);
       }
     });
+
   </script>
 </body>
 </html>
