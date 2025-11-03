@@ -45,30 +45,41 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ---- Timeline ----
-  const ul = document.getElementById("ntMilestones");
-  const fill = document.getElementById("ntFill");
-  const pin = document.getElementById("ntPin");
-  const label = document.getElementById("ntPhaseLabel");
-  if (!ul || !fill || !pin || !label) return;
-
+  const ul      = document.getElementById("ntMilestones");
+  const rail    = document.querySelector(".nt-rail");
+  const prog    = document.getElementById("ntProgress");
+  const bumpsEl = document.getElementById("ntBumps");
+  const pin     = document.getElementById("ntPin");
+  const label   = document.getElementById("ntPhaseLabel");
+  if (!ul || !rail || !prog || !bumpsEl || !pin || !label) return;
+  
   const step = 100 / (MILESTONES.length - 1);
   let currentIndex = 0;
-
+  
   MILESTONES.forEach((text, i) => {
     const li = document.createElement("li");
     li.style.left = `${i * step}%`;
-
     const pill = document.createElement("span");
     pill.textContent = text;
     pill.className = "nt-pill";
-    if (text === CURRENT) {
-      pill.classList.add("current");
-      currentIndex = i;
-    }
-
+    if (text === CURRENT) { pill.classList.add("current"); currentIndex = i; }
     li.appendChild(pill);
     ul.appendChild(li);
   });
+  
+  const widthPct = step * currentIndex;
+  prog.style.width = `${widthPct}%`;
+  pin.style.left = `${widthPct}%`;
+  label.textContent = CURRENT;
+  
+  bumpsEl.innerHTML = "";
+  for (let i = 1; i <= currentIndex; i++) {
+    const bump = document.createElement("div");
+    bump.className = "nt-bump";
+    bump.style.left = `${i * step}%`;
+    bumpsEl.appendChild(bump);
+  }
+
 
   const width = step * currentIndex;
   fill.style.width = `${width}%`;
