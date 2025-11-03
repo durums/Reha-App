@@ -1,19 +1,28 @@
 (() => {
+
   const $ = (id) => document.getElementById(id);
 
   const dayNames = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
-  const now = new Date();
-  $("dayDate").textContent = `${dayNames[now.getDay()]}, ${now.toLocaleDateString("de-DE")}`;
+
+
+  // Setzt das aktuelle Datum
+  function loadDayDate() {
+    const now = new Date();
+    const el = $("dayDate");
+    if (el) el.textContent = `${dayNames[now.getDay()]}, ${now.toLocaleDateString("de-DE")}`;
+  }
 
   // --- Trainingsplan simuliert ---
   function loadTraining() {
+    const now = new Date();
     const plans = [
       ["Dehnung & Aufwärmen (15 Min.)", "Kraftübungen Oberkörper (30 Min.)", "Cool Down (10 Min.)"],
       ["Ergometer (25 Min.)", "Atemübungen (15 Min.)", "Dehnung (10 Min.)"],
       ["Ruhetag – Spaziergang empfohlen", "Leichte Mobilisation (10 Min.)"],
     ];
     const plan = plans[now.getDay() % plans.length];
-    $("trainingToday").innerHTML = `<ul>${plan.map(p => `<li>${p}</li>`).join("")}</ul>`;
+    const el = $("trainingToday");
+    if (el) el.innerHTML = `<ul>${plan.map(p => `<li>${p}</li>`).join("")}</ul>`;
   }
 
   // --- Termine aus Kalender übernehmen ---
@@ -57,6 +66,9 @@
     ];
     const el = $("motivationText");
     if (el) el.textContent = texts[Math.floor(Math.random() * texts.length)];
+    const d = new Date();
+    const index = (d.getFullYear() * 366 + d.getMonth() * 32 + d.getDate()) % texts.length;
+    if (el) el.textContent = texts[index];
   }
 
   // --- Newsletter dynamisch ---
@@ -72,11 +84,15 @@
     const el = $("newsletterBox");
     if (el) el.innerHTML = news[Math.floor(Math.random() * news.length)];
   }
+  
+  loadDayDate();
+  loadTraining();
+  loadAppointments();
+  loadMotivation();
+  loadNewsletter();
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadTraining();
-    loadAppointments();
-    loadMotivation();
-    loadNewsletter();
-  });
+  // Ggf. bei SPA-Reload für andere Views als Funktion exportieren
+  window.loadMotivation = loadMotivation;
+  window.loadNewsletter = loadNewsletter;
+ 
 })();
