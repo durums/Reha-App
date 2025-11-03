@@ -112,109 +112,20 @@
   <script src="schedule-data.js"></script>
 
   <script type="module">
-    // Login
-  // --- Auth-State ---
-let didInitialLoad = false;
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // UI: App zeigen, Sidebar-Button sichtbar, Sidebar sicher schließen
-        showApp();
-        setMenuToggleVisible(true);
-        sidebar.classList.remove("active");
-    
-        // User-Kontext
-        window.currentUserId   = user.uid;
-        window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
-    
-        const email = user.email || user.displayName || ("UID: " + user.uid);
-        userInfo.textContent = `Angemeldet: ${email}`;
-        signOutBtn.style.display = "inline-block";
-    
-        // Sidebar: Kontozeile aktualisieren
-        updateSidebarAccount(user);
-    
-        // App-Ressourcen einmalig laden
-        loadAppJSOnce();
-    
-        // Routing: Default oder zuletzt besuchte Seite
-        if (!didInitialLoad) {
-          let targetHash = (location.hash || "").trim();
-    
-          // Falls kein Hash vorhanden: zuletzt besuchte Seite laden (Fallback: Tagesprogramm)
-          if (!targetHash || targetHash === "#") {
-            try {
-              const last = localStorage.getItem("rehapp:lastPage");
-              targetHash = last ? `#${last}` : "#tagesprogramm";
-            } catch {
-              targetHash = "#tagesprogramm";
-            }
-          }
-    
-          // Signup/Login-Ansichten nach erfolgreichem Login nie stehen lassen
-          if (targetHash === "#signup" || targetHash === "#login") {
-            targetHash = "#tagesprogramm";
-          }
-    
-          if (location.hash !== targetHash) {
-            location.hash = targetHash; // triggert hashchange -> routeToHash()
-          } else {
-            routeToHash();              // falls Hash schon korrekt ist
-          }
-    
-          didInitialLoad = true;
-        }
-      } else {
-        // UI: zurück zur Anmeldung
-        showAuth();
-        setMenuToggleVisible(false);
-        sidebar.classList.remove("active");
-    
-        userInfo.textContent = "Nicht angemeldet";
-        signOutBtn.style.display = "none";
-    
-        // Kontext leeren
-        window.currentUserId = null;
-        window.currentUserName = null;
-    
-        // Kontozeile leeren
-        updateSidebarAccount(null);
-    
-        didInitialLoad = false;
-      }
-    });
-
-
-
-// Passwort vergessen
-const forgotBtn = document.getElementById("forgotBtn");
-if (forgotBtn) {
-  forgotBtn.addEventListener("click", async () => {
-    const email = (document.getElementById("li-email")?.value || "").trim()
-               || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
-    if (!email) return;
-    try {
-      await sendPasswordResetEmail(auth, email);
-      alert(`Passwort-Reset gesendet an: ${email}`);
-    } catch (err) {
-      alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
-    }
-  });
-}
-
-    import {
-      getAuth, onAuthStateChanged,
-      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-      sendPasswordResetEmail              // ⬅️ HIER dazufügen
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    /* ======================
+       1) IMPORTS (müssen ganz oben stehen)
+       ====================== */
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getAuth, onAuthStateChanged,
-      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+      sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    // --- Firebase Config ---
+  
+    /* ======================
+       2) FIREBASE INIT
+       ====================== */
     const firebaseConfig = {
       apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
       authDomain: "reha-app-3d609.firebaseapp.com",
@@ -228,22 +139,42 @@ if (forgotBtn) {
     const db    = getFirestore(appFB);
     window.auth = auth;
     window.db   = db;
-
+  
+    /* ======================
+       3) DOM ELEMENTE & HELPERS
+       ====================== */
+    const authForms   = document.getElementById("auth-forms");
+    const appDiv      = document.getElementById("app");
+    const userInfo    = document.getElementById("user-info");
+    const signOutBtn  = document.getElementById("sign-out");
+    const sidebar     = document.getElementById("sidebar");
+    const menuToggle  = document.getElementById("menuToggle");
+    const closeSidebar= document.getElementById("closeSidebar");
+  
+    const setMenuToggleVisible = (v) => { if (menuToggle) menuToggle.style.display = v ? "block" : "none"; };
+  
+    const showAuth = () => {
+      document.body.classList.add("center-auth");
+      if (authForms) authForms.style.display="block";
+      if (appDiv)    appDiv.style.display="none";
+    };
+    const showApp = () => {
+      document.body.classList.remove("center-auth");
+      if (authForms) authForms.style.display="none";
+      if (appDiv)    appDiv.style.display="block";
+    };
+  
     function updateSidebarAccount(user) {
       const el = document.getElementById("sidebar-email");
       if (!el) return;
-      // Email aus Firebase-User ziehen, mit Fallbacks
       const email =
-        (user && (user.email || (user.providerData && user.providerData[0] && user.providerData[0].email))) ||
-        window.currentUserName || // falls du das woanders setzt
+        (user && (user.email || (user.providerData?.[0]?.email))) ||
+        window.currentUserName ||
         "Unbekannt";
-    
       el.textContent = email;
-      el.title = email; // Tooltip mit kompletter Adresse
+      el.title = email;
     }
-
-
-    // --- App.js nur einmal laden ---
+  
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
       const s = document.createElement("script");
@@ -252,127 +183,67 @@ if (forgotBtn) {
       s.type = "module";
       document.body.appendChild(s);
     }
-
-    const authForms   = document.getElementById("auth-forms");
-    const appDiv      = document.getElementById("app");
-    const userInfo    = document.getElementById("user-info");
-    const signOutBtn  = document.getElementById("sign-out");
-    const sidebar     = document.getElementById("sidebar");
-    const menuToggle  = document.getElementById("menuToggle");
-    const closeSidebar= document.getElementById("closeSidebar");
-
-    const forgotBtn = document.getElementById("forgotBtn");
-    forgotBtn.addEventListener("click", async () => {
-      const emailInput = document.getElementById("li-email");
-      let email = (emailInput?.value || "").trim();
-      if (!email) {
-        email = prompt("Bitte E-Mail für das Zurücksetzen eingeben:");
-        if (!email) return;
-      }
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert(`Passwort-Reset gesendet an: ${email}`);
-      } catch (err) {
-        alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
-      }
-    });
-
-    
-    const showAuth = () => {
-      document.body.classList.add("center-auth");
-      authForms.style.display="block";
-      appDiv.style.display="none";
-    };
-    const showApp = () => {
-      document.body.classList.remove("center-auth");
-      authForms.style.display="none";
-      appDiv.style.display="block";
-    };
-
-    // --- Login ---
-    document.getElementById("login-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("li-email").value.trim();
-      const pw    = document.getElementById("li-password").value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pw);
-      } catch (err) {
-        alert(`Login fehlgeschlagen: ${err.code}`);
-      }
-    });
-
-    // --- Signup ---
-    document.getElementById("signup-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("su-email").value.trim();
-      const pw    = document.getElementById("su-password").value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, pw);
-        alert("Registriert & angemeldet.");
-      } catch (err) {
-        alert(`Registrierung fehlgeschlagen: ${err.code}`);
-      }
-    });
-
-    // --- Logout ---
-    signOutBtn.addEventListener("click", async () => {
-      // Sidebar sofort schließen
-      sidebar.classList.remove("active");
-      setMenuToggleVisible(true);
-    
-      try {
-        await signOut(auth);
-      } catch (err) {
-        alert("Abmelden fehlgeschlagen.");
-      }
-    });
-
-
-    // --- Sidebar ---
-    const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
-    menuToggle.addEventListener("click", () => {
-      sidebar.classList.add("active");
-      setMenuToggleVisible(false);
-    });
-    
-    closeSidebar.addEventListener("click", () => {
-      sidebar.classList.remove("active");
-      setMenuToggleVisible(true);
-    });
-
-    document.querySelector("#sidebar nav.sidebar").addEventListener("click", (e) => {
-      const link = e.target.closest("a");
-      if (!link) return;
-      sidebar.classList.remove("active");
-      setMenuToggleVisible(true);
-    });
-
-
-    // --- Views dynamisch laden ---
+  
+    /* ======================
+       4) SIDEBAR UI
+       ====================== */
+    if (menuToggle) {
+      menuToggle.addEventListener("click", () => {
+        sidebar.classList.add("active");
+        setMenuToggleVisible(false);
+      });
+    }
+    if (closeSidebar) {
+      closeSidebar.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        setMenuToggleVisible(true);
+      });
+    }
+    const navEl = document.querySelector("#sidebar nav.sidebar");
+    if (navEl) {
+      navEl.addEventListener("click", (e) => {
+        const link = e.target.closest("a");
+        if (!link) return;
+        sidebar.classList.remove("active");
+        setMenuToggleVisible(true);
+      });
+    }
+  
+    if (signOutBtn) {
+      signOutBtn.addEventListener("click", async () => {
+        sidebar.classList.remove("active");
+        setMenuToggleVisible(true);
+        try { await signOut(auth); } catch { alert("Abmelden fehlgeschlagen."); }
+      });
+    }
+  
+    /* ======================
+       5) VIEW LOADER & ROUTER
+       ====================== */
     async function loadView(page) {
       const mount   = document.getElementById("content");
       const viewPath = `views/${page}.html`;
       const cssPath  = `views/${page}.css`;
       const jsPath   = `views/${page}.js`;
-
+  
       try {
         const res  = await fetch(viewPath);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const html = await res.text();
-
+  
         const parser = new DOMParser();
         const doc    = parser.parseFromString(html, "text/html");
         const newContent = doc.body.innerHTML;
-
+  
         document.querySelectorAll('link[data-view]').forEach(l => l.remove());
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = cssPath;
         link.dataset.view = page;
         document.head.appendChild(link);
-
-        mount.innerHTML = newContent;
-
+  
+        if (mount) mount.innerHTML = newContent;
+  
         document.getElementById("dynamic-view-script")?.remove();
         const script = document.createElement("script");
         script.src = jsPath;
@@ -380,11 +251,10 @@ if (forgotBtn) {
         script.defer = true;
         document.body.appendChild(script);
       } catch (e) {
-        mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+        if (mount) mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
       }
     }
-
-    // --- Router ---
+  
     function routeToHash() {
       let page = (location.hash || "#tagesprogramm").slice(1).trim();
       if (!page) page = "tagesprogramm";
@@ -394,45 +264,110 @@ if (forgotBtn) {
       document.querySelectorAll("#sidebar nav.sidebar a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
       });
+      // merken
+      try { localStorage.setItem("rehapp:lastPage", page); } catch {}
     }
+  
     window.addEventListener("hashchange", routeToHash);
-
-    // --- Auth-State ---
+  
+    /* ======================
+       6) AUTH: LOGIN / SIGNUP / RESET
+       ====================== */
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("li-email")?.value.trim();
+        const pw    = document.getElementById("li-password")?.value;
+        if (!email || !pw) return;
+        try {
+          await signInWithEmailAndPassword(auth, email, pw);
+          location.hash = "#tagesprogramm";
+          // falls hashchange nicht greift:
+          routeToHash();
+        } catch (err) {
+          alert(`Login fehlgeschlagen: ${err.code}`);
+        }
+        return false;
+      });
+    }
+  
+    const forgotBtn = document.getElementById("forgotBtn");
+    if (forgotBtn) {
+      forgotBtn.addEventListener("click", async () => {
+        const email = (document.getElementById("li-email")?.value || "").trim()
+                   || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
+        if (!email) return;
+        try {
+          await sendPasswordResetEmail(auth, email);
+          alert(`Passwort-Reset gesendet an: ${email}`);
+        } catch (err) {
+          alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
+        }
+      });
+    }
+  
+    const signupForm = document.getElementById("signup-form");
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("su-email")?.value.trim();
+        const pw    = document.getElementById("su-password")?.value;
+        if (!email || !pw) return;
+        try {
+          await createUserWithEmailAndPassword(auth, email, pw);
+          alert("Konto erstellt. Du bist jetzt angemeldet.");
+          location.hash = "#tagesprogramm";
+          routeToHash();
+        } catch (err) {
+          alert(`Registrierung fehlgeschlagen: ${err.code}`);
+        }
+      });
+    }
+  
+    /* ======================
+       7) AUTH STATE -> UI & ROUTING
+       ====================== */
     let didInitialLoad = false;
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
         showApp();
         setMenuToggleVisible(true);
-    
+        sidebar.classList.remove("active");
+  
         window.currentUserId   = user.uid;
         window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
-    
+  
         const email = user.email || user.displayName || ("UID: " + user.uid);
-        userInfo.textContent = `Angemeldet: ${email}`;
-        signOutBtn.style.display = "inline-block";
-    
-        // ⬇️ WICHTIG: Sidebar-Email aktualisieren
+        if (userInfo) userInfo.textContent = `Angemeldet: ${email}`;
+        if (signOutBtn) signOutBtn.style.display = "inline-block";
+  
         updateSidebarAccount(user);
-    
         loadAppJSOnce();
-    
+  
         if (!didInitialLoad) {
-          if (!location.hash) location.hash = "#tagesprogramm";
-          routeToHash();
+          // Erzwinge sinnvolle Start-Route
+          if (!location.hash || location.hash === "#" || location.hash === "#login" || location.hash === "#signup") {
+            location.replace("#tagesprogramm"); // kein extra History-Eintrag
+            routeToHash();
+          } else {
+            routeToHash();
+          }
           didInitialLoad = true;
         }
       } else {
         showAuth();
         setMenuToggleVisible(false);
-        sidebar.classList.remove("active"); // <-- Sidebar zu
-        userInfo.textContent = "Nicht angemeldet";
-        signOutBtn.style.display = "none";
+        sidebar.classList.remove("active");
+        if (userInfo) userInfo.textContent = "Nicht angemeldet";
+        if (signOutBtn) signOutBtn.style.display = "none";
         window.currentUserId = null;
         window.currentUserName = null;
+        updateSidebarAccount(null);
         didInitialLoad = false;
       }
     });
-
   </script>
+
 </body>
 </html>
