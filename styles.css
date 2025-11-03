@@ -928,6 +928,39 @@ body.center-auth {
   padding-left: calc(1rem - 4px); /* gleicht die Border aus */
 }
 
+/* Kontozeile oben */
+#sidebar .sidebar-account {
+  padding: .75rem 1rem .5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.12); /* war vorher border-top */
+  margin-bottom: .5rem;
+}
+
+#sidebar .account-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  color: #fff;
+  text-decoration: none;
+  opacity: .98;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#sidebar .account-row:hover { opacity: 1; }
+
+#sidebar .avatar-icon {
+  flex: 0 0 auto;
+  color: #fff;
+  opacity: .9;
+}
+
+#sidebar #sidebar-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 :root{
   --bg:#f5f7fb; --surface:#fff; --ink:#121417; --muted:#6b7280;
