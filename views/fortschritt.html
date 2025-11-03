@@ -1,71 +1,96 @@
 <section class="rehaprogress">
-  <div class="rp-head">
-    <a class="btn-dark" href="assets/nachbehandlung.pdf" download>
-      📄 Nachbehandlungs-Dokument
-    </a>
+  <!-- Kopf -->
+  <header class="rp-head">
+    <div class="rp-head-left">
+      <h2 class="rp-title">📈 Fortschritt</h2>
+      <p class="rp-sub">
+        Hier siehst du deinen aktuellen Reha-Status: Beweglichkeit, Kraft, Ausdauer und Schmerzreduktion.
+        Die Timeline unten zeigt, in welcher Phase der Nachbehandlung du dich befindest.
+      </p>
+    </div>
 
-    <aside class="card-dark rp-kpi">
-      <h3>KPI – Fortschritt</h3>
+    <!-- KPI-Panel -->
+    <aside class="card-dark rp-kpi" aria-labelledby="kpi-head">
+      <h3 id="kpi-head">KPI – Übersicht</h3>
 
-      <div class="kpi-row">
-        <div class="kpi-label">Beweglichkeit – <strong>75%</strong></div>
-        <div class="kpi-bar"><span style="width:75%"></span></div>
+      <div class="kpi-row" aria-label="Beweglichkeit">
+        <div class="kpi-label">
+          Beweglichkeit – <strong id="kpi-mobility-val">75%</strong>
+        </div>
+        <div class="kpi-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">
+          <span id="kpi-mobility-bar" style="width:75%"></span>
+        </div>
       </div>
 
-      <div class="kpi-donuts">
-        <figure class="donut">
-          <svg class="donut-svg" viewBox="0 0 120 120">
+      <div class="kpi-donuts" aria-label="Kraft und Ausdauer">
+        <figure class="donut" aria-label="Kraft 25%">
+          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
             <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
-            <circle cx="60" cy="60" r="48" class="donut-val"></circle>
+            <circle cx="60" cy="60" r="48" class="donut-val" data-percent="25"></circle>
           </svg>
-          <figcaption>Kraft – 25%</figcaption>
+          <div class="donut-center"><span class="donut-num">25</span><span class="donut-unit">%</span></div>
+          <figcaption>Kraft</figcaption>
         </figure>
 
-        <figure class="donut">
-          <svg class="donut-svg" viewBox="0 0 120 120">
+        <figure class="donut" aria-label="Ausdauer 62%">
+          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
             <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
-            <circle cx="60" cy="60" r="48" class="donut-val"></circle>
+            <circle cx="60" cy="60" r="48" class="donut-val" data-percent="62"></circle>
           </svg>
-          <figcaption>Ausdauer – 62%</figcaption>
+          <div class="donut-center"><span class="donut-num">62</span><span class="donut-unit">%</span></div>
+          <figcaption>Ausdauer</figcaption>
         </figure>
       </div>
 
-      <div class="kpi-row">
-        <div class="kpi-label">Schmerzreduktion – <strong>85%</strong></div>
-        <div class="kpi-bar"><span style="width:85%"></span></div>
+      <div class="kpi-row" aria-label="Schmerzreduktion">
+        <div class="kpi-label">
+          Schmerzreduktion – <strong id="kpi-pain-val">85%</strong>
+        </div>
+        <div class="kpi-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85">
+          <span id="kpi-pain-bar" style="width:85%"></span>
+        </div>
       </div>
     </aside>
-  </div>
+  </header>
 
-  <!-- Zahlenstrahl -->
-  <article class="card rp-timeline rp-timeline--full">
+  <!-- Timeline -->
+  <article class="card rp-timeline rp-timeline--full" aria-labelledby="tl-head">
     <div class="nt-head">
-      <span class="nt-title">Aktuelle Phase</span>
+      <span id="tl-head" class="nt-title">Nachbehandlungs-Timeline</span>
+      <details class="nt-help">
+        <summary>Wie lese ich das?</summary>
+        <p>
+          Oben siehst du die Phasen deiner Reha. Der farbige Balken markiert deinen bisherigen Weg.
+          Der blaue Punkt zeigt deine aktuelle Phase – dazu steht rechts die Bezeichnung.
+        </p>
+      </details>
     </div>
 
     <div class="nt-scale">
-      <ul id="ntMilestones" class="nt-milestones"></ul>
+      <ul id="ntMilestones" class="nt-milestones" aria-label="Meilensteine"></ul>
       <div class="nt-bar"><div id="ntFill" class="nt-fill"></div></div>
-      <div id="ntPin" class="nt-pin">
-        <div class="dot"></div>
+      <div id="ntPin" class="nt-pin" aria-live="polite">
+        <div class="dot" aria-hidden="true"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
   </article>
 
-  <!-- Info-Karten -->
+  <!-- Erklärungen -->
   <div class="rp-info">
     <article class="card pill">
       <h4>BEWEGUNGSUMFANG</h4>
       <ul class="list">
         <li>Abtrainieren der Hartrahmenorthese bei normalem Gangbild</li>
+        <li>Gelenkwinkel schrittweise erhöhen, Zielwerte mit Therapeuten abgleichen</li>
       </ul>
     </article>
 
     <article class="card pill">
       <h4>BELASTUNG</h4>
       <ul class="list">
-        <li>Volles Körpergewicht (ohne Gehhilfen)</li>
+        <li>Volles Körpergewicht ohne Gehhilfen</li>
+        <li>Belastung langsam steigern, Schmerzen & Schwellung beobachten</li>
       </ul>
     </article>
 
