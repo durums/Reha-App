@@ -140,7 +140,8 @@ function nicePhaseLabel(raw) {
     // Pin + Label
     pin.style.left = `${widthPct}%`;
     phaseLbl.textContent = nicePhaseLabel(PHASES[index].label);
-    pin.setAttribute("aria-label", phaseLbl.textContent);
+    pin.setAttribute("aria-label", phaseLbl.textContent); // a11y
+
   
     // Milestone-Highlight
     ul.querySelectorAll(".nt-pill").forEach((el, i) => {
