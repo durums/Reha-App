@@ -93,20 +93,23 @@ function nicePhaseLabel(raw) {
   });
 
   /* ===== Timeline + Slider ===== */
-  const ul      = document.getElementById("ntMilestones");
-  const rail    = document.querySelector(".nt-rail");
-  const prog    = document.getElementById("ntProgress");
-  const bumpsEl = document.getElementById("ntBumps");
-  const pin     = document.getElementById("ntPin");
-  const phaseLbl= document.getElementById("ntPhaseLabel");
-  const slider  = document.getElementById("ntSlider");
-  const listMove= document.getElementById("list-move");
-  const listLoad= document.getElementById("list-load");
-  const listTreat=document.getElementById("list-treat");
-  if (!ul || !rail || !prog || !bumpsEl || !pin || !phaseLbl || !slider) return;
-
+  const ul       = document.getElementById("ntMilestones");
+  const rail     = document.querySelector(".nt-rail");                // neu
+  const prog     = document.getElementById("ntProgress")              // neu
+                 || document.getElementById("ntFill");                // alt (Fallback)
+  const bumpsEl  = document.getElementById("ntBumps");                // neu (kann fehlen)
+  const pin      = document.getElementById("ntPin");
+  const phaseLbl = document.getElementById("ntPhaseLabel");
+  const slider   = document.getElementById("ntSlider");
+  const listMove = document.getElementById("list-move");
+  const listLoad = document.getElementById("list-load");
+  const listTreat= document.getElementById("list-treat");
+  
+  // nur das Nötigste checken, NICHT auf rail/bumps bestehen
+  if (!ul || !pin || !phaseLbl || !slider || !prog) return;
+  
   const step = 100 / (PHASES.length - 1);
-
+  
   // Milestones rendern
   ul.innerHTML = "";
   PHASES.forEach((p, i) => {
@@ -115,60 +118,65 @@ function nicePhaseLabel(raw) {
     const pill = document.createElement("span");
     pill.textContent = p.label;
     pill.className = "nt-pill";
-    pill.addEventListener("click", () => setPhase(i)); // Klick auf Label setzt Phase
+    pill.addEventListener("click", () => setPhase(i));
     li.appendChild(pill);
     ul.appendChild(li);
   });
-
+  
   // Slider Setup
   slider.min = "0"; slider.max = String(PHASES.length - 1); slider.step = "1";
-  const lastIndex = Number(localStorage.getItem("rehapp:progressPhase") || "4"); // Default: ab 4. Woche
+  const lastIndex = Number(localStorage.getItem("rehapp:progressPhase") || "4");
   slider.value = String(Math.min(PHASES.length - 1, Math.max(0, lastIndex)));
-
-  // Phase setzen
+  
   function setPhase(index){
     index = Math.min(PHASES.length - 1, Math.max(0, index));
     slider.value = String(index);
+  
     const widthPct = step * index;
-    prog.style.width = `${widthPct}%`;
-    pin.style.left   = `${widthPct}%`;
+    // Fortschritt zeichnen (neu ODER alt)
+    if (prog) prog.style.width = `${widthPct}%`;
+  
+    // Pin + Label
+    pin.style.left = `${widthPct}%`;
     phaseLbl.textContent = nicePhaseLabel(PHASES[index].label);
-    pin.setAttribute("aria-label", phaseLbl.textContent); // optional, für Screenreader
-
-
+    pin.setAttribute("aria-label", phaseLbl.textContent);
+  
     // Milestone-Highlight
     ul.querySelectorAll(".nt-pill").forEach((el, i) => {
       el.classList.toggle("current", i === index);
     });
-
-    // Bumps (bis inkl. aktueller)
-    bumpsEl.innerHTML = "";
-    for (let i = 1; i <= index; i++){
-      const bump = document.createElement("div");
-      bump.className = "nt-bump";
-      bump.style.left = `${i * step}%`;
-      bumpsEl.appendChild(bump);
+  
+    // Bumps, nur wenn Container existiert (neuer Stil)
+    if (bumpsEl) {
+      bumpsEl.innerHTML = "";
+      for (let i = 1; i <= index; i++){
+        const bump = document.createElement("div");
+        bump.className = "nt-bump";
+        bump.style.left = `${i * step}%`;
+        bumpsEl.appendChild(bump);
+      }
     }
-
+  
     // Inhalte füllen
-    const key = PHASES[index].key;
+    const key  = PHASES[index].key;
     const data = CONTENT[key] || { move:[], load:[], treat:[] };
     fillList(listMove,  data.move);
     fillList(listLoad,  data.load);
     fillList(listTreat, data.treat);
-
+  
     try { localStorage.setItem("rehapp:progressPhase", String(index)); } catch {}
   }
-
+  
   function fillList(ul, items){
     if (!ul) return;
     ul.innerHTML = items && items.length
       ? items.map(t => `<li>${t}</li>`).join("")
       : `<li><em>Keine Angaben</em></li>`;
   }
-
+  
   slider.addEventListener("input", () => setPhase(Number(slider.value)));
-
+  
   // Init
   setPhase(Number(slider.value));
+
 });
