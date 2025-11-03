@@ -95,23 +95,28 @@ function nicePhaseLabel(raw) {
 
   /* ===== Timeline + Slider ===== */
   const ul       = document.getElementById("ntMilestones");
-  const rail     = document.querySelector(".nt-rail");                // neu
-  const prog     = document.getElementById("ntProgress")              // neu
-                 || document.getElementById("ntFill");                // alt (Fallback)
-  const bumpsEl  = document.getElementById("ntBumps");                // neu (kann fehlen)
   const pin      = document.getElementById("ntPin");
   const phaseLbl = document.getElementById("ntPhaseLabel");
   const slider   = document.getElementById("ntSlider");
+  
+  // Fortschrittsbalken: neu ODER alt unterstützen
+  const prog     = document.getElementById("ntProgress") || document.getElementById("ntFill"); // <= wichtig
+  const bumpsEl  = document.getElementById("ntBumps"); // optional
+  
+  // Bubbles
   const listMove = document.getElementById("list-move");
   const listLoad = document.getElementById("list-load");
   const listTreat= document.getElementById("list-treat");
   
-  // nur das Nötigste checken, NICHT auf rail/bumps bestehen
-  if (!ul || !pin || !phaseLbl || !slider || !prog) return;
+  // Nur das Minimum verlangen – NICHT auf Rail/Bumps bestehen
+  if (!ul || !pin || !phaseLbl || !slider) {
+    console.warn("[fortschritt] required elements missing");
+    return;
+  }
   
   const step = 100 / (PHASES.length - 1);
   
-  // Milestones rendern
+  // Meilensteine rendern
   ul.innerHTML = "";
   PHASES.forEach((p, i) => {
     const li = document.createElement("li");
@@ -125,8 +130,10 @@ function nicePhaseLabel(raw) {
   });
   
   // Slider Setup
-  slider.min = "0"; slider.max = String(PHASES.length - 1); slider.step = "1";
-  const lastIndex = Number(localStorage.getItem("rehapp:progressPhase") || "4");
+  slider.min = "0";
+  slider.max = String(PHASES.length - 1);
+  slider.step = "1";
+  const lastIndex = Number(localStorage.getItem("rehapp:progressPhase") || "0");
   slider.value = String(Math.min(PHASES.length - 1, Math.max(0, lastIndex)));
   
   function setPhase(index){
@@ -134,21 +141,21 @@ function nicePhaseLabel(raw) {
     slider.value = String(index);
   
     const widthPct = step * index;
-    // Fortschritt zeichnen (neu ODER alt)
+  
+    // Fortschritt zeichnen (neu ODER alt, falls vorhanden)
     if (prog) prog.style.width = `${widthPct}%`;
   
     // Pin + Label
     pin.style.left = `${widthPct}%`;
-    phaseLbl.textContent = nicePhaseLabel(PHASES[index].label);
-    pin.setAttribute("aria-label", phaseLbl.textContent); // a11y
-
+    phaseLbl.textContent = nicePhaseLabel(PHASES[index].label); // <= setzt "Ab 1. Tag" etc.
+    pin.setAttribute("aria-label", phaseLbl.textContent);
   
     // Milestone-Highlight
     ul.querySelectorAll(".nt-pill").forEach((el, i) => {
       el.classList.toggle("current", i === index);
     });
   
-    // Bumps, nur wenn Container existiert (neuer Stil)
+    // Bumps nur, wenn Container da (neue Version)
     if (bumpsEl) {
       bumpsEl.innerHTML = "";
       for (let i = 1; i <= index; i++){
@@ -159,7 +166,7 @@ function nicePhaseLabel(raw) {
       }
     }
   
-    // Inhalte füllen
+    // Inhalte für die Bubbles
     const key  = PHASES[index].key;
     const data = CONTENT[key] || { move:[], load:[], treat:[] };
     fillList(listMove,  data.move);
@@ -169,16 +176,17 @@ function nicePhaseLabel(raw) {
     try { localStorage.setItem("rehapp:progressPhase", String(index)); } catch {}
   }
   
-  function fillList(ul, items){
-    if (!ul) return;
-    ul.innerHTML = items && items.length
+  function fillList(target, items){
+    if (!target) return;
+    target.innerHTML = items && items.length
       ? items.map(t => `<li>${t}</li>`).join("")
       : `<li><em>Keine Angaben</em></li>`;
   }
   
-  slider.addEventListener("input", () => setPhase(Number(slider.value)));
+  // Slider-Events
+  slider.addEventListener("input",  () => setPhase(Number(slider.value)));
+  slider.addEventListener("change", () => setPhase(Number(slider.value)));
   
   // Init
   setPhase(Number(slider.value));
-
 });
