@@ -778,6 +778,36 @@ body.center-auth {
   background: rgba(255,255,255,0.1);
 }
 
+/* Sidebar allgemein */
+#sidebar nav.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  color: #fff; /* Weiß wie vorher */
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Hover */
+#sidebar nav.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Aktiver Menüpunkt */
+#sidebar nav.sidebar a.active,
+#sidebar nav.sidebar a[aria-current="page"] {
+  background: #2563EB; /* kräftiges Blau */
+  color: #fff; /* bleibt weiß */
+  font-weight: 600;
+  border-left: 4px solid #1E3A8A; /* dunklerer Balken links */
+  padding-left: calc(1rem - 4px);
+}
+
+
 /* === Menü-Button === */
 .menu-toggle {
   position: fixed;
