@@ -1,0 +1,12 @@
+.signup-wrap { max-width: 420px; margin: 0 auto; padding: 1.5rem; }
+.signup-header h2 { margin: 0 0 .5rem; font-size: 1.5rem; font-weight: 700; }
+.signup-header .muted { color: #6B7280; }
+.signup-form { display: grid; gap: .75rem; }
+.signup-form input {
+  border: 1px solid #E5E7EB; border-radius: 10px; padding: .7rem .9rem; font-size: 1rem;
+}
+.signup-form button {
+  background: #2563EB; color: #fff; border: 1px solid #1E3A8A;
+  border-radius: 10px; padding: .7rem .9rem; cursor: pointer; font-weight: 600;
+}
+.signup-form button:hover { filter: brightness(0.98); }
