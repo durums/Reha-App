@@ -205,9 +205,17 @@
 
     // --- Logout ---
     signOutBtn.addEventListener("click", async () => {
-      try { await signOut(auth); } 
-      catch { alert("Abmelden fehlgeschlagen."); }
+      // Sidebar sofort schließen
+      sidebar.classList.remove("active");
+      setMenuToggleVisible(true);
+    
+      try {
+        await signOut(auth);
+      } catch (err) {
+        alert("Abmelden fehlgeschlagen.");
+      }
     });
+
 
     // --- Sidebar ---
     const setMenuToggleVisible = (v) => menuToggle.style.display = v ? "block" : "none";
@@ -305,15 +313,12 @@
       } else {
         showAuth();
         setMenuToggleVisible(false);
+        sidebar.classList.remove("active"); // <-- Sidebar zu
         userInfo.textContent = "Nicht angemeldet";
         signOutBtn.style.display = "none";
-    
         window.currentUserId = null;
         window.currentUserName = null;
         didInitialLoad = false;
-    
-        // ⬇️ Sidebar leeren
-        updateSidebarAccount(null);
       }
     });
 
