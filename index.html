@@ -293,21 +293,48 @@
         return false;
       });
     }
-  
+    const hint = document.getElementById("login-hint");
+      function showHint(text, type = "ok") {
+        if (!hint) return;
+        hint.className = `form-hint ${type}`;
+        hint.textContent = text;
+      }
+
     const forgotBtn = document.getElementById("forgotBtn");
     if (forgotBtn) {
       forgotBtn.addEventListener("click", async () => {
-        const email = (document.getElementById("li-email")?.value || "").trim()
-                   || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
-        if (!email) return;
+        const emailInput = document.getElementById("li-email");
+        const email = (emailInput?.value || "").trim();
+    
+        if (!email) {
+          showHint("Bitte geben Sie Ihre E-Mail ein.", "err");
+          emailInput?.focus();
+          return;
+        }
+    
+        // Button kurz deaktivieren, um Doppelklicks zu vermeiden
+        forgotBtn.disabled = true;
         try {
           await sendPasswordResetEmail(auth, email);
-          alert(`Passwort-Reset gesendet an: ${email}`);
+          showHint(`Passwort-Reset wurde an ${email} gesendet. Bitte auch den Spam-Ordner prüfen.`, "ok");
         } catch (err) {
-          alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
+          // Häufige Fehler z. B. auth/user-not-found
+          const msg = err?.code === "auth/user-not-found"
+            ? "Diese E-Mail ist bei uns nicht registriert."
+            : `Zurücksetzen fehlgeschlagen (${err.code}).`;
+          showHint(msg, "err");
+        } finally {
+          forgotBtn.disabled = false;
         }
       });
     }
+    
+    // Optional: Hinweis nach erfolgreichem Login leeren
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", () => showHint("", "ok"));
+    }
+
   
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
