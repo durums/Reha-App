@@ -113,21 +113,78 @@
 
   <script type="module">
     // Login
-    const loginForm = document.getElementById("login-form");
-    if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("li-email")?.value.trim();
-        const pw    = document.getElementById("li-password")?.value;
-        if (!email || !pw) return;
-        try {
-          await signInWithEmailAndPassword(auth, email, pw);
-        } catch (err) {
-          alert(`Login fehlgeschlagen: ${err.code}`);
+  // --- Auth-State ---
+let didInitialLoad = false;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // UI: App zeigen, Sidebar-Button sichtbar, Sidebar sicher schließen
+        showApp();
+        setMenuToggleVisible(true);
+        sidebar.classList.remove("active");
+    
+        // User-Kontext
+        window.currentUserId   = user.uid;
+        window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
+    
+        const email = user.email || user.displayName || ("UID: " + user.uid);
+        userInfo.textContent = `Angemeldet: ${email}`;
+        signOutBtn.style.display = "inline-block";
+    
+        // Sidebar: Kontozeile aktualisieren
+        updateSidebarAccount(user);
+    
+        // App-Ressourcen einmalig laden
+        loadAppJSOnce();
+    
+        // Routing: Default oder zuletzt besuchte Seite
+        if (!didInitialLoad) {
+          let targetHash = (location.hash || "").trim();
+    
+          // Falls kein Hash vorhanden: zuletzt besuchte Seite laden (Fallback: Tagesprogramm)
+          if (!targetHash || targetHash === "#") {
+            try {
+              const last = localStorage.getItem("rehapp:lastPage");
+              targetHash = last ? `#${last}` : "#tagesprogramm";
+            } catch {
+              targetHash = "#tagesprogramm";
+            }
+          }
+    
+          // Signup/Login-Ansichten nach erfolgreichem Login nie stehen lassen
+          if (targetHash === "#signup" || targetHash === "#login") {
+            targetHash = "#tagesprogramm";
+          }
+    
+          if (location.hash !== targetHash) {
+            location.hash = targetHash; // triggert hashchange -> routeToHash()
+          } else {
+            routeToHash();              // falls Hash schon korrekt ist
+          }
+    
+          didInitialLoad = true;
         }
-        return false; // extra-Fallschutz
-      });
-    }
+      } else {
+        // UI: zurück zur Anmeldung
+        showAuth();
+        setMenuToggleVisible(false);
+        sidebar.classList.remove("active");
+    
+        userInfo.textContent = "Nicht angemeldet";
+        signOutBtn.style.display = "none";
+    
+        // Kontext leeren
+        window.currentUserId = null;
+        window.currentUserName = null;
+    
+        // Kontozeile leeren
+        updateSidebarAccount(null);
+    
+        didInitialLoad = false;
+      }
+    });
+
+
 
 // Passwort vergessen
 const forgotBtn = document.getElementById("forgotBtn");
