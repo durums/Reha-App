@@ -1,5 +1,32 @@
 // fortschritt.js
 document.addEventListener("DOMContentLoaded", () => {
+
+function nicePhaseLabel(raw) {
+  // alles klein, dann gezielt formatieren
+  const s = String(raw || "").toLowerCase().trim();
+
+  // "1. tag" / "2. tag" -> "Ab Tag 1" / "Ab Tag 2"
+  const mTag = s.match(/^(\d+)\.\s*tag$/i);
+  if (mTag) return `Ab Tag ${mTag[1]}`;
+
+  // "ab 7. tag" -> "Ab 7. Tag"
+  const mAbTag = s.match(/^ab\s+(\d+)\.\s*tag$/i);
+  if (mAbTag) return `Ab ${mAbTag[1]}. Tag`;
+
+  // "ab 2. woche" -> "Ab 2. Woche"
+  const mAbWoche = s.match(/^ab\s+(\d+)\.\s*woche$/i);
+  if (mAbWoche) return `Ab ${mAbWoche[1]}. Woche`;
+
+  // "ab 6–8. woche" / "ab 6-8. woche" -> "Ab 6–8. Woche"
+  const mRangeWoche = s.match(/^ab\s+(\d+)\s*[\-–]\s*(\d+)\.\s*woche$/i);
+  if (mRangeWoche) return `Ab ${mRangeWoche[1]}–${mRangeWoche[2]}. Woche`;
+
+  // Fallback: erster Buchstabe groß + "Ab " sicherstellen
+  const cap = s.replace(/\b\w/g, ch => ch.toUpperCase()).replace("–", "–");
+  return cap.startsWith("Ab ") ? cap : `Ab ${cap}`;
+}
+
+  
   /* ===== Phasen & Inhalte ===== */
   const PHASES = [
     { key: "tag1",  label: "1. TAG" },
@@ -105,7 +132,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const widthPct = step * index;
     prog.style.width = `${widthPct}%`;
     pin.style.left   = `${widthPct}%`;
-    phaseLbl.textContent = PHASES[index].label;
+    phaseLbl.textContent = nicePhaseLabel(PHASES[index].label);
+    pin.setAttribute("aria-label", phaseLbl.textContent); // optional, für Screenreader
+
 
     // Milestone-Highlight
     ul.querySelectorAll(".nt-pill").forEach((el, i) => {
