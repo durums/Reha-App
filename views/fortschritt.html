@@ -1,18 +1,16 @@
 <section class="rehaprogress">
-  <!-- Kopf -->
   <header class="rp-head">
     <div class="rp-head-left">
-      <h2 class="rp-title">Fortschritt</h2>
+      <h2 class="rp-title">📈 Fortschritt</h2>
       <p class="rp-sub">
-        Hier siehst du deinen aktuellen Reha-Status: Beweglichkeit, Kraft, Ausdauer und Schmerzreduktion.
-        Die Timeline unten zeigt, in welcher Phase der Nachbehandlung du dich befindest.
+        Wähle oben die Zeit deiner Nachbehandlung. Darunter siehst du, was aktuell für
+        <strong>Bewegungsumfang</strong>, <strong>Belastung</strong> und <strong>Behandlung</strong> gilt.
       </p>
     </div>
 
-    <!-- KPI-Panel -->
+    <!-- KPI-Panel (bleibt – optional nutzbar) -->
     <aside class="card-dark rp-kpi" aria-labelledby="kpi-head">
       <h3 id="kpi-head">KPI – Übersicht</h3>
-
       <div class="kpi-row" aria-label="Beweglichkeit">
         <div class="kpi-label">
           Beweglichkeit – <strong id="kpi-mobility-val">75%</strong>
@@ -21,7 +19,6 @@
           <span id="kpi-mobility-bar" style="width:75%"></span>
         </div>
       </div>
-
       <div class="kpi-donuts" aria-label="Kraft und Ausdauer">
         <figure class="donut" aria-label="Kraft 25%">
           <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
@@ -31,7 +28,6 @@
           <div class="donut-center"><span class="donut-num">25</span><span class="donut-unit">%</span></div>
           <figcaption>Kraft</figcaption>
         </figure>
-
         <figure class="donut" aria-label="Ausdauer 62%">
           <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
             <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
@@ -41,7 +37,6 @@
           <figcaption>Ausdauer</figcaption>
         </figure>
       </div>
-
       <div class="kpi-row" aria-label="Schmerzreduktion">
         <div class="kpi-label">
           Schmerzreduktion – <strong id="kpi-pain-val">85%</strong>
@@ -53,65 +48,54 @@
     </aside>
   </header>
 
-  <!-- Timeline -->
+  <!-- Timeline + Slider -->
   <article class="card rp-timeline rp-timeline--full" aria-labelledby="tl-head">
     <div class="nt-head">
       <span id="tl-head" class="nt-title">Nachbehandlungs-Timeline</span>
       <div class="nt-info">
-        <p>
-          Oben siehst du die Phasen deiner Reha. Der farbige Balken markiert deinen bisherigen Weg.
-          Der blaue Punkt zeigt deine aktuelle Phase – dazu steht rechts die Bezeichnung.
-        </p>
+        Oben siehst du die Phasen deiner Reha. Der blaue Balken markiert deinen bisherigen Weg.
+        Mit dem Schieberegler wählst du eine Phase aus – die Inhalte unten passen sich an.
       </div>
-
     </div>
 
     <div class="nt-scale">
+      <!-- Phase-Labels (werden per JS positioniert) -->
       <ul id="ntMilestones" class="nt-milestones" aria-label="Meilensteine"></ul>
-    
+
       <!-- Zahlenstrahl -->
       <div class="nt-rail">
         <div id="ntProgress" class="nt-progress"></div>
         <div id="ntBumps" class="nt-bumps"></div>
       </div>
-    
+
+      <!-- Slider -->
+      <input id="ntSlider" class="nt-slider" type="range" min="0" max="6" step="1" value="0" aria-label="Phase wählen" />
+
+      <!-- Aktuelle Phase -->
       <div id="ntPin" class="nt-pin" aria-live="polite">
         <div class="dot" aria-hidden="true"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
-
   </article>
 
-  <!-- Erklärungen -->
+  <!-- Dynamische Inhalte -->
   <div class="rp-info">
     <article class="card pill">
       <h4>BEWEGUNGSUMFANG</h4>
-      <ul class="list">
-        <li>Abtrainieren der Hartrahmenorthese bei normalem Gangbild</li>
-        <li>Gelenkwinkel schrittweise erhöhen, Zielwerte mit Therapeuten abgleichen</li>
-      </ul>
+      <ul id="list-move" class="list"></ul>
     </article>
 
     <article class="card pill">
       <h4>BELASTUNG</h4>
-      <ul class="list">
-        <li>Volles Körpergewicht ohne Gehhilfen</li>
-        <li>Belastung langsam steigern, Schmerzen & Schwellung beobachten</li>
-      </ul>
+      <ul id="list-load" class="list"></ul>
     </article>
 
     <article class="card pill">
       <h4>BEHANDLUNG</h4>
-      <ul class="list">
-        <li>Passive Bewegungsübung</li>
-        <li>Gangschule (Treppen)</li>
-        <li>Lymphdrainage</li>
-      </ul>
+      <ul id="list-treat" class="list"></ul>
     </article>
   </div>
 </section>
 
 <script src="fortschritt.js"></script>
-
-
