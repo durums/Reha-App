@@ -1,74 +1,77 @@
-(() => {
-  const $ = (id) => document.getElementById(id);
-  const form = $("feedbackForm");
-  const list = $("feedbackList");
-  const user = window.currentUserName || "Anonym";
+// fortschritt.js
+document.addEventListener("DOMContentLoaded", () => {
+  // ---- Daten (kannst du später aus Firestore/LS füllen) ----
+  const KPIS = {
+    mobility: 75,   // Beweglichkeit
+    strength: 25,   // Kraft
+    endurance: 62,  // Ausdauer
+    pain: 85        // Schmerzreduktion
+  };
 
-  // === Laden (lokal oder Firebase) ===
-  async function loadFeedback() {
-    list.innerHTML = "<li>Lade Feedback …</li>";
-    try {
-      if (window.db) {
-        // 🔹 Mit Firestore
-        const { getDocs, collection, query, orderBy } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-        const snap = await getDocs(query(collection(window.db, "feedback"), orderBy("created", "desc")));
-        list.innerHTML = "";
-        snap.forEach(doc => {
-          const d = doc.data();
-          list.append(makeItem(d.user, d.text, d.rating, d.created?.toDate?.() || new Date()));
-        });
-      } else {
-        // 🔹 Lokal
-        const arr = JSON.parse(localStorage.getItem("feedback") || "[]");
-        list.innerHTML = "";
-        arr.sort((a,b)=> b.created - a.created).forEach(d => {
-          list.append(makeItem(d.user, d.text, d.rating, new Date(d.created)));
-        });
-      }
-    } catch (err) {
-      console.error("Feedback laden fehlgeschlagen:", err);
-      list.innerHTML = "<li>⚠️ Konnte Feedback nicht laden.</li>";
-    }
+  const MILESTONES = [
+    "1. TAG", "2. TAG", "AB 7. TAG", "AB 2. WOCHE",
+    "AB 4. WOCHE", "AB 6–8. WOCHE", "AB 20. WOCHE"
+  ];
+  const CURRENT = "AB 4. WOCHE";
+
+  // ---- KPIs setzen ----
+  const mobVal = document.getElementById("kpi-mobility-val");
+  const mobBar = document.getElementById("kpi-mobility-bar");
+  const painVal= document.getElementById("kpi-pain-val");
+  const painBar= document.getElementById("kpi-pain-bar");
+
+  if (mobVal && mobBar) {
+    mobVal.textContent = `${KPIS.mobility}%`;
+    mobBar.style.width = `${KPIS.mobility}%`;
+    mobBar.parentElement?.setAttribute("aria-valuenow", String(KPIS.mobility));
+  }
+  if (painVal && painBar) {
+    painVal.textContent = `${KPIS.pain}%`;
+    painBar.style.width = `${KPIS.pain}%`;
+    painBar.parentElement?.setAttribute("aria-valuenow", String(KPIS.pain));
   }
 
-  // === Eintrag erzeugen ===
-  function makeItem(u, t, r, d) {
-    const li = document.createElement("li");
-    li.innerHTML = `<strong>${u}</strong> – ${"⭐".repeat(r)}<br>${t}<br><small>${d.toLocaleString()}</small>`;
-    return li;
-  }
-
-  // === Absenden ===
-  form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const text = $("fbText").value.trim();
-    const rating = parseInt($("fbRating").value);
-    if (!text || !rating) return alert("Bitte alle Felder ausfüllen.");
-
-    const entry = { user, text, rating, created: Date.now() };
-
-    try {
-      if (window.db) {
-        // 🔹 Firestore speichern
-        const { addDoc, collection, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-        await addDoc(collection(window.db, "feedback"), { ...entry, created: serverTimestamp() });
-      } else {
-        // 🔹 Lokal speichern
-        const arr = JSON.parse(localStorage.getItem("feedback") || "[]");
-        arr.push(entry);
-        localStorage.setItem("feedback", JSON.stringify(arr));
-      }
-
-      $("fbText").value = "";
-      $("fbRating").value = "";
-      alert("Vielen Dank für Ihr Feedback!");
-      loadFeedback();
-    } catch (err) {
-      console.error("Feedback speichern fehlgeschlagen:", err);
-      alert("⚠️ Feedback konnte nicht gespeichert werden.");
+  // Donuts (Kraft / Ausdauer)
+  const C = 2 * Math.PI * 48; // Umfang
+  document.querySelectorAll(".donut").forEach(fig => {
+    const path = fig.querySelector(".donut-val");
+    const centerNum = fig.querySelector(".donut-num");
+    const pct = Number(path?.getAttribute("data-percent") || 0);
+    if (path) {
+      path.style.strokeDasharray = C;
+      path.style.strokeDashoffset = C * (1 - pct / 100);
     }
+    if (centerNum) centerNum.textContent = String(pct);
   });
 
-  // Beim Laden anzeigen
-  document.addEventListener("DOMContentLoaded", loadFeedback);
-})();
+  // ---- Timeline ----
+  const ul = document.getElementById("ntMilestones");
+  const fill = document.getElementById("ntFill");
+  const pin = document.getElementById("ntPin");
+  const label = document.getElementById("ntPhaseLabel");
+  if (!ul || !fill || !pin || !label) return;
+
+  const step = 100 / (MILESTONES.length - 1);
+  let currentIndex = 0;
+
+  MILESTONES.forEach((text, i) => {
+    const li = document.createElement("li");
+    li.style.left = `${i * step}%`;
+
+    const pill = document.createElement("span");
+    pill.textContent = text;
+    pill.className = "nt-pill";
+    if (text === CURRENT) {
+      pill.classList.add("current");
+      currentIndex = i;
+    }
+
+    li.appendChild(pill);
+    ul.appendChild(li);
+  });
+
+  const width = step * currentIndex;
+  fill.style.width = `${width}%`;
+  pin.style.left = `${width}%`;
+  label.textContent = CURRENT;
+});
