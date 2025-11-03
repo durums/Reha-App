@@ -87,6 +87,26 @@
 .list{margin:0;padding-left:18px}
 .list li{margin:6px 0}
 
+.nt-rail{
+  position:absolute; left:0; right:0; bottom:0;
+  height:18px; background:#0f213d; border-radius:999px; z-index:1;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.nt-progress{
+  position:absolute; left:0; top:0; bottom:0;
+  width:0%; background:#2563EB; border-radius:999px; z-index:2;
+  transition: width .35s ease;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.nt-bumps{ position:absolute; inset:0; z-index:3; pointer-events:none; }
+.nt-bump{
+  position:absolute; bottom:100%;
+  transform:translateX(-50%); width:28px; height:28px;
+  background:#2563EB; border-radius:999px;
+  box-shadow: 0 2px 0 rgba(0,0,0,.08), 0 0 0 3px #2563EB;
+}
+
+
 @media (max-width:980px){
   .rp-info{grid-template-columns:1fr}
   .rp-timeline--full{max-width:none;padding:18px 16px}
