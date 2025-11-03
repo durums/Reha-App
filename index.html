@@ -22,25 +22,25 @@
       <h2>Menü</h2>
       <button id="closeSidebar">×</button>
     </div>
-
-    <ul class="sidebar-menu">
-      <li><a href="#trainingsplan" id="menu-trainingsplan">🏋️ Trainingsplan</a></li>
-      <li><a href="#fortschritt"   id="menu-fortschritt">📊 Fortschritt</a></li>
-      <li><a href="#tagesprogramm" id="menu-tagesprogramm">🗓️ Tagesprogramm</a></li>
-      <li><a href="#kalender"      id="menu-kalender">📅 Kalender</a></li>
-      <li><a href="#termine"       id="menu-termine">🗂️ Termine</a></li>
-      <li><a href="#rezepte"       id="menu-rezepte">📄 Verordnungen</a></li>
-      <li><a href="#feedback"      id="menu-feedback">💬 Feedback</a></li>
-      <li><a href="#profil"        id="menu-profil">👤 Profil</a></li>
-      <li><a href="#hilfe"         id="menu-hilfe">❓ Hilfe</a></li>
-    </ul>
-
-    <!-- 👉 Profil direkt über dem Footer -->
+  
+    <!-- ⬇️ Neu: Hash-Links für den Router -->
+    <nav class="sidebar">
+      <a href="#trainingsplan" data-match="trainingsplan">Trainingsplan</a>
+      <a href="#fortschritt"   data-match="fortschritt">Fortschritt</a>
+      <a href="#tagesprogramm" data-match="tagesprogramm">Tagesprogramm</a>
+      <a href="#kalender"      data-match="kalender">Kalender</a>
+      <a href="#termine"       data-match="termine">Termine</a>
+      <a href="#feedback"      data-match="feedback">Feedback</a>
+      <a href="#profil"        data-match="profil">Profil</a>
+      <a href="#hilfe"         data-match="hilfe">Hilfe</a>
+    </nav>
+  
+    <!-- 👉 Profil & Footer bleiben wie gehabt -->
     <div class="sidebar-profile">
       <img src="assets/avatar.jpg" alt="Profilbild" class="sidebar-avatar" id="sidebar-avatar">
       <span id="sidebar-username">Max Mustermann</span>
     </div>
-
+  
     <div class="sidebar-footer">
       <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
     </div>
