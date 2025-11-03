@@ -68,12 +68,19 @@
 
     <div class="nt-scale">
       <ul id="ntMilestones" class="nt-milestones" aria-label="Meilensteine"></ul>
-      <div class="nt-bar"><div id="ntFill" class="nt-fill"></div></div>
+    
+      <!-- Zahlenstrahl -->
+      <div class="nt-rail">
+        <div id="ntProgress" class="nt-progress"></div>
+        <div id="ntBumps" class="nt-bumps"></div>
+      </div>
+    
       <div id="ntPin" class="nt-pin" aria-live="polite">
         <div class="dot" aria-hidden="true"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
+
   </article>
 
   <!-- Erklärungen -->
@@ -106,3 +113,4 @@
 </section>
 
 <script src="fortschritt.js"></script>
+
