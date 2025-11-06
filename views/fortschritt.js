@@ -1,5 +1,52 @@
 // fortschritt.js
 document.addEventListener("DOMContentLoaded", () => {
+// === Ergänzung am ENDE des bestehenden DOMContentLoaded-Handlers ===
+  // Download + Consent
+  const nbBtn   = document.getElementById("nbDownloadBtn");
+  const dialog  = document.getElementById("nbConsentDialog");
+
+  async function downloadPlanAsHTML() {
+    const res  = await fetch("Nachbehandlungsplan.html", { cache: "no-store" });
+    if (!res.ok) throw new Error("Nachbehandlungsplan nicht gefunden.");
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+
+    // 1) Download auslösen
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Nachbehandlungsplan.html";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // 2) Zusätzlich in neuem Tab ANZEIGEN
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // Nach kurzer Zeit wieder freigeben
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  function openConsent() {
+    if (typeof dialog?.showModal === "function") {
+      dialog.showModal();
+    } else {
+      // Fallback ohne <dialog>-Support
+      const ok = confirm("Darf der Nachbehandlungsplan heruntergeladen und angezeigt werden?");
+      if (ok) downloadPlanAsHTML().catch(err => alert(err.message));
+    }
+  }
+
+  if (nbBtn) {
+    nbBtn.addEventListener("click", openConsent);
+  }
+  if (dialog) {
+    dialog.addEventListener("close", () => {
+      if (dialog.returnValue === "ok") {
+        downloadPlanAsHTML().catch(err => alert(err.message));
+      }
+    });
+  }
+// === Ende der Ergänzung ===
 
 function nicePhaseLabel(raw) {
   // alles klein, dann gezielt formatieren
