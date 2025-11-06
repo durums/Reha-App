@@ -1,6 +1,11 @@
 <section class="rehaprogress">
   <header class="rp-head">
     <div class="rp-head-left">
+      <div class="rp-actions">
+        <button id="nbDownloadBtn" class="btn btn-primary" type="button">
+          ⬇️ Nachbehandlungsplan
+        </button>
+      </div>
       <h2 class="rp-title">📈 Fortschritt</h2>
       <p class="rp-sub">
         Wähle oben die Zeit deiner Nachbehandlung. Darunter siehst du, was aktuell für
@@ -97,5 +102,24 @@
     </article>
   </div>
 </section>
+<dialog id="nbConsentDialog" class="nb-consent">
+  <form method="dialog" class="nb-consent__inner">
+    <h3>Einwilligung zum Download</h3>
+    <p>
+      Mit Klick auf <strong>Einverstanden</strong> stimmst du zu, dass der
+      <em>Nachbehandlungsplan</em> (lokale Projektdatei) heruntergeladen und in
+      einem neuen Tab angezeigt wird.
+    </p>
 
+    <div class="nb-consent__actions">
+      <button value="cancel" class="btn btn-ghost">Abbrechen</button>
+      <button value="ok" class="btn btn-primary">Einverstanden</button>
+    </div>
+
+    <p class="nb-consent__hint">
+      Hinweis: Du kannst die geöffnete Seite anschließend über den Browser als PDF drucken.
+    </p>
+  </form>
+</dialog>
 <script src="fortschritt.js"></script>
+
