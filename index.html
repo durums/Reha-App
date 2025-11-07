@@ -53,8 +53,10 @@
   </div>
 
 
-  <div class="card" id="auth-forms">
-    <h2>Anmeldung</h2>
+<div class="card" id="auth-forms">
+  <h2 id="auth-title">Anmeldung</h2>
+
+    <!-- Login -->
     <form id="login-form" onsubmit="return false;">
       <input id="li-email"    type="email"    placeholder="E-Mail" required />
       <input id="li-password" type="password" placeholder="Passwort" required />
@@ -67,11 +69,36 @@
       </div>
     </form>
   
+    <!-- Link zum Signup -->
     <div style="margin-top:12px;">
       <a href="#signup" id="signupLink" style="color:#2563EB;text-decoration:underline;">Konto erstellen</a>
     </div>
+  
+    <!-- Signup -->
+    <form id="signup-form" onsubmit="return false;" style="display:none; margin-top:16px;">
+      <input id="su-firstname"  type="text"     placeholder="Vorname" required />
+      <input id="su-lastname"   type="text"     placeholder="Nachname" required />
+      <input id="su-birthdate"  type="date"     placeholder="Geburtsdatum" />
+      <input id="su-email"      type="email"    placeholder="E-Mail" required />
+      <input id="su-password"   type="password" placeholder="Passwort (min. 6 Zeichen)" minlength="6" required />
+  
+      <label for="su-group" style="margin-top:.5rem;display:block;">Gruppe</label>
+      <select id="su-group" required style="width:100%;padding:.6rem;border-radius:.5rem;border:1px solid #ccc;">
+        <option value="" disabled selected>Bitte auswählen…</option>
+        <option value="Knie">Knie</option>
+        <option value="Hüfte">Hüfte</option>
+        <option value="Arm">Arm</option>
+        <option value="Onkologie">Onkologie</option>
+      </select>
+  
+      <button type="submit" style="margin-top:12px;">Konto erstellen</button>
+  
+      <div style="margin-top:12px;">
+        <a href="#login" id="backToLogin" style="color:#2563EB;text-decoration:underline;">Zurück zur Anmeldung</a>
+      </div>
+    </form>
   </div>
-
+  
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
