@@ -469,6 +469,126 @@
 
     // initiale Ansicht setzen
     updateAuthView();
+      // --- Ende index-spezifisch ---
   </script>
 </body>
 </html>
+
+<!-- =============================
+     NEUE DATEIEN: Profil-Ansicht
+     ============================= -->
+
+<!-- Datei: views/profil.html -->
+<!-- Speichere diese Datei unter views/profil.html -->
+<!-- Wird vom Router automatisch geladen, wenn #profil aktiv ist -->
+<!-- Enthält ein Formular zum Bearbeiten von Vorname/Nachname -->
+
+<!--
+<div class="profile-card">
+  <h2>Profil</h2>
+  <form id="profile-form" onsubmit="return false;">
+    <div class="row">
+      <label for="pf-first">Vorname</label>
+      <input id="pf-first" type="text" placeholder="Vorname" required />
+    </div>
+    <div class="row">
+      <label for="pf-last">Nachname</label>
+      <input id="pf-last" type="text" placeholder="Nachname" required />
+    </div>
+    <div class="row">
+      <label for="pf-email">E‑Mail</label>
+      <input id="pf-email" type="email" placeholder="E‑Mail" disabled />
+    </div>
+
+    <div class="actions">
+      <button id="pf-save" type="submit">Speichern</button>
+    </div>
+
+    <div id="pf-status" class="status" aria-live="polite"></div>
+  </form>
+</div>
+-->
+
+<!-- Datei: views/profil.css -->
+<!-- Einfache Styles für das Profilformular -->
+<!--
+.profile-card { padding: 1rem; }
+.profile-card h2 { margin: 0 0 1rem; }
+.profile-card .row { display: flex; flex-direction: column; gap: .25rem; margin-bottom: .75rem; }
+.profile-card input { padding: .6rem .75rem; border: 1px solid #d1d5db; border-radius: .5rem; }
+.profile-card .actions { margin-top: .5rem; }
+.profile-card button { padding: .6rem .9rem; border: none; border-radius: .5rem; background:#2563EB; color:#fff; cursor:pointer; }
+.profile-card button:hover { filter: brightness(.95); }
+.profile-card .status { margin-top: .5rem; font-size: .95rem; color: #0a0; }
+-->
+
+<!-- Datei: views/profil.js -->
+<!-- Lädt/aktualisiert Vorname/Nachname in Firestore und aktualisiert die Sidebar nach dem Speichern -->
+<!--
+(async () => {
+  // Firestore-Funktionen bei Bedarf dynamisch importieren
+  const { doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+  const form   = document.getElementById('profile-form');
+  const firstI = document.getElementById('pf-first');
+  const lastI  = document.getElementById('pf-last');
+  const emailI = document.getElementById('pf-email');
+  const status = document.getElementById('pf-status');
+
+  // Auth prüfen
+  if (!window.auth || !window.db) {
+    console.error('Firebase nicht initialisiert.');
+    return;
+  }
+  const user = auth.currentUser;
+  if (!user) {
+    // nicht eingeloggt → zurück zur Anmeldung
+    location.hash = '#login';
+    return;
+  }
+
+  // Bestehende Profildaten laden
+  try {
+    emailI.value = user.email || '';
+    const ref  = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.firstName) firstI.value = data.firstName;
+      if (data.lastName)  lastI.value  = data.lastName;
+    } else {
+      // Falls es noch kein Profil gibt, Formular bleibt leer
+    }
+  } catch (e) {
+    console.warn('Profil konnte nicht geladen werden:', e);
+  }
+
+  // Speichern-Handler (Vorname/Nachname)
+  form?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const firstName = firstI.value.trim();
+    const lastName  = lastI.value.trim();
+    if (!firstName || !lastName) {
+      status.textContent = 'Bitte Vor- und Nachname ausfüllen.';
+      status.style.color = '#c00';
+      return;
+    }
+
+    try {
+      const ref = doc(db, 'users', user.uid);
+      await setDoc(ref, { firstName, lastName }, { merge: true });
+      status.textContent = 'Gespeichert!';
+      status.style.color = '#0a0';
+
+      // Sidebar-Name frisch laden
+      if (typeof updateSidebarAccount === 'function') {
+        updateSidebarAccount(user);
+      }
+    } catch (e) {
+      console.error('Speichern fehlgeschlagen:', e);
+      status.textContent = (e.code || e.message || 'Fehler beim Speichern');
+      status.style.color = '#c00';
+    }
+  });
+})();
+-->
