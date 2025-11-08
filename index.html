@@ -14,28 +14,28 @@
 <body class="center-auth">
 
   <!-- 🔘 Menü-Button oben links -->
-  <button id="menuToggle" class="menu-toggle" style="display:none;">☰</button>
+  <button id="menuToggle" class="menu-toggle" type="button" aria-label="Menü öffnen" aria-controls="sidebar" style="display:none;">☰</button>
 
   <!-- 🌐 Seitenmenü -->
-  <div id="sidebar">
+  <div id="sidebar" aria-hidden="true">
     <div class="sidebar-header">
       <h2>Menü</h2>
-      <button id="closeSidebar">×</button>
+      <button id="closeSidebar" type="button" aria-label="Menü schließen">×</button>
     </div>
-  
+
     <!-- 👤 Konto jetzt OBEN -->
     <div class="sidebar-account">
       <a class="account-row" href="#profil" title="Profil öffnen">
-        <svg class="avatar-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="avatar-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.9"/>
           <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="currentColor" opacity="0.5"/>
         </svg>
         <span id="sidebar-email">—</span>
       </a>
     </div>
-  
+
     <!-- Navi bleibt darunter -->
-    <nav class="sidebar">
+    <nav class="sidebar" role="navigation" aria-label="Hauptnavigation">
       <a href="#trainingsplan" data-match="trainingsplan">🏋️ Trainingsplan</a>
       <a href="#fortschritt"   data-match="fortschritt">📊 Fortschritt</a>
       <a href="#tagesprogramm" data-match="tagesprogramm">🗓️ Tagesprogramm</a>
@@ -46,59 +46,59 @@
       <a href="#profil"        data-match="profil">👤 Profil</a>
       <a href="#hilfe"         data-match="hilfe">❓ Hilfe</a>
     </nav>
-  
+
     <div class="sidebar-footer">
-      <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
+      <button id="sign-out" class="logout-btn" type="button">🚪 Abmelden</button>
     </div>
   </div>
 
 
-<div class="card" id="auth-forms">
-  <h2 id="auth-title">Anmeldung</h2>
+  <div class="card" id="auth-forms">
+    <h2 id="auth-title">Anmeldung</h2>
 
     <!-- Login -->
-    <form id="login-form" onsubmit="return false;">
-      <input id="li-email"    type="email"    placeholder="E-Mail" required />
-      <input id="li-password" type="password" placeholder="Passwort" required />
-  
+    <form id="login-form" onsubmit="return false;" autocomplete="on">
+      <input id="li-email"    type="email"    placeholder="E-Mail" required autocomplete="email" aria-label="E-Mail" />
+      <input id="li-password" type="password" placeholder="Passwort" required autocomplete="current-password" aria-label="Passwort" />
+
       <div class="login-actions" style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;margin:.5rem 0 0;">
         <button type="submit">Anmelden</button>
-        <button type="button" id="forgotBtn" class="linklike" style="background:none;border:none;color:#2563EB;cursor:pointer;padding:.25rem .25rem;">
+        <button type="button" id="forgotBtn" class="linklike" style="background:none;border:none;cursor:pointer;padding:.25rem .25rem;">
           Passwort vergessen?
         </button>
       </div>
     </form>
-  
+
     <!-- Link zum Signup -->
     <div style="margin-top:12px;">
-      <a href="#signup" id="signupLink" style="color:#2563EB;text-decoration:underline;">Konto erstellen</a>
+      <a href="#signup" id="signupLink" style="text-decoration:underline;">Konto erstellen</a>
     </div>
-  
+
     <!-- Signup -->
-    <form id="signup-form" onsubmit="return false;" style="display:none; margin-top:16px;">
-      <input id="su-firstname"  type="text"     placeholder="Vorname" required />
-      <input id="su-lastname"   type="text"     placeholder="Nachname" required />
-      <input id="su-birthdate"  type="date"     placeholder="Geburtsdatum" />
-      <input id="su-email"      type="email"    placeholder="E-Mail" required />
-      <input id="su-password"   type="password" placeholder="Passwort (min. 6 Zeichen)" minlength="6" required />
-  
+    <form id="signup-form" onsubmit="return false;" style="display:none; margin-top:16px;" autocomplete="on">
+      <input id="su-firstname"  type="text"     placeholder="Vorname" required autocomplete="given-name" aria-label="Vorname" />
+      <input id="su-lastname"   type="text"     placeholder="Nachname" required autocomplete="family-name" aria-label="Nachname" />
+      <input id="su-birthdate"  type="date"     placeholder="Geburtsdatum" aria-label="Geburtsdatum" />
+      <input id="su-email"      type="email"    placeholder="E-Mail" required autocomplete="email" aria-label="E-Mail" />
+      <input id="su-password"   type="password" placeholder="Passwort (min. 6 Zeichen)" minlength="6" required autocomplete="new-password" aria-label="Passwort (min. 6 Zeichen)" />
+
       <label for="su-group" style="margin-top:.5rem;display:block;">Gruppe</label>
-      <select id="su-group" required style="width:100%;padding:.6rem;border-radius:.5rem;border:1px solid #ccc;">
+      <select id="su-group" required style="width:100%;padding:.6rem;border-radius:.5rem;border:1px solid #ccc;" aria-label="Gruppe">
         <option value="" disabled selected>Bitte auswählen…</option>
         <option value="Knie">Knie</option>
         <option value="Hüfte">Hüfte</option>
         <option value="Arm">Arm</option>
         <option value="Onkologie">Onkologie</option>
       </select>
-  
+
       <button type="submit" style="margin-top:12px;">Konto erstellen</button>
-  
+
       <div style="margin-top:12px;">
-        <a href="#login" id="backToLogin" style="color:#2563EB;text-decoration:underline;">Zurück zur Anmeldung</a>
+        <a href="#login" id="backToLogin" style="text-decoration:underline;">Zurück zur Anmeldung</a>
       </div>
     </form>
   </div>
-  
+
 
   <!-- 🔐 Geschützte App -->
   <div id="app" class="container" style="display:none;">
@@ -110,11 +110,11 @@
       <main id="content" class="main-content"></main>
     </div>
 
-    <div class="sync-status" id="syncStatus">Synchronisiere…</div>
+    <div class="sync-status" id="syncStatus" aria-live="polite">Synchronisiere…</div>
     <div class="edit-section" id="editSection">
       <div class="edit-area active" id="editArea">
         <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten…"></textarea>
-        <button class="save-btn" id="saveBtn">Speichern</button>
+        <button class="save-btn" id="saveBtn" type="button">Speichern</button>
         <div class="qr-section">
           <div class="qr-title">App teilen via QR-Code</div>
           <div class="qr-code" id="qrCode"></div>
@@ -124,15 +124,15 @@
     </div>
 
     <!-- 📝 Notizen Modal -->
-    <div class="note-modal" id="noteModal">
+    <div class="note-modal" id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
       <div class="note-modal-content">
         <div class="note-modal-title" id="noteModalTitle">Notiz hinzufügen</div>
         <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen…"></textarea>
         <div class="note-modal-buttons">
-          <button class="note-save-btn"   id="noteSaveBtn">Speichern</button>
-          <button class="note-cancel-btn" id="noteCancelBtn">Abbrechen</button>
+          <button class="note-save-btn"   id="noteSaveBtn"   type="button">Speichern</button>
+          <button class="note-cancel-btn" id="noteCancelBtn" type="button">Abbrechen</button>
         </div>
-        <button class="note-delete-btn" id="noteDeleteBtn" style="display:none;">Notiz löschen</button>
+        <button class="note-delete-btn" id="noteDeleteBtn" type="button" style="display:none;">Notiz löschen</button>
       </div>
     </div>
   </div>
@@ -141,16 +141,18 @@
 
   <script type="module">
     /* ======================
-       1) IMPORTS (müssen ganz oben stehen)
+       1) IMPORTS (gebündelt)
        ====================== */
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-      getAuth, onAuthStateChanged,
+      getAuth, onAuthStateChanged, updateProfile,
       createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
       sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  
+    import {
+      getFirestore, doc, setDoc, getDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
     /* ======================
        2) FIREBASE INIT
        ====================== */
@@ -167,7 +169,7 @@
     const db    = getFirestore(appFB);
     window.auth = auth;
     window.db   = db;
-  
+
     /* ======================
        3) DOM ELEMENTE & HELPERS
        ====================== */
@@ -178,9 +180,9 @@
     const sidebar     = document.getElementById("sidebar");
     const menuToggle  = document.getElementById("menuToggle");
     const closeSidebar= document.getElementById("closeSidebar");
-  
+
     const setMenuToggleVisible = (v) => { if (menuToggle) menuToggle.style.display = v ? "block" : "none"; };
-  
+
     const showAuth = () => {
       document.body.classList.add("center-auth");
       if (authForms) authForms.style.display="block";
@@ -191,7 +193,7 @@
       if (authForms) authForms.style.display="none";
       if (appDiv)    appDiv.style.display="block";
     };
-  
+
     function updateSidebarAccount(user) {
       const el = document.getElementById("sidebar-email");
       if (!el) return;
@@ -202,28 +204,31 @@
       el.textContent = email;
       el.title = email;
     }
-  
+
     function loadAppJSOnce() {
       if (document.getElementById("app-js-loaded")) return;
       const s = document.createElement("script");
       s.src = "app.js";
       s.id = "app-js-loaded";
       s.type = "module";
+      s.defer = true;
       document.body.appendChild(s);
     }
-  
+
     /* ======================
        4) SIDEBAR UI
        ====================== */
     if (menuToggle) {
       menuToggle.addEventListener("click", () => {
         sidebar.classList.add("active");
+        sidebar.setAttribute("aria-hidden", "false");
         setMenuToggleVisible(false);
       });
     }
     if (closeSidebar) {
       closeSidebar.addEventListener("click", () => {
         sidebar.classList.remove("active");
+        sidebar.setAttribute("aria-hidden", "true");
         setMenuToggleVisible(true);
       });
     }
@@ -233,45 +238,47 @@
         const link = e.target.closest("a");
         if (!link) return;
         sidebar.classList.remove("active");
+        sidebar.setAttribute("aria-hidden", "true");
         setMenuToggleVisible(true);
       });
     }
-  
+
     if (signOutBtn) {
       signOutBtn.addEventListener("click", async () => {
         sidebar.classList.remove("active");
+        sidebar.setAttribute("aria-hidden", "true");
         setMenuToggleVisible(true);
         try { await signOut(auth); } catch { alert("Abmelden fehlgeschlagen."); }
       });
     }
-  
+
     /* ======================
        5) VIEW LOADER & ROUTER
        ====================== */
     async function loadView(page) {
-      const mount   = document.getElementById("content");
+      const mount    = document.getElementById("content");
       const viewPath = `views/${page}.html`;
       const cssPath  = `views/${page}.css`;
       const jsPath   = `views/${page}.js`;
-  
+
       try {
-        const res  = await fetch(viewPath);
+        const res  = await fetch(viewPath, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const html = await res.text();
-  
+
         const parser = new DOMParser();
         const doc    = parser.parseFromString(html, "text/html");
         const newContent = doc.body.innerHTML;
-  
+
         document.querySelectorAll('link[data-view]').forEach(l => l.remove());
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = cssPath;
         link.dataset.view = page;
         document.head.appendChild(link);
-  
+
         if (mount) mount.innerHTML = newContent;
-  
+
         document.getElementById("dynamic-view-script")?.remove();
         const script = document.createElement("script");
         script.src = jsPath;
@@ -282,12 +289,13 @@
         if (mount) mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
       }
     }
-  
+
     function routeToHash() {
       let page = (location.hash || "#tagesprogramm").slice(1).trim();
       if (!page) page = "tagesprogramm";
       loadView(page);
       sidebar.classList.remove("active");
+      sidebar.setAttribute("aria-hidden", "true");
       setMenuToggleVisible(true);
       document.querySelectorAll("#sidebar nav.sidebar a").forEach(a => {
         a.classList.toggle("active", a.getAttribute("href") === `#${page}`);
@@ -295,9 +303,9 @@
       // merken
       try { localStorage.setItem("rehapp:lastPage", page); } catch {}
     }
-  
+
     window.addEventListener("hashchange", routeToHash);
-  
+
     /* ======================
        6) AUTH: LOGIN / SIGNUP / RESET
        ====================== */
@@ -307,19 +315,18 @@
         e.preventDefault();
         const email = document.getElementById("li-email")?.value.trim();
         const pw    = document.getElementById("li-password")?.value;
-        if (!email || !pw) return;
+        if (!email || !pw) return false;
         try {
           await signInWithEmailAndPassword(auth, email, pw);
           location.hash = "#tagesprogramm";
-          // falls hashchange nicht greift:
-          routeToHash();
+          routeToHash(); // falls hashchange nicht greift
         } catch (err) {
-          alert(`Login fehlgeschlagen: ${err.code}`);
+          alert(`Login fehlgeschlagen: ${err.code || err.message}`);
         }
         return false;
       });
     }
-  
+
     const forgotBtn = document.getElementById("forgotBtn");
     if (forgotBtn) {
       forgotBtn.addEventListener("click", async () => {
@@ -330,29 +337,60 @@
           await sendPasswordResetEmail(auth, email);
           alert(`Passwort-Reset gesendet an: ${email}`);
         } catch (err) {
-          alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
+          alert(`Zurücksetzen fehlgeschlagen: ${err.code || err.message}`);
         }
       });
     }
-  
+
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = document.getElementById("su-email")?.value.trim();
-        const pw    = document.getElementById("su-password")?.value;
-        if (!email || !pw) return;
+
+        // Input-Felder abrufen
+        const firstName = document.getElementById("su-firstname")?.value.trim();
+        const lastName  = document.getElementById("su-lastname")?.value.trim();
+        const birthdate = document.getElementById("su-birthdate")?.value || null;
+        const group     = document.getElementById("su-group")?.value;
+        const email     = document.getElementById("su-email")?.value.trim();
+        const pw        = document.getElementById("su-password")?.value;
+
+        if (!firstName || !lastName || !group || !email || !pw) {
+          alert("Bitte alle Pflichtfelder ausfüllen.");
+          return;
+        }
+
         try {
-          await createUserWithEmailAndPassword(auth, email, pw);
+          // 1) Benutzer in Firebase Auth anlegen
+          const cred = await createUserWithEmailAndPassword(auth, email, pw);
+          const uid  = cred.user.uid;
+
+          // 2) Anzeigename in Firebase Auth setzen
+          await updateProfile(cred.user, {
+            displayName: `${firstName} ${lastName}`
+          });
+
+          // 3) Benutzerprofil in Firestore speichern
+          await setDoc(doc(db, "users", uid), {
+            uid,
+            email,
+            firstName,
+            lastName,
+            birthdate,
+            group, // z.B. "Knie", "Hüfte", "Arm", "Onkologie"
+            createdAt: serverTimestamp()
+          });
+
           alert("Konto erstellt. Du bist jetzt angemeldet.");
           location.hash = "#tagesprogramm";
           routeToHash();
         } catch (err) {
-          alert(`Registrierung fehlgeschlagen: ${err.code}`);
+          console.error(err);
+          alert(`Registrierung fehlgeschlagen: ${err.code || err.message}`);
         }
       });
     }
-  
+
     /* ======================
        7) AUTH STATE -> UI & ROUTING
        ====================== */
@@ -362,17 +400,18 @@
         showApp();
         setMenuToggleVisible(true);
         sidebar.classList.remove("active");
-  
+        sidebar.setAttribute("aria-hidden", "false");
+
         window.currentUserId   = user.uid;
         window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
-  
+
         const email = user.email || user.displayName || ("UID: " + user.uid);
         if (userInfo) userInfo.textContent = `Angemeldet: ${email}`;
         if (signOutBtn) signOutBtn.style.display = "inline-block";
-  
+
         updateSidebarAccount(user);
         loadAppJSOnce();
-  
+
         if (!didInitialLoad) {
           // Erzwinge sinnvolle Start-Route
           if (!location.hash || location.hash === "#" || location.hash === "#login" || location.hash === "#signup") {
@@ -387,6 +426,7 @@
         showAuth();
         setMenuToggleVisible(false);
         sidebar.classList.remove("active");
+        sidebar.setAttribute("aria-hidden", "true");
         if (userInfo) userInfo.textContent = "Nicht angemeldet";
         if (signOutBtn) signOutBtn.style.display = "none";
         window.currentUserId = null;
