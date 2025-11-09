@@ -92,7 +92,6 @@
       daysC().append(col);
     });
 
-    userPill() && (userPill().textContent = user || "Gast");
   }
 
   // ===== Klick-Logik =====

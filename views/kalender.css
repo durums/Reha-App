@@ -14,7 +14,14 @@ button:hover{background:#F3F4F6}
 .muted{color:#6B7280}
 
 /* ===== Kalenderraster – alles strikt über IDs, damit nichts kollidiert ===== */
-#kal{height:calc(100vh - 64px);display:grid;grid-template-rows:var(--header) var(--allday) 1fr;background:#fff}
+#kal{
+  height: auto !important; /* Entfernt die starre Viewport-Höhe */
+  max-height: calc(var(--header) + var(--allday) + (10 * var(--row))); /* 10 Stunden × 50px */
+  overflow: hidden; /* Kein Scrollen */
+  display: grid;
+  grid-template-rows: var(--header) var(--allday) 1fr;
+  background: #fff;
+}
 #header{display:grid;grid-template-columns:var(--gutter) repeat(7, minmax(var(--colmin),1fr));align-items:center;background:var(--head);border-bottom:1px solid var(--grid)}
 #header .cell{padding-left:.75rem;font-weight:600;color:var(--head-fg)}
 #header .time{padding-left:.5rem;font-weight:500;color:var(--hour)}
@@ -26,7 +33,13 @@ button:hover{background:#F3F4F6}
 #hours{border-right:1px solid var(--grid)}
 .hour{height:var(--row);display:flex;align-items:center;justify-content:flex-end;padding-right:.5rem;color:var(--hour);border-bottom:1px solid var(--grid)}
 
-#days{display:grid;grid-template-columns:repeat(7, minmax(var(--colmin),1fr));overflow:auto}
+#days{
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--colmin), 1fr));
+  overflow-y: hidden !important; /* Vertikales Scrollen verbieten */
+  overflow-x: auto; /* Horizontales Scrollen bei kleinen Bildschirmen erlauben */
+  height: auto; /* Höhe automatisch an Inhalt anpassen */
+}
 .col{position:relative;border-right:1px solid var(--grid)}
 .col:last-child{border-right:none}
 .slot{height:var(--row);border-bottom:1px solid var(--grid);display:flex;align-items:center;padding-left:.5rem;user-select:none}
@@ -59,3 +72,9 @@ dialog form{padding:14px}
 
 /* Konteinerhöhen im App-Layout erzwingen */
 #content, #kal { min-height: calc(100vh - 140px) !important; display:block !important; }
+
+/* temporär */
+.col:last-child .slot:last-child,
+.col:nth-child(7) .slot:last-child {
+  border-bottom: none;
+}
