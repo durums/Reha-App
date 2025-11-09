@@ -54,3 +54,119 @@
 .feedback-list li strong {
   color: #2b7be4;
 }
+
+/* === Feedback Modal Styling === */
+.feedback-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none; /* Standard: versteckt */
+  place-items: center;
+  z-index: 3000;
+  backdrop-filter: blur(4px); /* Blur-Effekt wie bei Amazon */
+}
+
+.feedback-modal-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.25);
+  width: min(500px, 92vw); /* Max 500px, aber 92% auf Mobile */
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalFadeIn 0.3s ease; /* Sanftes Einblenden */
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #f3f4f6;
+  border: 0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: #6b7280;
+  transition: background 0.2s;
+}
+
+.feedback-close:hover {
+  background: #e5e7eb;
+}
+
+.feedback-modal-card h2 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  color: #111827;
+}
+
+.feedback-modal-card label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.feedback-modal-card select,
+.feedback-modal-card textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.feedback-modal-card select:focus,
+.feedback-modal-card textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.feedback-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-send {
+  background: #2563eb;
+  color: #fff;
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-send:hover {
+  background: #1d4ed8;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.btn-cancel:hover {
+  background: #e5e7eb;
+}

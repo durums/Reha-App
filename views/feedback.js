@@ -1,88 +1,114 @@
-// fortschritt.js
-document.addEventListener("DOMContentLoaded", () => {
-  // ---- Daten (kannst du später aus Firestore/LS füllen) ----
-  const KPIS = {
-    mobility: 75,   // Beweglichkeit
-    strength: 25,   // Kraft
-    endurance: 62,  // Ausdauer
-    pain: 85        // Schmerzreduktion
-  };
-
-  const MILESTONES = [
-    "1. TAG", "2. TAG", "AB 7. TAG", "AB 2. WOCHE",
-    "AB 4. WOCHE", "AB 6–8. WOCHE", "AB 20. WOCHE"
-  ];
-  const CURRENT = "AB 4. WOCHE";
-
-  // ---- KPIs setzen ----
-  const mobVal = document.getElementById("kpi-mobility-val");
-  const mobBar = document.getElementById("kpi-mobility-bar");
-  const painVal= document.getElementById("kpi-pain-val");
-  const painBar= document.getElementById("kpi-pain-bar");
-
-  if (mobVal && mobBar) {
-    mobVal.textContent = `${KPIS.mobility}%`;
-    mobBar.style.width = `${KPIS.mobility}%`;
-    mobBar.parentElement?.setAttribute("aria-valuenow", String(KPIS.mobility));
+// feedback.js – Vollständiges Feedback-Modal System
+(() => {
+  // === Modal dynamisch erstellen (einmalig beim Laden) ===
+  function createModal() {
+    const modalHTML = `
+      <div id="feedbackModal" class="feedback-modal-overlay">
+        <div class="feedback-modal-card">
+          <button class="feedback-close" aria-label="Schließen">&times;</button>
+          <h2>Feedback geben</h2>
+          <form id="feedbackForm">
+            <label>
+              Wie zufrieden bist du?
+              <select name="rating" required>
+                <option value="">Bitte wählen</option>
+                <option value="5">⭐⭐⭐⭐⭐ Sehr zufrieden</option>
+                <option value="4">⭐⭐⭐⭐ Zufrieden</option>
+                <option value="3">⭐⭐⭐ Neutral</option>
+                <option value="2">⭐⭐ Verbesserungsbedarf</option>
+                <option value="1">⭐ Schlecht</option>
+              </select>
+            </label>
+            <label>
+              Deine Nachricht:
+              <textarea name="message" rows="4" placeholder="Was können wir verbessern?" required></textarea>
+            </label>
+            <div class="feedback-actions">
+              <button type="button" class="btn-cancel">Abbrechen</button>
+              <button type="submit" class="btn-send">Senden</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
   }
-  if (painVal && painBar) {
-    painVal.textContent = `${KPIS.pain}%`;
-    painBar.style.width = `${KPIS.pain}%`;
-    painBar.parentElement?.setAttribute("aria-valuenow", String(KPIS.pain));
-  }
 
-  // Donuts (Kraft / Ausdauer)
-  const C = 2 * Math.PI * 48; // Umfang
-  document.querySelectorAll(".donut").forEach(fig => {
-    const path = fig.querySelector(".donut-val");
-    const centerNum = fig.querySelector(".donut-num");
-    const pct = Number(path?.getAttribute("data-percent") || 0);
-    if (path) {
-      path.style.strokeDasharray = C;
-      path.style.strokeDashoffset = C * (1 - pct / 100);
+  // === Modal öffnen ===
+  function openModal() {
+    let modal = document.getElementById('feedbackModal');
+    if (!modal) {
+      createModal();
+      modal = document.getElementById('feedbackModal');
     }
-    if (centerNum) centerNum.textContent = String(pct);
-  });
-
-  // ---- Timeline ----
-  const ul      = document.getElementById("ntMilestones");
-  const rail    = document.querySelector(".nt-rail");
-  const prog    = document.getElementById("ntProgress");
-  const bumpsEl = document.getElementById("ntBumps");
-  const pin     = document.getElementById("ntPin");
-  const label   = document.getElementById("ntPhaseLabel");
-  if (!ul || !rail || !prog || !bumpsEl || !pin || !label) return;
-  
-  const step = 100 / (MILESTONES.length - 1);
-  let currentIndex = 0;
-  
-  MILESTONES.forEach((text, i) => {
-    const li = document.createElement("li");
-    li.style.left = `${i * step}%`;
-    const pill = document.createElement("span");
-    pill.textContent = text;
-    pill.className = "nt-pill";
-    if (text === CURRENT) { pill.classList.add("current"); currentIndex = i; }
-    li.appendChild(pill);
-    ul.appendChild(li);
-  });
-  
-  const widthPct = step * currentIndex;
-  prog.style.width = `${widthPct}%`;
-  pin.style.left = `${widthPct}%`;
-  label.textContent = CURRENT;
-  
-  bumpsEl.innerHTML = "";
-  for (let i = 1; i <= currentIndex; i++) {
-    const bump = document.createElement("div");
-    bump.className = "nt-bump";
-    bump.style.left = `${i * step}%`;
-    bumpsEl.appendChild(bump);
+    modal.style.display = 'grid';
+    document.body.style.overflow = 'hidden'; // Hintergrund sperren
+    modal.querySelector('select').focus(); // Barrierefreiheit
   }
 
+  // === Modal schließen ===
+  function closeModal() {
+    const modal = document.getElementById('feedbackModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    document.getElementById('feedbackForm').reset();
+  }
 
-  const width = step * currentIndex;
-  fill.style.width = `${width}%`;
-  pin.style.left = `${width}%`;
-  label.textContent = CURRENT;
-});
+  // === Daten speichern ===
+  async function saveFeedback(data) {
+    const feedbacks = JSON.parse(localStorage.getItem('rehapp:feedback') || '[]');
+    feedbacks.push(data);
+    localStorage.setItem('rehapp:feedback', JSON.stringify(feedbacks));
+    console.log('Feedback lokal gespeichert:', data);
+    }
+
+  // === Initialisierung ===
+  function init() {
+    // Button finden (muss die ID #help-feedback haben)
+    const btn = document.getElementById('help-feedback');
+    if (!btn) {
+      console.warn('Feedback-Button (#help-feedback) nicht gefunden');
+      return;
+    }
+
+    // Event: Button klickt → Modal öffnet
+    btn.addEventListener('click', openModal);
+
+    // Event: Modal schließen
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'feedbackModal') closeModal();
+      if (e.target.classList.contains('feedback-close')) closeModal();
+      if (e.target.classList.contains('btn-cancel')) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Event: Formular absenden
+    document.addEventListener('submit', async (e) => {
+      if (e.target.id !== 'feedbackForm') return;
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = {
+        rating: parseInt(formData.get('rating')),
+        message: formData.get('message').trim(),
+        user: window.currentUserName || 'Anonym',
+        timestamp: new Date().toISOString()
+      };
+
+      if (!data.message || !data.rating) {
+        alert('Bitte fülle alle Felder aus.');
+        return;
+      }
+
+      await saveFeedback(data);
+      alert('✅ Vielen Dank für dein Feedback!');
+      closeModal();
+    });
+  }
+
+  // === Starten, wenn DOM bereit ist ===
+  document.addEventListener('DOMContentLoaded', init);
+})();
