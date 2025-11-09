@@ -6,23 +6,23 @@
   const workouts = [
   { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke',
     emoji:'🏃‍♂️', duration:5, level:'leicht', area:'oberkoerper',
-    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID' }, // echte videos noch einfügen 
+    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID'}, // echte videos noch einfügen, dann sollte es funktionieren
     
   { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur',
     emoji:'🧘‍♀️', duration:8, level:'leicht', area:'oberkoerper',
-    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID' },
+    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID'},
     
   { id:'armrotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
     emoji:'💪', duration:10, level:'mittel', area:'oberkoerper',
-    videoUrl: 'https://www.youtube.com/embed/YET_ANOTHER_ID' },
+    videoUrl: 'https://www.youtube.com/embed/YET_ANOTHER_ID'},
     
   { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft',
     emoji:'🦵', duration:7, level:'mittel', area:'unterkoerper',
-    videoUrl: 'https://www.youtube.com/embed/EXAMPLE_ID' },
+    videoUrl: 'https://www.youtube.com/embed/EXAMPLE_ID'},
     
   { id:'waage', title:'Standwaage leicht', desc:'Balance & Koordination',
     emoji:'⚖️', duration:6, level:'leicht', area:'rumpf',
-    videoUrl: 'https://www.youtube.com/embed/LAST_EXAMPLE_ID' },
+    videoUrl: 'https://www.youtube.com/embed/LAST_EXAMPLE_ID'},
 ];
   const byId = Object.fromEntries(workouts.map(w => [w.id, w]));
 
