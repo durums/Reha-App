@@ -4,22 +4,26 @@
 
   // --- Daten ---
   const workouts = [
-    { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke',
-      emoji:'🏃‍♂️', duration:5, level:'leicht', area:'oberkoerper',
-      videoUrl: '/views/Videos-Training/test_clip.mp4' },
-    { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur',
-      emoji:'🧘‍♀️', duration:8, level:'leicht', area:'oberkoerper',
-      videoUrl: '/views/Videos-Training/test_clip.mp4' },
-    { id:'armrotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
-      emoji:'💪', duration:10, level:'mittel', area:'oberkoerper',
-      videoUrl: '/views/Videos-Training/test_clip.mp4' },
-    { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft',
-      emoji:'🦵', duration:7, level:'mittel', area:'unterkoerper',
-      videoUrl: '/views/Videos-Training/test_clip.mp4' },
-    { id:'waage', title:'Standwaage leicht', desc:'Balance & Koordination',
-      emoji:'⚖️', duration:6, level:'leicht', area:'rumpf',
-      videoUrl: '/views/Videos-Training/test_clip.mp4' },
-  ];
+  { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke',
+    emoji:'🏃‍♂️', duration:5, level:'leicht', area:'oberkoerper',
+    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID' }, // echte videos noch einfügen 
+    
+  { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur',
+    emoji:'🧘‍♀️', duration:8, level:'leicht', area:'oberkoerper',
+    videoUrl: 'https://www.youtube.com/embed/ANOTHER_VIDEO_ID' },
+    
+  { id:'armrotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation',
+    emoji:'💪', duration:10, level:'mittel', area:'oberkoerper',
+    videoUrl: 'https://www.youtube.com/embed/YET_ANOTHER_ID' },
+    
+  { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft',
+    emoji:'🦵', duration:7, level:'mittel', area:'unterkoerper',
+    videoUrl: 'https://www.youtube.com/embed/EXAMPLE_ID' },
+    
+  { id:'waage', title:'Standwaage leicht', desc:'Balance & Koordination',
+    emoji:'⚖️', duration:6, level:'leicht', area:'rumpf',
+    videoUrl: 'https://www.youtube.com/embed/LAST_EXAMPLE_ID' },
+];
   const byId = Object.fromEntries(workouts.map(w => [w.id, w]));
 
   const grid = document.getElementById('tp-grid');
@@ -79,37 +83,44 @@
   const videoTitle    = $('#tp-video-title');
   const videoCloseBtn = $('#tp-video-close');
 
-  // Kein leerer Player
-  videoBackdrop.style.display = 'none';
-  videoBackdrop.hidden = true;
-  videoEl.removeAttribute('src');
-  try { videoEl.preload = 'none'; } catch {}
-
   function showDialog() {
     videoBackdrop.hidden = false;
     videoBackdrop.style.display = 'flex';
   }
+  
   function hideDialog() {
     videoBackdrop.hidden = true;
     videoBackdrop.style.display = 'none';
   }
 
+  // Video öffnen
   function openVideo(w) {
     if (!w?.videoUrl) { alert('Kein Video hinterlegt.'); return; }
     videoTitle.textContent = w.title;
-    videoEl.removeAttribute('src');
-    videoEl.src = w.videoUrl;
+    
+    // Container leeren
+    videoEl.innerHTML = '';
+    
+    // Neuen iframe erstellen
+    const iframe = document.createElement('iframe');
+    iframe.src = w.videoUrl + '?autoplay=1';
+    iframe.allowFullscreen = true;
+    iframe.style.border = 'none';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    
+    videoEl.appendChild(iframe);
     showDialog();
-    videoEl.play().catch(() => {});
   }
 
+  // Video schließen
   function closeVideo() {
-    try { videoEl.pause(); } catch {}
-    videoEl.removeAttribute('src');
-    videoEl.load();
+    videoEl.innerHTML = ''; // iframe entfernen
     hideDialog();
   }
 
+  // Event-Listener
   videoCloseBtn.addEventListener('click', closeVideo);
   videoBackdrop.addEventListener('click', (e) => {
     if (e.target === videoBackdrop) closeVideo();

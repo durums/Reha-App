@@ -60,17 +60,12 @@
 </div>
 
 
-<!-- Video-Dialog -->
+<!-- Video-Dialog (YouTube-Embed) -->
 <div id="tp-video" class="tp-video-backdrop" style="display: none;">
   <div class="tp-video-dialog" role="dialog" aria-modal="true" aria-labelledby="tp-video-title">
     <button id="tp-video-close" class="tp-video-close" aria-label="Schließen">×</button>
     <h3 id="tp-video-title" class="tp-video-title" style="margin:0 0 .5rem 0"></h3>
-    <video id="tp-video-el"
-           controls
-           playsinline
-           preload="none"
-           muted
-           style="width:100%; max-height:70vh; border-radius:12px;"></video>
+    <div id="tp-video-el" class="tp-video-container"></div> 
   </div>
 </div>
 

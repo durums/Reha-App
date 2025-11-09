@@ -162,3 +162,22 @@
 /* Kleinigkeit: Tabs etwas „snappier“ bei viel Text */
 .tp-tab{ display: inline-flex; align-items: center; }
 
+/* YouTube Video Container */
+.tp-video-container {
+  aspect-ratio: 16 / 9; /* YouTube-Videos sind 16:9 */
+  width: 100%;
+  background: #000; /* Schwarzer Hintergrund für Letterboxing */
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Modal größer für Videos */
+.tp-video-dialog {
+  width: min(920px, 92vw);
+  max-width: 1000px; /* Etwas größer */
+  background: var(--surface,#fff);
+  border-radius: 16px;
+  padding: 1rem 1rem 1.25rem;
+  box-shadow: var(--shadow,0 12px 40px rgba(0,0,0,.25));
+  position: relative;
+}

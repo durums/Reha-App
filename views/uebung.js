@@ -197,20 +197,20 @@ const LONG_DESC = {
 const WORKOUTS = [
   { id:'schulterkreisen', title:'Schulterkreisen', desc:'Sanfte Mobilisation der Schultergelenke.',
     emoji:'🏃‍♂️', duration:5, level:'leicht', area:'Oberkörper',
-    videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
+    videoUrl: 'https://www.youtube.com/embed/VIDEO_ID'},
   { id:'nackendehnung', title:'Nackendehnungen', desc:'Entspannung der Nackenmuskulatur.',
     emoji:'🧘‍♀️', duration:8, level:'leicht', area:'Oberkörper',
-    videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
+    videoUrl: 'https://www.youtube.com/embed/VIDEO_ID'},
   // 👇 ID auf "armrotation" vereinheitlicht
   { id:'armrotation', title:'Arm-Rotationen', desc:'Kräftigung und Mobilisation.',
     emoji:'💪', duration:10, level:'mittel', area:'Oberkörper',
-    videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
+    videoUrl: 'https://www.youtube.com/embed/VIDEO_ID'},
   { id:'kniebeuge', title:'Kniebeugen (assistiert)', desc:'Grundmobilisation & Kraft.',
     emoji:'🦵', duration:7, level:'mittel', area:'Unterkörper',
-    videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
+    videoUrl: 'https://www.youtube.com/embed/VIDEO_ID'},
   { id:'waage', title:'Standwaage leicht', desc:'Balance & Koordination.',
     emoji:'⚖️', duration:6, level:'leicht', area:'Rumpf',
-    videoUrl: ASSET_BASE + 'Videos-Training/test_clip.mp4' },
+    videoUrl: 'https://www.youtube.com/embed/VIDEO_ID'},
 ];
 
 function q(sel){return document.querySelector(sel)}
@@ -237,17 +237,11 @@ function fmtMMSS(sec){const m=String(Math.floor(sec/60)).padStart(2,'0');const s
   q('#u-area').textContent = w.area || '–';
   q('#u-desc-text').innerHTML = LONG_DESC[w.id] || `<p>${w.desc || ''}</p>`;
 
-  // Video erst beim Bedarf laden (kein Autoload)
-  const vid = q('#u-video');
-  vid.removeAttribute('src');
-  vid.preload = 'none';
+  // Video (einfach nur URL setzen)
+  const iframe = q('#u-video');
   if (w.videoUrl) {
-    vid.src = w.videoUrl;
+    iframe.src = w.videoUrl;
   }
-  vid.addEventListener('error', () => {
-    console.error('Video-Fehler', vid.error);
-    alert('Video konnte nicht geladen werden (Pfad prüfen).');
-  });
 
   // Simple Timer (Countdown von Dauer in Minuten; mit Reset)
   let total = (w.duration||5) * 60; // Sekunden
