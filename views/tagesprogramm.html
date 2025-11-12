@@ -47,34 +47,4 @@
     <div id="newsletterBox" class="newsletter"></div>
   </section>
 
-  <!-- Firebase (v9+ modular, via CDN) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-  
-    // TODO: Deine Projekt-Keys hier einfügen:
-    const firebaseConfig = {
-      apiKey: "...",
-      authDomain: "...",
-      projectId: "...",
-      // ggf. storageBucket, appId etc.
-    };
-  
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
-  
-    // Anonym anmelden (sorgt dafür, dass Firestore-Regeln mit "auth != null" greifen)
-    await signInAnonymously(auth).catch(console.error);
-  
-    // Global verfügbar machen:
-    window.firebaseDb   = db;
-    window.firebaseAuth = auth;
-  
-    // Optional: deinen Benutzerbezug setzen (falls du bereits einen Namen o.ä. hast)
-    // window.currentUserName = window.currentUserName || "Gast";
-  </script>
-
-
 </div>
