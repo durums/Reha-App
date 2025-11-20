@@ -52,6 +52,15 @@
 
     // ICS-Export Button (muss in kalender.html existieren)
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
+
+    // ===== NEU: PDF-Import-Button + Input =====
+    const importBtn   = $("importPdfBtn");
+    const importInput = $("importPdfInput");
+
+    if (importBtn && importInput) {
+      importBtn.addEventListener("click", () => importInput.click());
+      importInput.addEventListener("change", onPdfChosen);
+    }
   }
 
   // ===== Render =====
@@ -306,6 +315,96 @@
     URL.revokeObjectURL(url);
   }
 
+  // ===== PDF-Import =====
+  async function onPdfChosen(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const termine = await parsePdfToAppointments(arrayBuffer);
+
+      if (!termine.length) {
+        alert("In der PDF wurden keine Termine erkannt.");
+        return;
+      }
+
+      termine.forEach(addAppointmentToCalendar);
+      render();
+
+      alert(`${termine.length} Termine aus der PDF importiert.`);
+    } catch (err) {
+      console.error("PDF-Import fehlgeschlagen:", err);
+      alert("PDF konnte nicht gelesen werden.");
+    } finally {
+      evt.target.value = ""; // Reset
+    }
+  }
+
+  /**
+   * Liest eine PDF (ArrayBuffer) und versucht daraus Termine zu bauen.
+   * -> Regex bei Bedarf an das Layout deiner PDF anpassen.
+   */
+  async function parsePdfToAppointments(arrayBuffer) {
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const strings = content.items.map((item) => item.str);
+      fullText += strings.join(" ") + "\n";
+    }
+
+    // Beispiel-Zeilen:
+    // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
+    const lines = fullText.split(/\r?\n/);
+    const termine = [];
+
+    const regex =
+      /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*[:\-]\s*(.+)$/;
+
+    for (const line of lines) {
+      const m = line.match(regex);
+      if (!m) continue;
+
+      const [_, dateStr, startStr, endStr, title] = m;
+
+      const start = new Date(`${dateStr}T${startStr}:00`);
+      const end   = new Date(`${dateStr}T${endStr}:00`);
+
+      termine.push({
+        title: title.trim(),
+        start,
+        end,
+      });
+    }
+
+    return termine;
+  }
+
+  /**
+   * Termin in den bestehenden Kalender integrieren.
+   * Nimmt die Start-Stunde als Slot (z.B. 08:30 -> "08:00").
+   */
+  function addAppointmentToCalendar(appt) {
+    const hour = appt.start.getHours();
+    if (hour < START || hour > END) {
+      console.warn("Termin liegt außerhalb der Kalenderzeit:", appt);
+      return;
+    }
+    const tag  = iso(appt.start);
+    const slot = `${pad(hour)}:00`;
+
+    // Slot schon belegt? -> hier überspringen
+    if (store[tag] && store[tag][slot]) {
+      console.warn("Slot bereits belegt, übersprungen:", tag, slot);
+      return;
+    }
+
+    book(tag, slot, user);
+  }
+
   // ===== Utils =====
   function mondayOf(d){ const x = new Date(d); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
   function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
@@ -316,100 +415,5 @@
   function daysBetween(a,b){ const A = new Date(a.getFullYear(),a.getMonth(),a.getDate()); const B = new Date(b.getFullYear(),b.getMonth(),b.getDate()); return Math.round((B-A)/86400000); }
   function div(cls,txt=""){ const n=document.createElement("div"); if(cls) n.className=cls; if(txt) n.textContent=txt; return n; }
   function cell(cls,txt){ const n=document.createElement("div"); n.className = cls==="time" ? "cell time" : "cell"; n.textContent=txt; return n; }
+
 })();
-
-// Elemente holen
-const importBtn  = document.getElementById("importPdfBtn");
-const importInput = document.getElementById("importPdfInput");
-
-// 1) Klick auf Button -> Dateiauswahl öffnen
-if (importBtn && importInput) {
-  importBtn.addEventListener("click", () => importInput.click());
-
-  // 2) Datei ausgewählt -> einlesen
-  importInput.addEventListener("change", async (evt) => {
-    const file = evt.target.files && evt.target.files[0];
-    if (!file) return;
-
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-
-      // 3) PDF mit pdf.js in Text umwandeln
-      const termine = await parsePdfToAppointments(arrayBuffer);
-
-      if (!termine.length) {
-        alert("In der PDF wurden keine Termine erkannt.");
-        return;
-      }
-
-      // 4) Termine in deinen Kalender übernehmen
-      termine.forEach(addAppointmentToCalendar);
-
-      alert(`${termine.length} Termine aus der PDF importiert.`);
-    } catch (err) {
-      console.error("PDF-Import fehlgeschlagen:", err);
-      alert("PDF konnte nicht gelesen werden.");
-    } finally {
-      importInput.value = ""; // Reset
-    }
-  });
-}
-
-/**
- * Liest eine PDF (ArrayBuffer) und versucht daraus Termine zu bauen.
- * -> Hier musst du das Format deiner PDF anpassen!
- */
-async function parsePdfToAppointments(arrayBuffer) {
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  let fullText = "";
-
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const content = await page.getTextContent();
-    const strings = content.items.map((item) => item.str);
-    fullText += strings.join(" ") + "\n";
-  }
-
-  // Beispiel: Wir erwarten Zeilen wie
-  // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
-  const lines = fullText.split(/\r?\n/);
-  const termine = [];
-
-  const regex =
-    /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*[:\-]\s*(.+)$/;
-
-  for (const line of lines) {
-    const m = line.match(regex);
-    if (!m) continue;
-
-    const [_, dateStr, startStr, endStr, title] = m;
-
-    const start = new Date(`${dateStr}T${startStr}:00`);
-    const end   = new Date(`${dateStr}T${endStr}:00`);
-
-    termine.push({
-      title: title.trim(),
-      start,
-      end,
-    });
-  }
-
-  return termine;
-}
-
-/**
- * Termin in deinen bestehenden Kalender integrieren.
- * HIER an deine vorhandene Kalender-API anpassen!
- */
-function addAppointmentToCalendar(appt) {
-  // Beispiel – DU musst das anpassen:
-  // Wenn du z.B. schon eine Funktion window.addKalenderTermin hast:
-  //
-  // window.addKalenderTermin({
-  //   title: appt.title,
-  //   start: appt.start,
-  //   end: appt.end
-  // });
-
-  console.log("Importierter Termin:", appt);
-}
