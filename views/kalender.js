@@ -317,3 +317,99 @@
   function div(cls,txt=""){ const n=document.createElement("div"); if(cls) n.className=cls; if(txt) n.textContent=txt; return n; }
   function cell(cls,txt){ const n=document.createElement("div"); n.className = cls==="time" ? "cell time" : "cell"; n.textContent=txt; return n; }
 })();
+
+// Elemente holen
+const importBtn  = document.getElementById("importPdfBtn");
+const importInput = document.getElementById("importPdfInput");
+
+// 1) Klick auf Button -> Dateiauswahl öffnen
+if (importBtn && importInput) {
+  importBtn.addEventListener("click", () => importInput.click());
+
+  // 2) Datei ausgewählt -> einlesen
+  importInput.addEventListener("change", async (evt) => {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+
+      // 3) PDF mit pdf.js in Text umwandeln
+      const termine = await parsePdfToAppointments(arrayBuffer);
+
+      if (!termine.length) {
+        alert("In der PDF wurden keine Termine erkannt.");
+        return;
+      }
+
+      // 4) Termine in deinen Kalender übernehmen
+      termine.forEach(addAppointmentToCalendar);
+
+      alert(`${termine.length} Termine aus der PDF importiert.`);
+    } catch (err) {
+      console.error("PDF-Import fehlgeschlagen:", err);
+      alert("PDF konnte nicht gelesen werden.");
+    } finally {
+      importInput.value = ""; // Reset
+    }
+  });
+}
+
+/**
+ * Liest eine PDF (ArrayBuffer) und versucht daraus Termine zu bauen.
+ * -> Hier musst du das Format deiner PDF anpassen!
+ */
+async function parsePdfToAppointments(arrayBuffer) {
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = "";
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item) => item.str);
+    fullText += strings.join(" ") + "\n";
+  }
+
+  // Beispiel: Wir erwarten Zeilen wie
+  // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
+  const lines = fullText.split(/\r?\n/);
+  const termine = [];
+
+  const regex =
+    /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*[:\-]\s*(.+)$/;
+
+  for (const line of lines) {
+    const m = line.match(regex);
+    if (!m) continue;
+
+    const [_, dateStr, startStr, endStr, title] = m;
+
+    const start = new Date(`${dateStr}T${startStr}:00`);
+    const end   = new Date(`${dateStr}T${endStr}:00`);
+
+    termine.push({
+      title: title.trim(),
+      start,
+      end,
+    });
+  }
+
+  return termine;
+}
+
+/**
+ * Termin in deinen bestehenden Kalender integrieren.
+ * HIER an deine vorhandene Kalender-API anpassen!
+ */
+function addAppointmentToCalendar(appt) {
+  // Beispiel – DU musst das anpassen:
+  // Wenn du z.B. schon eine Funktion window.addKalenderTermin hast:
+  //
+  // window.addKalenderTermin({
+  //   title: appt.title,
+  //   start: appt.start,
+  //   end: appt.end
+  // });
+
+  console.log("Importierter Termin:", appt);
+}
