@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+
+    <link rel="stylesheet" href="../chat.css">
+    <script type="module" src="../chat.js" defer></script>
+</head>
+
+<body>
+
+<header class="chat-header">
+    <h1>Chat</h1>
+</header>
+
+<main class="chat-container">
+
+    <div class="chat-select-section">
+        <label for="contactSelect">Kontakt wählen:</label>
+        <select id="contactSelect">
+            <option value="fahrer">Fahrer</option>
+            <option value="therapeut">Therapeut</option>
+            <option value="personal">Personalabteilung</option>
+        </select>
+    </div>
+
+    <div id="messagesContainer" class="messages"></div>
+
+    <div class="input-row">
+        <input id="messageInput" type="text" placeholder="Nachricht schreiben…" />
+        <button id="sendBtn">Senden</button>
+    </div>
+
+</main>
+
+</body>
+</html>
