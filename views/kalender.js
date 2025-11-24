@@ -9,36 +9,34 @@
   let store = loadStore();
   let user  = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
-  let isBound = false; // verhindert mehrfaches Binden
+  let isBound = false;
 
   // ===== DOM Helpers =====
-  const $ = (id) => document.getElementById(id);
-  const header     = () => $("header");
-  const hours      = () => $("hours");
-  const daysC      = () => $("days");
+  const $         = (id) => document.getElementById(id);
+  const kalHeader = () => $("kalHeader");
+  const kalHours  = () => $("kalHours");
+  const kalDays   = () => $("kalDays");
   const rangeLabel = () => $("rangeLabel");
   const userPill   = () => $("userPill");
   const dlg        = () => $("dialog");
   const dlgTitle   = () => $("dlgTitle");
   const dlgList    = () => $("dlgList");
 
-  // ===== Init (robust fürs dynamische Nachladen) =====
+  // ===== Init =====
   document.addEventListener("DOMContentLoaded", readyOrWait);
-  // Falls das Script nachträglich injiziert wird, direkt prüfen:
   readyOrWait();
 
   function readyOrWait() {
     if (isBound) return;
 
-    const ok = header() && hours() && daysC();
+    const ok = kalHeader() && kalHours() && kalDays();
     if (ok) {
       isBound = true;
       bindOnce();
-      setTimeout(render, 300); // kleiner Puffer bis Layout steht
+      setTimeout(render, 300);
     } else {
-      // Warten, bis die View im DOM ist
       const t = setInterval(() => {
-        if (header() && hours() && daysC()) {
+        if (kalHeader() && kalHours() && kalDays()) {
           clearInterval(t);
           if (isBound) return;
           isBound = true;
@@ -67,10 +65,8 @@
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
 
-    // ICS-Export Button (muss in kalender.html existieren)
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
 
-    // ===== PDF-Import-Button + Input =====
     const importBtn   = $("importPdfBtn");
     const importInput = $("importPdfInput");
 
@@ -78,44 +74,52 @@
       importBtn.addEventListener("click", () => importInput.click());
       importInput.addEventListener("change", onPdfChosen);
     }
+
+    if (userPill()) {
+      userPill().textContent = `Angemeldet als ${user}`;
+    }
   }
 
   // ===== Render =====
   function render() {
     // Kopfzeile
-    header().innerHTML = "";
-    header().append(cell("time", "Zeit"));
+    kalHeader().innerHTML = "";
+    kalHeader().append(kalCell("time", "Zeit"));
 
     const days = [...Array(7)].map((_, i) => addDays(weekStart, i));
     days.forEach(d => {
       const label = `${DAYS[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
-      header().append(cell("cell", label));
+      kalHeader().append(kalCell("cell", label));
     });
-    rangeLabel() && (rangeLabel().textContent = `${fmt(days[0])} – ${fmt(days[6])}`);
+    if (rangeLabel()) {
+      rangeLabel().textContent = `${fmt(days[0])} – ${fmt(days[6])}`;
+    }
 
     // Stunden links
-    hours().innerHTML = "";
+    kalHours().innerHTML = "";
     for (let h = START; h <= END; h++) {
-      hours().append(div("hour", `${pad(h)}:00`));
+      kalHours().append(kalDiv("kal-hour", `${pad(h)}:00`));
     }
 
     // Grid (Slots)
-    daysC().innerHTML = "";
+    kalDays().innerHTML = "";
     const today = new Date();
     days.forEach(d => {
       const tag = iso(d);
-      const col = div("col" + (sameDate(d, today) ? " today" : ""));
+      const col = kalDiv(
+        "kal-col" + (sameDate(d, today) ? " today" : "")
+      );
       for (let h = START; h <= END; h++) {
         const slot = `${pad(h)}:00`;
         const who  = (store[tag] || {})[slot];
         const cls  = who ? (who === user ? "own" : "booked") : "free";
-        const el   = div(`slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
+        const el   = kalDiv(`kal-slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
         col.append(el);
       }
-      daysC().append(col);
+      kalDays().append(col);
     });
   }
 
@@ -179,8 +183,8 @@
     dlgTitle().textContent = "Freien Termin auswählen";
     dlgList().innerHTML = "";
     for (const [tag, slot] of items) {
-      const row = div("item");
-      row.append(div("", `${tag} ${slot}`));
+      const row = kalDiv("item");
+      row.append(kalDiv("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Auswählen";
       b.onclick = () => {
@@ -217,8 +221,8 @@
     dlgTitle().textContent = "Eigene Termine";
     dlgList().innerHTML = "";
     for (const [tag, slot] of mine) {
-      const row = div("item");
-      row.append(div("", `${tag} ${slot}`));
+      const row = kalDiv("item");
+      row.append(kalDiv("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Wählen";
       b.onclick = () => {
@@ -364,13 +368,12 @@
   }
 
   function toICSTimes(tag, slot, minutes) {
-    const start = new Date(`${tag}T${slot}:00`); // lokale Zeit
+    const start = new Date(`${tag}T${slot}:00`);
     const end   = new Date(start.getTime() + minutes * 60000);
     return { dtStart: toICSDateTime(start), dtEnd: toICSDateTime(end) };
   }
 
   function toICSDateTime(d) {
-    // als UTC-Zeitstempel YYYYMMDDTHHMMSSZ
     const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     return z.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   }
@@ -409,14 +412,10 @@
       console.error("PDF-Import fehlgeschlagen:", err);
       alert("PDF konnte nicht gelesen werden.");
     } finally {
-      evt.target.value = ""; // Reset
+      evt.target.value = "";
     }
   }
 
-  /**
-   * Liest eine PDF (ArrayBuffer) und versucht daraus Termine zu bauen.
-   * -> Regex bei Bedarf an das Layout deiner PDF anpassen.
-   */
   async function parsePdfToAppointments(arrayBuffer) {
     if (!window.pdfjsLib) {
       console.error("pdfjsLib ist nicht geladen.");
@@ -433,8 +432,6 @@
       fullText += strings.join(" ") + "\n";
     }
 
-    // Beispiel-Zeilen:
-    // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
     const lines = fullText.split(/\r?\n/);
     const termine = [];
 
@@ -460,10 +457,6 @@
     return termine;
   }
 
-  /**
-   * Termin in den bestehenden Kalender integrieren.
-   * Nimmt die Start-Stunde als Slot (z.B. 08:30 -> "08:00").
-   */
   function addAppointmentToCalendar(appt) {
     const hour = appt.start.getHours();
     if (hour < START || hour > END) {
@@ -473,7 +466,6 @@
     const tag  = iso(appt.start);
     const slot = `${pad(hour)}:00`;
 
-    // Slot schon belegt? -> hier überspringen
     if (store[tag] && store[tag][slot]) {
       console.warn("Slot bereits belegt, übersprungen:", tag, slot);
       return;
@@ -523,16 +515,16 @@
     return Math.round((B - A) / 86400000);
   }
 
-  function div(cls, txt = "") {
+  function kalDiv(cls, txt = "") {
     const n = document.createElement("div");
     if (cls) n.className = cls;
     if (txt) n.textContent = txt;
     return n;
   }
 
-  function cell(cls, txt) {
+  function kalCell(kind, txt) {
     const n = document.createElement("div");
-    n.className = cls === "time" ? "cell time" : "cell";
+    n.className = kind === "time" ? "kal-cell time" : "kal-cell";
     n.textContent = txt;
     return n;
   }
