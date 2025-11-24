@@ -9,34 +9,34 @@
   let store = loadStore();
   let user  = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
-  let isBound = false;
+  let isBound = false; // verhindert mehrfaches Binden
 
   // ===== DOM Helpers =====
-  const $         = (id) => document.getElementById(id);
-  const kalHeader = () => $("kalHeader");
-  const kalHours  = () => $("kalHours");
-  const kalDays   = () => $("kalDays");
+  const $ = (id) => document.getElementById(id);
+  const header     = () => $("header");
+  const hours      = () => $("hours");
+  const daysC      = () => $("days");
   const rangeLabel = () => $("rangeLabel");
   const userPill   = () => $("userPill");
   const dlg        = () => $("dialog");
   const dlgTitle   = () => $("dlgTitle");
   const dlgList    = () => $("dlgList");
 
-  // ===== Init =====
+  // ===== Init (robust fürs dynamische Nachladen) =====
   document.addEventListener("DOMContentLoaded", readyOrWait);
   readyOrWait();
 
   function readyOrWait() {
     if (isBound) return;
 
-    const ok = kalHeader() && kalHours() && kalDays();
+    const ok = header() && hours() && daysC();
     if (ok) {
       isBound = true;
       bindOnce();
       setTimeout(render, 300);
     } else {
       const t = setInterval(() => {
-        if (kalHeader() && kalHours() && kalDays()) {
+        if (header() && hours() && daysC()) {
           clearInterval(t);
           if (isBound) return;
           isBound = true;
@@ -65,8 +65,10 @@
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
 
+    // ICS-Export Button
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
 
+    // PDF-Import-Button + Input
     const importBtn   = $("importPdfBtn");
     const importInput = $("importPdfInput");
 
@@ -83,43 +85,41 @@
   // ===== Render =====
   function render() {
     // Kopfzeile
-    kalHeader().innerHTML = "";
-    kalHeader().append(kalCell("time", "Zeit"));
+    header().innerHTML = "";
+    header().append(cell("time", "Zeit"));
 
     const days = [...Array(7)].map((_, i) => addDays(weekStart, i));
     days.forEach(d => {
       const label = `${DAYS[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
-      kalHeader().append(kalCell("cell", label));
+      header().append(cell("cell", label));
     });
     if (rangeLabel()) {
       rangeLabel().textContent = `${fmt(days[0])} – ${fmt(days[6])}`;
     }
 
     // Stunden links
-    kalHours().innerHTML = "";
+    hours().innerHTML = "";
     for (let h = START; h <= END; h++) {
-      kalHours().append(kalDiv("kal-hour", `${pad(h)}:00`));
+      hours().append(div("hour", `${pad(h)}:00`));
     }
 
     // Grid (Slots)
-    kalDays().innerHTML = "";
+    daysC().innerHTML = "";
     const today = new Date();
     days.forEach(d => {
       const tag = iso(d);
-      const col = kalDiv(
-        "kal-col" + (sameDate(d, today) ? " today" : "")
-      );
+      const col = div("col" + (sameDate(d, today) ? " today" : ""));
       for (let h = START; h <= END; h++) {
         const slot = `${pad(h)}:00`;
         const who  = (store[tag] || {})[slot];
         const cls  = who ? (who === user ? "own" : "booked") : "free";
-        const el   = kalDiv(`kal-slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
+        const el   = div(`slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
         col.append(el);
       }
-      kalDays().append(col);
+      daysC().append(col);
     });
   }
 
@@ -183,8 +183,8 @@
     dlgTitle().textContent = "Freien Termin auswählen";
     dlgList().innerHTML = "";
     for (const [tag, slot] of items) {
-      const row = kalDiv("item");
-      row.append(kalDiv("", `${tag} ${slot}`));
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Auswählen";
       b.onclick = () => {
@@ -221,8 +221,8 @@
     dlgTitle().textContent = "Eigene Termine";
     dlgList().innerHTML = "";
     for (const [tag, slot] of mine) {
-      const row = kalDiv("item");
-      row.append(kalDiv("", `${tag} ${slot}`));
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
       const b = document.createElement("button");
       b.textContent = "Wählen";
       b.onclick = () => {
@@ -432,6 +432,8 @@
       fullText += strings.join(" ") + "\n";
     }
 
+    // Beispiel-Zeilen:
+    // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
     const lines = fullText.split(/\r?\n/);
     const termine = [];
 
@@ -515,16 +517,16 @@
     return Math.round((B - A) / 86400000);
   }
 
-  function kalDiv(cls, txt = "") {
+  function div(cls, txt = "") {
     const n = document.createElement("div");
     if (cls) n.className = cls;
     if (txt) n.textContent = txt;
     return n;
   }
 
-  function kalCell(kind, txt) {
+  function cell(cls, txt) {
     const n = document.createElement("div");
-    n.className = kind === "time" ? "kal-cell time" : "kal-cell";
+    n.className = cls === "time" ? "cell time" : "cell";
     n.textContent = txt;
     return n;
   }
