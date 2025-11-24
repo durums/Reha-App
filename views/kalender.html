@@ -64,6 +64,8 @@
       padding: 1rem;
     }
 
+    /* ==== Kalender Layout (eindeutige Klassen/IDs) ==== */
+
     .kalender-wrapper {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -72,7 +74,7 @@
       max-height: 900px;
     }
 
-    #hours {
+    #kalHours {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -81,20 +83,20 @@
       background: #fafafa;
     }
 
-    .hour {
+    .kal-hour {
       height: 40px;
       line-height: 40px;
       font-size: 0.85rem;
       color: #555;
     }
 
-    .grid {
+    .kal-grid {
       display: grid;
       grid-template-rows: auto 1fr;
       overflow: hidden;
     }
 
-    #header {
+    #kalHeader {
       display: grid;
       grid-template-columns: repeat(8, 1fr); /* Zeit + 7 Tage */
       border-bottom: 1px solid #ddd;
@@ -103,18 +105,18 @@
       font-weight: 600;
     }
 
-    .cell {
+    .kal-cell {
       padding: 0.35rem;
       border-right: 1px solid #eee;
       text-align: center;
       box-sizing: border-box;
     }
 
-    .cell.time {
+    .kal-cell.time {
       font-weight: 700;
     }
 
-    #days {
+    #kalDays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       overflow: auto;
@@ -123,15 +125,15 @@
       border-top: none;
     }
 
-    .col {
+    .kal-col {
       border-right: 1px solid #f0f0f0;
     }
 
-    .col.today {
+    .kal-col.today {
       background: #fffde7;
     }
 
-    .slot {
+    .kal-slot {
       height: 40px;
       border-bottom: 1px solid #f0f0f0;
       font-size: 0.8rem;
@@ -144,17 +146,17 @@
       box-sizing: border-box;
     }
 
-    .slot.free:hover {
+    .kal-slot.free:hover {
       background: #e3f2fd;
     }
 
-    .slot.own {
+    .kal-slot.own {
       background: #bbdefb;
       color: #0d47a1;
       font-weight: 600;
     }
 
-    .slot.booked {
+    .kal-slot.booked {
       background: #eeeeee;
       color: #777;
     }
@@ -230,7 +232,7 @@
     <button id="moveBtn" class="secondary" type="button">Termin verschieben/absagen</button>
     <button id="exportBtn" class="secondary" type="button">Alle meine Termine exportieren</button>
 
-    <!-- NEU: PDF-Import-Button -->
+    <!-- PDF-Import-Button -->
     <button id="importPdfBtn" class="secondary" type="button">PDF importieren</button>
     <!-- verstecktes File-Input für PDF -->
     <input
@@ -246,11 +248,11 @@
 
   <main>
     <div class="kalender-wrapper">
-      <div id="hours"></div>
+      <div id="kalHours"></div>
 
-      <div class="grid">
-        <div id="header"></div>
-        <div id="days"></div>
+      <div class="kal-grid">
+        <div id="kalHeader"></div>
+        <div id="kalDays"></div>
       </div>
     </div>
   </main>
@@ -267,17 +269,13 @@
   <!-- pdf.js einbinden -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
   <script>
-    // Worker für pdf.js setzen
     if (window.pdfjsLib) {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
     }
   </script>
 
-  <!-- Dein Kalender-Script (Dateiname ggf. anpassen!) -->
+  <!-- Dein Kalender-Script -->
   <script src="kalender.js"></script>
-  <!-- falls deine Datei noch "kalender (1).js" heißt:
-       <script src="kalender (1).js"></script>
-  -->
 </body>
 </html>
