@@ -64,8 +64,6 @@
       padding: 1rem;
     }
 
-    /* ==== Kalender Layout (eindeutige Klassen/IDs) ==== */
-
     .kalender-wrapper {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -74,7 +72,7 @@
       max-height: 900px;
     }
 
-    #kalHours {
+    #hours {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -83,20 +81,20 @@
       background: #fafafa;
     }
 
-    .kal-hour {
+    .hour {
       height: 40px;
       line-height: 40px;
       font-size: 0.85rem;
       color: #555;
     }
 
-    .kal-grid {
+    .grid {
       display: grid;
       grid-template-rows: auto 1fr;
       overflow: hidden;
     }
 
-    #kalHeader {
+    #header {
       display: grid;
       grid-template-columns: repeat(8, 1fr); /* Zeit + 7 Tage */
       border-bottom: 1px solid #ddd;
@@ -105,18 +103,18 @@
       font-weight: 600;
     }
 
-    .kal-cell {
+    .cell {
       padding: 0.35rem;
       border-right: 1px solid #eee;
       text-align: center;
       box-sizing: border-box;
     }
 
-    .kal-cell.time {
+    .cell.time {
       font-weight: 700;
     }
 
-    #kalDays {
+    #days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       overflow: auto;
@@ -125,15 +123,15 @@
       border-top: none;
     }
 
-    .kal-col {
+    .col {
       border-right: 1px solid #f0f0f0;
     }
 
-    .kal-col.today {
+    .col.today {
       background: #fffde7;
     }
 
-    .kal-slot {
+    .slot {
       height: 40px;
       border-bottom: 1px solid #f0f0f0;
       font-size: 0.8rem;
@@ -146,17 +144,17 @@
       box-sizing: border-box;
     }
 
-    .kal-slot.free:hover {
+    .slot.free:hover {
       background: #e3f2fd;
     }
 
-    .kal-slot.own {
+    .slot.own {
       background: #bbdefb;
       color: #0d47a1;
       font-weight: 600;
     }
 
-    .kal-slot.booked {
+    .slot.booked {
       background: #eeeeee;
       color: #777;
     }
@@ -248,11 +246,11 @@
 
   <main>
     <div class="kalender-wrapper">
-      <div id="kalHours"></div>
+      <div id="hours"></div>
 
-      <div class="kal-grid">
-        <div id="kalHeader"></div>
-        <div id="kalDays"></div>
+      <div class="grid">
+        <div id="header"></div>
+        <div id="days"></div>
       </div>
     </div>
   </main>
@@ -275,7 +273,7 @@
     }
   </script>
 
-  <!-- Dein Kalender-Script -->
+  <!-- Kalender-Script: Dateiname anpassen, falls nötig -->
   <script src="kalender.js"></script>
 </body>
 </html>
