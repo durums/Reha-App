@@ -34,7 +34,7 @@ let unsubscribe = null;
 // =============================
 onAuthStateChanged(auth, (u) => {
     if (!u) {
-        window.location.href = "../../index.html";
+        window.location.href = "../index.html";
         return;
     }
     user = u;
