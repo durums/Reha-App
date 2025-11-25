@@ -1,103 +1,25 @@
-body {
-    margin: 0;
-    background: #F9FAFB;
-    font-family: Inter, Roboto, sans-serif;
+.kontakt-section {
+  padding: 1.2rem;
+  line-height: 1.5;
 }
 
-.chat-header {
-    background: #A8D0E6;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    padding: 0 40px;
+.kontakt-section h2 {
+  margin-bottom: 0.5rem;
 }
 
-.chat-header h1 {
-    font-size: 28px;
-    margin: 0;
+.kontakt-section ol {
+  margin: 0.5rem 0 1rem 1.2rem;
 }
 
-.chat-container {
-    max-width: 1200px;
-    width: 90%;
-    margin: 30px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.kontakt-btn {
+  padding: 0.6rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
 
-.chat-select-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-label {
-    font-size: 14px;
-    color: #6B7280;
-}
-
-select {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #D1D5DB;
-}
-
-.messages {
-    background: #FFFFFF;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    height: 60vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.message {
-    max-width: 70%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 16px;
-}
-
-.me {
-    background: #2563EB;
-    color: white;
-    align-self: flex-end;
-}
-
-.them {
-    background: #E5E7EB;
-    color: #111827;
-    align-self: flex-start;
-}
-
-.input-row {
-    display: flex;
-    gap: 10px;
-}
-
-.input-row input {
-    flex: 1;
-    padding: 14px;
-    font-size: 16px;
-    border: 1px solid #D1D5DB;
-    border-radius: 8px;
-}
-
-#sendBtn {
-    padding: 14px 20px;
-    font-size: 16px;
-    background: #2563EB;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-#sendBtn:hover {
-    background: #1D4ED8;
+.kontakt-btn:hover {
+  filter: brightness(0.92);
 }
