@@ -1,46 +1,5 @@
 (() => {
 
-  async function ensurePDFImport() {
-    // Wenn bereits alles geladen ist, sofort zurück
-    if (typeof window.PDFImport !== 'undefined') return;
-    
-    console.log('Lade PDF.js Bibliotheken...');
-    
-    // Prüfe und lade pdf.min.js falls nicht vorhanden
-    if (typeof window.pdfjsLib === 'undefined') {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-        script.onload = resolve;
-        script.onerror = () => reject(new Error('pdf.min.js konnte nicht geladen werden (evtl. Adblocker?)'));
-        document.head.appendChild(script);
-      });
-    }
-    
-    // Lade pdf.worker.min.js (wird benötigt)
-    await new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      script.onload = resolve;
-      script.onerror = () => reject(new Error('pdf.worker.min.js konnte nicht geladen werden'));
-      document.head.appendChild(script);
-    });
-    
-    console.log('Lade PDF-Import Modul...');
-    
-    // Lade nun pdf-import.js
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'pdf-import.js'; // Pfad prüfen: Muss im gleichen Ordner wie kalender.js liegen!
-      script.onload = () => {
-        console.log('PDF-Import Modul geladen');
-        resolve();
-      };
-      script.onerror = () => reject(new Error('pdf-import.js konnte nicht geladen werden'));
-      document.head.appendChild(script);
-    });
-  }
-
   // ===== Konstanten =====
   const START = 8, END = 17; // Stunden inkl.
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
@@ -56,7 +15,6 @@
   const hours      = () => $("hours");
   const daysC      = () => $("days");
   const rangeLabel = () => $("rangeLabel");
-  const userPill   = () => $("userPill");
   const dlg        = () => $("dialog");
   const dlgTitle   = () => $("dlgTitle");
   const dlgList    = () => $("dlgList");
@@ -83,6 +41,39 @@
     }
   }
 
+  // Nur noch prüfen, ob PDFImport verfügbar ist
+  async function ensurePDFImport() {
+    // Wenn bereits im globalen Scope, sofort zurück
+    if (typeof window.PDFImport !== 'undefined') {
+      console.log('✅ PDFImport bereits verfügbar');
+      return;
+    }
+    
+    console.log('📦 Lade PDFImport-Modul...');
+    
+    // 🔧 WICHTIG: Absoluter Pfad vom Root-Verzeichnis
+    // Die Datei liegt im selben Ordner wie index.html, NICHT in views/
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = '/pdf-import.js'; // <-- KORREKT: Root-Pfad
+      
+      script.onload = () => {
+        if (typeof window.PDFImport === 'undefined') {
+          reject(new Error('PDFImport-Modul hat sich nicht registriert - Syntaxfehler?'));
+        } else {
+          console.log('✅ PDFImport-Modul erfolgreich geladen');
+          resolve();
+        }
+      };
+      
+      script.onerror = () => {
+        reject(new Error('❌ pdf-import.js nicht gefunden unter /pdf-import.js - Pfad prüfen!'));
+      };
+      
+      document.head.appendChild(script);
+    });
+  }
+
   function bindOnce() {
     $("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, -7); render(); });
     $("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,  7); render(); });
@@ -91,13 +82,14 @@
     $("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
-
-    // ICS-Export Button (muss in kalender.html existieren)
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
+
+    // 🔧 KORRIGIERT: PDF-Import Button Event-Handler
     $("pdfImportBtn")?.addEventListener("click", () => {
       $("pdfFileInput").click();
     });
     
+    // 🔧 KORRIGIERT: Error-Handling und besserer User-Feedback
     $("pdfFileInput")?.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -107,26 +99,40 @@
       const confirmBtn = $("pdfConfirmBtn");
       
       try {
-        preview.innerHTML = '<div>Lade PDF...</div>';
+        preview.innerHTML = '<div>⏳ Lade PDF-Import-Modul...</div>';
+        confirmBtn.style.display = 'none';
         modal.showModal();
-      
-        await ensurePDFImport();
-      
-        // Parse PDF
-        const events = await PDFImport.parse(file);
-        preview.innerHTML = PDFImport.generatePreview(events);
         
-        // Bestätigungs-Button
+        // Modul sicher laden
+        await ensurePDFImport();
+        
+        preview.innerHTML = '<div>📄 Parse PDF...</div>';
+        const events = await PDFImport.parse(file);
+        
+        if (events.length === 0) {
+          preview.innerHTML = '<div class="pdf-error">⚠️ Keine Termine im PDF gefunden</div>';
+          return;
+        }
+        
+        preview.innerHTML = PDFImport.generatePreview(events);
+        confirmBtn.style.display = 'inline-block';
+        
+        // 🔧 KORRIGIERT: Klare Rückmeldung nach Import
         confirmBtn.onclick = () => {
           const result = PDFImport.importToCalendar(events, store, user);
           saveStore();
           modal.close();
-          alert(`Importiert: ${result.imported} Termine\nKonflikte: ${result.conflicts}`);
+          alert(`✅ Import erfolgreich!\n\nImportiert: ${result.imported} Termine\n⚠️ Übersprungen: ${result.conflicts} Konflikte`);
           render();
         };
         
       } catch (error) {
-        preview.innerHTML = `<div class="pdf-error">Fehler: ${error.message}</div>`;
+        console.error('❌ PDF-Import Fehler:', error);
+        preview.innerHTML = `
+          <div class="pdf-error">
+            <strong>Fehler:</strong> ${error.message}<br>
+            <small>Öffne die Browser-Console (F12) für Details</small>
+          </div>`;
         confirmBtn.style.display = 'none';
       }
     });
