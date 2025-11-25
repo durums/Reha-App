@@ -1,6 +1,10 @@
 <h2 class="rp-title">📅 Kalender</h2>
 
-<!-- views/kalender.html -->
+<!-- WICHTIG: pdf.js ZUERST laden, bevor irgendetwas anderes läuft -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+
+<!-- DER REST IHRES CODES -->
 <div class="toolbar">
   <div class="left">
     <button id="prevBtn">◀︎ Woche</button>
@@ -29,7 +33,7 @@
   </div>
 </div>
 
-<!-- 🔧 KORRIGIERT: Modal nach dem Kalender (bessere Struktur) -->
+<!-- 🔧 KORRIGIERT: Modal nach dem Kalender -->
 <dialog id="pdfImportModal">
   <form method="dialog">
     <h3 id="pdfImportTitle">PDF-Therapieplan importieren</h3>
