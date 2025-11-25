@@ -1,13 +1,5 @@
 <h2 class="rp-title">📅 Kalender</h2>
 
-<!-- 🔧 KORRIGIERT: Nur pdf.js laden, pdf-import.js wird dynamisch in kalender.js geladen -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
-<script>console.log('pdf.min.js geladen:', typeof window.pdfjsLib);</script>
-
-<!-- WICHTIG: Entfernt, denn kalender.js lädt es dynamisch -->
-<!-- <script src="pdf-import.js"></script> --> 
-
 <!-- views/kalender.html -->
 <div class="toolbar">
   <div class="left">
@@ -21,8 +13,15 @@
     <button id="mineBtn">Eigene Termine</button>
     <button id="moveBtn">Verschieben / Absagen</button>
     <button id="exportBtn">Kalender-Export</button>
-    <button id="pdfImportBtn" title="PDF-Therapieplan importieren">📄 Import</button>
-    <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;">
+
+    <!-- NEU: PDF-Import-Button + verstecktes File-Input -->
+    <button id="importPdfBtn">Plan (PDF) importieren</button>
+    <input
+      id="importPdfInput"
+      type="file"
+      accept="application/pdf"
+      style="display:none"
+    />
   </div>
 </div>
 
@@ -40,17 +39,6 @@
     <h3 id="dlgTitle">Auswahl</h3>
     <div id="dlgList" class="list"></div>
     <div class="dlg-actions">
-      <button value="cancel">Abbrechen</button>
-    </div>
-  </form>
-</dialog>
-
-<dialog id="pdfImportModal">
-  <form method="dialog">
-    <h3 id="pdfImportTitle">PDF-Therapieplan importieren</h3>
-    <div id="pdfPreview" class="list"></div>
-    <div class="dlg-actions">
-      <button type="button" id="pdfConfirmBtn" style="background:#10B981;color:white;border-color:#059669;display:none;">Importieren</button>
       <button value="cancel">Abbrechen</button>
     </div>
   </form>
