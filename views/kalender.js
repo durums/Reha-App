@@ -55,7 +55,7 @@
     // Die Datei liegt im selben Ordner wie index.html, NICHT in views/
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = '/pdf-import.js'; // <-- KORREKT: Root-Pfad
+      script.src = '../pdf-import.js'; 
       
       script.onload = () => {
         if (typeof window.PDFImport === 'undefined') {
