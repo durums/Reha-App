@@ -68,6 +68,18 @@
     }
   }
 
+    // CSV-Import
+    const csvBtn   = $("importCsvBtn");
+    const csvInput = $("importCsvInput");
+    
+    if (csvBtn && csvInput) {
+      csvBtn.addEventListener("click", () => csvInput.click());
+      csvInput.addEventListener("change", onCsvChosen);
+    } else {
+      console.warn("CSV-Buttons wurden nicht gefunden.");
+    }
+
+
   // ===== Render =====
   function render() {
     // Kopfzeile (Tage)
