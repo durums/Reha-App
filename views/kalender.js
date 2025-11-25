@@ -422,6 +422,95 @@
 
     book(tag, slot, user);
   }
+  // ===== CSV-Import =====
+
+async function onCsvChosen(evt) {
+  const file = evt.target.files && evt.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const termine = parseCsvAppointments(text);
+
+    if (!termine.length) {
+      alert("In der CSV wurden keine Termine gefunden.");
+      return;
+    }
+
+    termine.forEach(addCsvAppointmentToCalendar);
+    render();
+
+    alert(`${termine.length} Termine aus CSV importiert.`);
+  } catch (err) {
+    console.error("CSV-Import fehlgeschlagen:", err);
+    alert("CSV konnte nicht gelesen werden.");
+  } finally {
+    evt.target.value = "";
+  }
+}
+
+function parseCsvAppointments(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  const out = [];
+
+  // Erwartetes Format:
+  // Datum,Zeit,Beschreibung
+  // 24.11.2025,09:00,10:00 Vitalwerterfassung – 4. Etage – Frau Bick
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    const parts = line.split(",");
+
+    if (parts.length < 3) continue;
+
+    const datum = parts[0];
+    const startZeit = parts[1];
+    
+    // Beschreibung enthält Kommas → wieder joinen
+    const beschreibung = parts.slice(2).join(",").trim();
+
+    // Start-Zeit (HH:MM)
+    const isoDate = deDateToIso(datum);
+    const start = new Date(`${isoDate}T${startZeit}:00`);
+
+    out.push({
+      title: beschreibung,
+      start
+    });
+  }
+
+  return out;
+}
+  
+  // CSV behandelt keine Endzeiten → immer auf volle Stunde runden
+  function addCsvAppointmentToCalendar(appt) {
+    let hour = appt.start.getHours();
+    const minute = appt.start.getMinutes();
+  
+    if (minute >= 30 && hour < END) {
+      hour += 1;
+    }
+  
+    if (hour < START || hour > END) {
+      console.warn("Termin außerhalb des Kalenders:", appt);
+      return;
+    }
+  
+    const tag = iso(appt.start);
+    const slot = `${pad(hour)}:00`;
+  
+    if (store[tag] && store[tag][slot]) {
+      console.warn("Slot belegt (übersprungen):", tag, slot);
+      return;
+    }
+
+  book(tag, slot, user);
+}
+
 
   // ===== Utils =====
   function mondayOf(d){ const x = new Date(d); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
