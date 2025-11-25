@@ -373,7 +373,7 @@
       
       console.log('📦 Lade PDFImport-Modul...');
       const script = document.createElement('script');
-      script.src = '../pdf-import.js'; // ← WICHTIG: Pfad an Ihre Struktur anpassen!
+      script.src = 'pdf-import.js'; // ← WICHTIG: Pfad an Ihre Struktur anpassen!
       
       script.onload = () => {
         if (typeof window.PDFImport === 'undefined') {
