@@ -43,36 +43,48 @@
 
   // Nur noch prüfen, ob PDFImport verfügbar ist
   async function ensurePDFImport() {
-    // Wenn bereits im globalen Scope, sofort zurück
-    if (typeof window.PDFImport !== 'undefined') {
-      console.log('✅ PDFImport bereits verfügbar');
-      return;
-    }
-    
-    console.log('📦 Lade PDFImport-Modul...');
-    
-    // 🔧 WICHTIG: Absoluter Pfad vom Root-Verzeichnis
-    // Die Datei liegt im selben Ordner wie index.html, NICHT in views/
-    return new Promise((resolve, reject) => {
+  // Wenn alles bereits geladen, sofort zurück
+  if (typeof window.PDFImport !== 'undefined') {
+    console.log('✅ PDFImport bereits verfügbar');
+    return;
+  }
+
+  console.log('📦 Lade PDF.js Bibliothek...');
+
+  // 1. Prüfe/warte auf pdf.js
+  if (typeof window.pdfjsLib === 'undefined') {
+    await new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = '../pdf-import.js'; 
-      
-      script.onload = () => {
-        if (typeof window.PDFImport === 'undefined') {
-          reject(new Error('PDFImport-Modul hat sich nicht registriert - Syntaxfehler?'));
-        } else {
-          console.log('✅ PDFImport-Modul erfolgreich geladen');
-          resolve();
-        }
-      };
-      
-      script.onerror = () => {
-        reject(new Error('❌ pdf-import.js nicht gefunden unter /pdf-import.js - Pfad prüfen!'));
-      };
-      
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('pdf.min.js konnte nicht geladen werden'));
       document.head.appendChild(script);
     });
   }
+
+  console.log('📦 Lade PDFImport-Modul...');
+
+  // 2. Lade jetzt pdf-import.js
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = '../pdf-import.js'; // <-- WICHTIG: Relativer Pfad!
+    
+    script.onload = () => {
+      if (typeof window.PDFImport === 'undefined') {
+        reject(new Error('PDFImport-Modul hat sich nicht registriert'));
+      } else {
+        console.log('✅ PDFImport-Modul erfolgreich geladen');
+        resolve();
+      }
+    };
+    
+    script.onerror = () => {
+      reject(new Error('❌ pdf-import.js nicht gefunden unter ../pdf-import.js - Pfad prüfen!'));
+    };
+    
+    document.head.appendChild(script);
+  });
+}
 
   function bindOnce() {
     $("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, -7); render(); });

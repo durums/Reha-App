@@ -3,6 +3,8 @@
 <!-- 🔧 KORRIGIERT: Nur pdf.js laden, pdf-import.js wird dynamisch in kalender.js geladen -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>console.log('pdf.min.js geladen:', typeof window.pdfjsLib);</script>
+
 <!-- WICHTIG: Entfernt, denn kalender.js lädt es dynamisch -->
 <!-- <script src="pdf-import.js"></script> --> 
 
