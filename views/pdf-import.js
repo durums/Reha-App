@@ -7,64 +7,70 @@ window.PDFImport = {
     const events = [];
     let currentDate = null;
 
+    // Datumszeile: Montag – 24.11.2025
     const dateRegex = /^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+–\s+(\d{2}\.\d{2}\.\d{4})$/;
 
-    const entryRegex = /^•\s*(\d{2}:\d{2})–(\d{2}:\d{2})\s+(.*?)\s+–\s+(.*?)\s+–\s+(.*)$/;
+    // Terminzeile: 09:00–10:00 Titel – Ort – Person
+    const entryRegex = /^(\d{2}:\d{2})–(\d{2}:\d{2})\s+(.*?)\s+–\s+(.*?)\s+–\s+(.*)$/;
 
     for (let raw of lines) {
       const line = raw.trim();
       if (!line) continue;
 
-      // --- DATUM ERKENNEN ---
-      let m = dateRegex.exec(line);
-      if (m) {
-        const [_, wtag, dateStr] = m;
-        const iso = dateStr.split(".").reverse().join("-");
+      // Datum erkennen
+      const d = dateRegex.exec(line);
+      if (d) {
+        const iso = d[2].split('.').reverse().join('-');
         currentDate = iso;
         continue;
       }
 
-      // --- TERMINZEILE ERKENNEN ---
-      let e = entryRegex.exec(line);
-      if (e && currentDate) {
-        const [_, start, end, title, room, person] = e;
+      // Termin erkennen
+      const e = entryRegex.exec(line);
+      if (!e || !currentDate) continue;
 
-        events.push({
-          date: currentDate,
-          start: start,
-          end: end,
-          title: title.trim(),
-          room: room.trim(),
-          person: person.trim()
-        });
-      }
+      const [, start, end, title, room, person] = e;
+
+      // Auf volle Stunde runden:
+      const sh = start.split(':')[0] + ":00";
+      let eh = end.split(':')[0];
+      if (end.split(':')[1] !== "00") eh = String(Number(eh) + 1).padStart(2,'0');
+      eh += ":00";
+
+      events.push({
+        date: currentDate,
+        start: sh,
+        end: eh,
+        title: title.trim(),
+        room: room.trim(),
+        person: person.trim()
+      });
     }
 
     return events;
   },
 
+
   generatePreview(events) {
-    return events.map(ev => `
+    return events.map(e => `
       <div class="pdf-event-item">
-        <strong>${ev.date}</strong><br>
-        ${ev.start}–${ev.end}<br>
-        ${ev.title}<br>
-        <em>${ev.room} – ${ev.person}</em>
+        <strong>${e.date}</strong><br>
+        ${e.start}–${e.end}<br>
+        ${e.title}<br>
+        <em>${e.room} – ${e.person}</em>
       </div>
     `).join("");
   },
 
+
   importToCalendar(events, store, user) {
-    let imported = 0;
-    let conflicts = 0;
+    let imported = 0, conflicts = 0;
 
     for (const ev of events) {
-      store[ev.date] ??= {};
+      store[ev.date] ||= {};
 
-      const slot = ev.start;
-
-      if (!store[ev.date][slot]) {
-        store[ev.date][slot] = user;
+      if (!store[ev.date][ev.start]) {
+        store[ev.date][ev.start] = ev.title;   // sichtbarer Titel im Kalender
         imported++;
       } else {
         conflicts++;
