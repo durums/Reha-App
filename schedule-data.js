@@ -53,7 +53,7 @@ window.DEFAULT_SCHEDULE = {
 
     // Montag (07.07.2025) – Tag 5
     5: `08:30 - 09:00 | Atemtherapie Gruppe | Gruppenraum 3/3.OG | Frau Herrmann
-09:00 - 10:30 | Trainingstherapie (3. Etage) | Reha 2 | 
+09:00 - 10:30 | Trainingstherapie (3. Etage) | Reha 2 |
 10:30 - 11:00 | Fango (4. Etage) | | Passive Leistung
 11:00 - 11:30 | Krankengymnastik (4. Etage) | | Frau Flock
 11:30 - 11:50 | Essen EG | | Herr Pauser
@@ -96,10 +96,10 @@ window.REHA_PLAN_EVENTS = [
 
     // Montag 30.06.2025
     { date: "2025-06-30", start: "09:00", end: "09:30", title: "Vitalwerterfassung",       location: "4. Etage" },
-    { date: "2025-06-30", start: "09:30", end: "10:30", title: "Rehaeinführung",            location: "4. Etage" },
-    { date: "2025-06-30", start: "10:30", end: "11:00", title: "Lymphdrainage",             location: "4. Etage" },
-    { date: "2025-06-30", start: "11:00", end: "11:30", title: "Krankengymnastik",          location: "4. Etage" },
-    { date: "2025-06-30", start: "11:30", end: "12:00", title: "Essen",                     location: "EG" },
+    { date: "2025-06-30", start: "09:30", end: "10:30", title: "Rehaeinführung",           location: "4. Etage" },
+    { date: "2025-06-30", start: "10:30", end: "11:00", title: "Lymphdrainage",            location: "4. Etage" },
+    { date: "2025-06-30", start: "11:00", end: "11:30", title: "Krankengymnastik",         location: "4. Etage" },
+    { date: "2025-06-30", start: "11:30", end: "12:00", title: "Essen",                    location: "EG" },
     { date: "2025-06-30", start: "12:00", end: "13:00", title: "Arzt Eingangsuntersuchung", location: "4. Etage" },
 
     // 👉 Hier kannst du ALLE weiteren Termine aus deinem PDF hinzufügen.
