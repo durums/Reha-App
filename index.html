@@ -18,131 +18,92 @@
 <body class="center-auth">
 
   <!-- 🔘 Menü-Button oben links -->
-  <button id="menuToggle" class="menu-toggle" style="display:none;">☰</button>
+  <button id="menu-toggle" class="menu-toggle" aria-label="Menü öffnen" hidden>
+    ☰
+  </button>
 
-  <!-- 🌐 Seitenmenü -->
-  <div id="sidebar">
-    <div class="sidebar-header">
-      <h2>Menü</h2>
-      <button id="closeSidebar">×</button>
-    </div>
-  
-    <!-- 👤 Konto jetzt OBEN -->
-    <div class="sidebar-account">
-      <div class="welcome-text">Willkommen</div>
-      <a class="account-row" href="#profil" title="Profil öffnen">
-        <svg class="avatar-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.9"/>
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="currentColor" opacity="0.5"/>
-        </svg>
-        <span id="sidebar-name">—</span>
-      </a>
-    </div>
-  
-    <!-- Navi bleibt darunter -->
-    <nav class="sidebar">
-      <a href="#trainingsplan" data-match="trainingsplan">🏋️ Trainingsplan</a>
-      <a href="#fortschritt"   data-match="fortschritt">📊 Fortschritt</a>
-      <a href="#tagesprogramm" data-match="tagesprogramm">🗓️ Tagesprogramm</a>
-      <a href="#kalender"      data-match="kalender">📅 Kalender</a>
-      <a href="#termine"       data-match="termine">🗂️ Termine</a>
-      <a href="#kontaktieren"  data-match="feedback">📞 Kontaktieren</a>
-      <a href="#rezepte"       data-match="rezepte">🧾 Rezepte</a>
-      <a href="#feedback"      data-match="feedback">⭐ Feedback</a>
-      <a href="#profil"        data-match="profil">👤 Profil</a>
-      <a href="#hilfe"         data-match="hilfe">❓ Hilfe</a>
-    </nav>
-  
-    <div class="sidebar-footer">
-      <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
-    </div>
-  </div>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar-container">
+      <header class="sidebar-header">
+        <div class="sidebar-logo">🏥</div>
+        <div>
+          <div class="sidebar-title">Reha Programm</div>
+          <div class="sidebar-subtitle">Dein persönlicher Rehaplan</div>
+        </div>
+      </header>
 
-  <!-- 🔐 Auth-Bereich -->
-  <div class="card" id="auth-forms">
-    <h2 id="auth-title">Anmeldung</h2>
-
-    <!-- Login -->
-    <form id="login-form" onsubmit="return false;">
-      <input id="li-email"    type="email"    placeholder="E-Mail" required />
-      <input id="li-password" type="password" placeholder="Passwort" required />
-  
-      <div class="login-actions" style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;margin:.5rem 0 0;">
-        <button type="submit">Anmelden</button>
-        <button type="button" id="forgotBtn" class="linklike" style="background:none;border:none;color:#2563EB;cursor:pointer;padding:.25rem .25rem;">
-          Passwort vergessen?
-        </button>
-      </div>
-    </form>
-  
-    <!-- Link zum Signup -->
-    <div style="margin-top:12px;">
-      <a href="#signup" id="signupLink" style="color:#2563EB;text-decoration:underline;">Konto erstellen</a>
-    </div>
-  
-    <!-- Signup -->
-    <form id="signup-form" onsubmit="return false;" style="display:none; margin-top:16px;">
-      <input id="su-firstname"  type="text"     placeholder="Vorname" required />
-      <input id="su-lastname"   type="text"     placeholder="Nachname" required />
-      <input id="su-birthdate"  type="date"     placeholder="Geburtsdatum" />
-      <input id="su-email"      type="email"    placeholder="E-Mail" required />
-      <input id="su-password"   type="password" placeholder="Passwort (min. 6 Zeichen)" minlength="6" required />
-  
-      <label for="su-group" style="margin-top:.5rem;display:block;">Gruppe</label>
-      <select id="su-group" required style="width:100%;padding:.6rem;border-radius:.5rem;border:1px solid:#ccc;">
-        <option value="" disabled selected>Bitte auswählen…</option>
-        <option value="Knie">Knie</option>
-        <option value="Hüfte">Hüfte</option>
-        <option value="Arm">Arm</option>
-        <option value="Onkologie">Onkologie</option>
-      </select>
-  
-      <button type="submit" style="margin-top:12px;">Konto erstellen</button>
-  
-      <div style="margin-top:12px;">
-        <a href="#login" id="backToLogin" style="color:#2563EB;text-decoration:underline;">Zurück zur Anmeldung</a>
-      </div>
-    </form>
-  </div>
-  
-
-  <!-- 🔐 Geschützte App -->
-  <div id="app" class="container" style="display:none;">
-    <div id="user-area" style="display:none;">
-      <span id="user-info">Nicht angemeldet</span>
-    </div>
-
-    <div id="app-section">
-      <main id="content" class="main-content"></main>
-    </div>
-
-    <div class="sync-status" id="syncStatus">Synchronisiere…</div>
-    <div class="edit-section" id="editSection">
-      <div class="edit-area active" id="editArea">
-        <textarea class="edit-textarea" id="scheduleEditor" placeholder="Programm hier bearbeiten…"></textarea>
-        <button class="save-btn" id="saveBtn">Speichern</button>
-        <div class="qr-section">
-          <div class="qr-title">App teilen via QR-Code</div>
-          <div class="qr-code" id="qrCode"></div>
-          <div class="qr-url"  id="qrUrl"></div>
+      <div class="sidebar-account">
+        <div id="account-info" class="account-box">
+          <div class="welcome-text">Willkommen</div>
+          <div id="account-email" class="account-email">Gast</div>
         </div>
       </div>
-    </div>
 
-    <!-- 📝 Notizen Modal -->
-    <div class="note-modal" id="noteModal">
-      <div class="note-modal-content">
-        <div class="note-modal-title" id="noteModalTitle">Notiz hinzufügen</div>
-        <textarea class="note-textarea" id="noteTextarea" placeholder="Hier können Sie eine Notiz zu diesem Termin hinzufügen…"></textarea>
-        <div class="note-modal-buttons">
-          <button class="note-save-btn"   id="noteSaveBtn">Speichern</button>
-          <button class="note-cancel-btn" id="noteCancelBtn">Abbrechen</button>
-        </div>
-        <button class="note-delete-btn" id="noteDeleteBtn" style="display:none;">Notiz löschen</button>
+      <nav class="sidebar">
+        <a href="#trainingsplan" data-match="trainingsplan">🏋️ Trainingsplan</a>
+        <a href="#fortschritt"   data-match="fortschritt">📊 Fortschritt</a>
+        <a href="#tagesprogramm" data-match="tagesprogramm">🗓️ Tagesprogramm</a>
+        <a href="#kalender"      data-match="kalender">📅 Kalender</a>
+        <a href="#kalender2"     data-match="kalender2">🆕 Kalender 2.0</a>
+        <a href="#termine"       data-match="termine">🗂️ Termine</a>
+        <a href="#kontaktieren"  data-match="feedback">📞 Kontaktieren</a>
+        <a href="#rezepte"       data-match="rezepte">🧾 Rezepte</a>
+        <a href="#feedback"      data-match="feedback">⭐ Feedback</a>
+        <a href="#profil"        data-match="profil">👤 Profil</a>
+        <a href="#hilfe"         data-match="hilfe">❓ Hilfe</a>
+      </nav>
+    
+      <div class="sidebar-footer">
+        <button id="sign-out" class="logout-btn">🚪 Abmelden</button>
       </div>
-    </div>
+    </aside>
+
+    <main id="content" class="content">
+      <section class="auth-panel">
+        <h1 id="auth-title">Anmelden</h1>
+
+        <!-- LOGIN-FORMULAR -->
+        <form id="login-form" class="auth-form">
+          <input id="li-email"    type="email"    placeholder="E-Mail" required />
+          <input id="li-password" type="password" placeholder="Passwort" required />
+  
+          <div class="login-actions" style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;margin:.5rem 0 0;">
+            <button type="submit">Anmelden</button>
+            <button type="button" id="forgotBtn" class="linklike-btn" style="background:none;border:none;color:#2563EB;cursor:pointer;padding:.25rem .25rem;">
+              Passwort vergessen?
+            </button>
+          </div>
+        </form>
+  
+        <!-- Link zum Signup -->
+        <div style="margin-top:12px;">
+          <a href="#signup" id="signupLink" style="color:#2563EB;text-decoration:underline;">Konto erstellen</a>
+        </div>
+  
+        <!-- SIGNUP-FORMULAR -->
+        <form id="signup-form" class="auth-form" style="display:none;">
+          <input id="su-displayName" type="text"     placeholder="Name (optional)" />
+          <input id="su-email"       type="email"    placeholder="E-Mail" required />
+          <input id="su-password"    type="password" placeholder="Passwort (min. 6 Zeichen)" required />
+          <button type="submit">Registrieren</button>
+        </form>
+      </section>
+    </main>
   </div>
 
+  <!-- Firebase Config (für Host/Domain anpassen, wenn nötig) -->
+  <script>
+    window.FIREBASE_CONFIG = {
+      apiKey:            "DEIN_API_KEY_HIER",
+      authDomain:        "DEIN_AUTH_DOMAIN.firebaseapp.com",
+      projectId:         "DEIN_PROJECT_ID",
+      storageBucket:     "DEIN_BUCKET_ID.appspot.com",
+      messagingSenderId: "DEINE_SENDER_ID",
+      appId:             "DEINE_APP_ID"
+    };
+  </script>
+
+  <!-- 🔁 Reha-Plan Daten -->
   <script src="schedule-data.js"></script>
 
   <script type="module">
@@ -162,85 +123,53 @@
     /* ======================
        2) FIREBASE INIT
        ====================== */
-    const firebaseConfig = {
-      apiKey: "AIzaSyDJkR9vgTV4tzkVYGUQzA8o-bEU2Lq_now",
-      authDomain: "reha-app-3d609.firebaseapp.com",
-      projectId: "reha-app-3d609",
-      storageBucket: "reha-app-3d609.firebasestorage.app",
-      messagingSenderId: "805175943839",
-      appId: "1:805175943839:web:60e9ffefba4eb4ccb7f8aa"
-    };
-    const appFB = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const auth  = getAuth(appFB);
-    const db    = getFirestore(appFB);
-    window.auth = auth;
-    window.db   = db;
+    const firebaseConfig = window.FIREBASE_CONFIG;
+    let app;
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
   
     /* ======================
-       3) DOM ELEMENTE & HELPERS
+       3) HILFSFUNKTIONEN UI
        ====================== */
-    const authForms   = document.getElementById("auth-forms");
-    const appDiv      = document.getElementById("app");
-    const userInfo    = document.getElementById("user-info");
-    const signOutBtn  = document.getElementById("sign-out");
     const sidebar     = document.getElementById("sidebar");
-    const menuToggle  = document.getElementById("menuToggle");
-    const closeSidebar= document.getElementById("closeSidebar");
+    const menuToggle  = document.getElementById("menu-toggle");
   
-    const setMenuToggleVisible = (v) => { if (menuToggle) menuToggle.style.display = v ? "block" : "none"; };
-  
-    const showAuth = () => {
-      document.body.classList.add("center-auth");
-      if (authForms) authForms.style.display="block";
-      if (appDiv)    appDiv.style.display="none";
-    };
-    const showApp = () => {
-      document.body.classList.remove("center-auth");
-      if (authForms) authForms.style.display="none";
-      if (appDiv)    appDiv.style.display="block";
-    };
-
-    // Sidebar-Name aktualisieren: Firestore -> displayName -> Email
-    async function updateSidebarAccount(user) {
-      const nameEl = document.getElementById("sidebar-name");
-      if (!nameEl) return;
-      if (!user) { nameEl.textContent = "—"; return; }
-      try {
-        const ref  = doc(db, "users", user.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const { firstName = "", lastName = "" } = snap.data();
-          const fullName = `${firstName} ${lastName}`.trim();
-          if (fullName) { nameEl.textContent = fullName; return; }
-        }
-      } catch (e) { console.warn("Profil nicht lesbar:", e); }
-      nameEl.textContent = user.displayName || user.email || "Unbekannt";
+    function setMenuToggleVisible(visible) {
+      if (!menuToggle) return;
+      if (visible) {
+        menuToggle.hidden = false;
+      } else {
+        menuToggle.hidden = true;
+      }
     }
   
-    function loadAppJSOnce() {
-      if (document.getElementById("app-js-loaded")) return;
-      const s = document.createElement("script");
-      s.src = "app.js";
-      s.id = "app-js-loaded";
-      s.type = "module";
-      document.body.appendChild(s);
+    if (menuToggle && sidebar) {
+      menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+      });
     }
   
     /* ======================
-       4) SIDEBAR UI
+       4) ACCOUNT-INFO im Sidebar
        ====================== */
-    if (menuToggle) {
-      menuToggle.addEventListener("click", () => {
-        sidebar.classList.add("active");
-        setMenuToggleVisible(false);
-      });
+    function updateSidebarAccount(user) {
+      const emailEl = document.getElementById("account-email");
+      if (!emailEl) return;
+      if (!user) {
+        emailEl.textContent = "Gast";
+        return;
+      }
+      emailEl.textContent = user.email || "Angemeldet";
     }
-    if (closeSidebar) {
-      closeSidebar.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        setMenuToggleVisible(true);
-      });
-    }
+  
+    /* ======================
+       5) Sidebar-Links: Klick schließt Sidebar auf Mobile
+       ====================== */
     const navEl = document.querySelector("#sidebar nav.sidebar");
     if (navEl) {
       navEl.addEventListener("click", (e) => {
@@ -251,6 +180,7 @@
       });
     }
   
+    const signOutBtn = document.getElementById("sign-out");
     if (signOutBtn) {
       signOutBtn.addEventListener("click", async () => {
         sidebar.classList.remove("active");
@@ -263,29 +193,52 @@
        5) VIEW LOADER & ROUTER
        ====================== */
     async function loadView(page) {
-      const mount   = document.getElementById("content");
-      const viewPath = `views/${page}.html`;
-      const cssPath  = `views/${page}.css`;
-      const jsPath   = `views/${page}.js`;
-  
+      const mount = document.getElementById("content");
+
+      // ✨ Spezialbehandlung für Kalender / Kalender 2.0
+      let basePage = page;
+
+      // Standardwerte zurücksetzen
+      window.DEFAULT_KALENDER_TAB = null;
+      window.KALENDER2_MODE = null;
+
+      if (page === "kalender2") {
+        // gleiche View-Dateien wie "kalender" laden
+        basePage = "kalender";
+
+        // Direkt Tab "Kalender 2.0 – Rehaplan" aktiv
+        window.DEFAULT_KALENDER_TAB = "reha";
+
+        // Statt Kalender-Raster: Bulletlist aus Rehaplan
+        window.KALENDER2_MODE = "list";
+      } else if (page === "kalender") {
+        // Normal: Tab Kalender 1.0
+        basePage = "kalender";
+        window.DEFAULT_KALENDER_TAB = "basic";
+      }
+
+      const viewPath = `views/${basePage}.html`;
+      const cssPath  = `views/${basePage}.css`;
+      const jsPath   = `views/${basePage}.js`;
+
       try {
         const res  = await fetch(viewPath);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const html = await res.text();
-  
-        const parser = new DOMParser();
-        const doc    = parser.parseFromString(html, "text/html");
+
+        const parser    = new DOMParser();
+        const doc       = parser.parseFromString(html, "text/html");
         const newContent = doc.body.innerHTML;
-  
+
         document.querySelectorAll('link[data-view]').forEach(l => l.remove());
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = cssPath;
-        link.dataset.view = page;
+        link.dataset.view = basePage;
         document.head.appendChild(link);
-  
+
         if (mount) mount.innerHTML = newContent;
-  
+
         document.getElementById("dynamic-view-script")?.remove();
         const script = document.createElement("script");
         script.src = jsPath;
@@ -293,10 +246,13 @@
         script.defer = true;
         document.body.appendChild(script);
       } catch (e) {
-        if (mount) mount.innerHTML = `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+        if (mount) {
+          mount.innerHTML =
+            `<div style="padding:1rem;">❌ Konnte "${page}" nicht laden.<br>${e}</div>`;
+        }
       }
     }
-  
+
     function routeToHash() {
       let page = (location.hash || "#tagesprogramm").slice(1).trim();
       if (!page) page = "tagesprogramm";
@@ -339,57 +295,24 @@
       });
     }
   
-    const forgotBtn = document.getElementById("forgotBtn");
-    if (forgotBtn) {
-      forgotBtn.addEventListener("click", async () => {
-        const email = (document.getElementById("li-email")?.value || "").trim()
-                   || prompt("Bitte E-Mail für das Zurücksetzen eingeben:") || "";
-        if (!email) return;
-        try {
-          await sendPasswordResetEmail(auth, email);
-          alert(`Passwort-Reset gesendet an: ${email}`);
-        } catch (err) {
-          alert(`Zurücksetzen fehlgeschlagen: ${err.code}`);
-        }
-      });
-    }
-
-    // Signup: Auth-Account + Firestore-Profil
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
       signupForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-
-        const firstName = document.getElementById("su-firstname")?.value.trim();
-        const lastName  = document.getElementById("su-lastname")?.value.trim();
-        const birthdate = document.getElementById("su-birthdate")?.value || null;
-        const group     = document.getElementById("su-group")?.value;
-        const email     = document.getElementById("su-email")?.value.trim();
-        const pw        = document.getElementById("su-password")?.value;
-
-        if (!firstName || !lastName || !group || !email || !pw) {
-          alert("Bitte alle Pflichtfelder ausfüllen.");
-          return;
-        }
-
+        const email = document.getElementById("su-email")?.value.trim();
+        const pw    = document.getElementById("su-password")?.value;
+        const name  = document.getElementById("su-displayName")?.value.trim();
+        if (!email || !pw) return;
         try {
           const cred = await createUserWithEmailAndPassword(auth, email, pw);
-          const uid  = cred.user.uid;
-
-          try { await updateProfile(cred.user, { displayName: `${firstName} ${lastName}` }); }
-          catch (e) { console.warn("displayName nicht gesetzt:", e); }
-
-          try {
-            await setDoc(doc(db, "users", uid), {
-              uid, email, firstName, lastName, birthdate, group,
-              createdAt: serverTimestamp()
-            });
-          } catch (e) {
-            console.error("Firestore setDoc fehlgeschlagen:", e);
-            alert(`Profil speichern fehlgeschlagen: ${e.code || e.message || e}`);
-            return;
+          if (name) {
+            await updateProfile(cred.user, { displayName: name });
           }
-
+          await setDoc(doc(db, "users", cred.user.uid), {
+            email,
+            displayName: name || null,
+            createdAt: serverTimestamp()
+          });
           alert("Konto erstellt. Du bist jetzt angemeldet.");
           location.hash = "#tagesprogramm";
           routeToHash();
@@ -408,6 +331,31 @@
       });
     }
   
+    const signupLink = document.getElementById("signupLink");
+    const forgotBtn  = document.getElementById("forgotBtn");
+    if (signupLink) {
+      signupLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.hash = "#signup";
+        updateAuthView();
+      });
+    }
+    if (forgotBtn) {
+      forgotBtn.addEventListener("click", async () => {
+        const email = document.getElementById("li-email")?.value.trim();
+        if (!email) {
+          alert("Bitte zuerst deine E-Mail im Feld eintragen.");
+          return;
+        }
+        try {
+          await sendPasswordResetEmail(auth, email);
+          alert("Passwort-Zurücksetzen-E-Mail wurde gesendet.");
+        } catch (err) {
+          alert(`Fehler beim Senden der Reset-Mail: ${err.code || err.message}`);
+        }
+      });
+    }
+  
     /* ======================
        7) AUTH STATE -> UI & ROUTING
        ====================== */
@@ -416,74 +364,40 @@
       const signupForm = document.getElementById("signup-form");
       const titleEl    = document.getElementById("auth-title");
 
-      if (!auth.currentUser) {
-        const h = (location.hash || "").toLowerCase();
-        const wantSignup = h.includes("#signup");
-        if (titleEl)    titleEl.textContent = wantSignup ? "Konto erstellen" : "Anmeldung";
-        if (loginForm)  loginForm.style.display  = wantSignup ? "none" : "block";
-        if (signupForm) signupForm.style.display = wantSignup ? "block" : "none";
+      const hash = (location.hash || "#login").slice(1);
+
+      if (hash === "signup") {
+        if (titleEl) titleEl.textContent = "Konto erstellen";
+        if (loginForm)  loginForm.style.display = "none";
+        if (signupForm) signupForm.style.display = "block";
+      } else {
+        if (titleEl) titleEl.textContent = "Anmelden";
+        if (loginForm)  loginForm.style.display = "block";
+        if (signupForm) signupForm.style.display = "none";
       }
     }
 
-    let didInitialLoad = false;
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        showApp();
-        setMenuToggleVisible(true);
-        sidebar.classList.remove("active");
-
-        window.currentUserId   = user.uid;
-        window.currentUserName = user.displayName || user.email || ("UID: " + user.uid);
-
-        const emailOrName = user.displayName || user.email || ("UID: " + user.uid);
-        if (userInfo) userInfo.textContent = `Angemeldet: ${emailOrName}`;
-        if (signOutBtn) signOutBtn.style.display = "inline-block";
-
-        updateSidebarAccount(user);
-        loadAppJSOnce();
-
-        if (!didInitialLoad) {
-          if (!location.hash || location.hash === "#" || location.hash === "#login" || location.hash === "#signup") {
-            location.replace("#tagesprogramm");
-            routeToHash();
-          } else {
-            routeToHash();
-          }
-          didInitialLoad = true;
+      const main = document.querySelector("main#content");
+      if (!user) {
+        document.body.classList.add("center-auth");
+        if (main) {
+          main.innerHTML = document.querySelector(".auth-panel")?.outerHTML || "";
         }
-      } else {
-        showAuth();
-        setMenuToggleVisible(false);
-        sidebar.classList.remove("active");
-        if (userInfo) userInfo.textContent = "Nicht angemeldet";
-        if (signOutBtn) signOutBtn.style.display = "none";
-        window.currentUserId = null;
-        window.currentUserName = null;
-        updateSidebarAccount(null);
-        didInitialLoad = false;
         updateAuthView();
+        updateSidebarAccount(null);
+        setMenuToggleVisible(false);
+      } else {
+        document.body.classList.remove("center-auth");
+        updateSidebarAccount(user);
+        setMenuToggleVisible(true);
+        if (!location.hash || location.hash === "#login" || location.hash === "#signup") {
+          const last = (localStorage.getItem("rehapp:lastPage") || "tagesprogramm").trim();
+          location.hash = "#" + last;
+        }
+        routeToHash();
       }
     });
-
-    updateAuthView();
-  </script>
-
-  <!-- 📄 pdf.js für den Reha-Kalender-Import -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
-  <script>
-    if (window.pdfjsLib) {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
-    } else {
-      console.error("pdf.js wurde nicht geladen");
-    }
   </script>
 </body>
 </html>
-
-<!-- =============================
-     NEUE DATEIEN: Profil-Ansicht
-     ============================= -->
-
-<!-- Datei: views/profil.html -->
-<!-- ... (dein Kommentarblock bleibt unverändert) ... -->
