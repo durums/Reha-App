@@ -38,112 +38,143 @@
   align-items: flex-start;
 }
 
-.kalender2-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: .5rem;
+.kalender2-left,
+.kalender2-right {
+  background: #fff;
+  border-radius: .75rem;
+  padding: .75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
-#kal2-month-label {
-  font-weight: 600;
+.kalender2-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .5rem;
 }
 
 .kalender2-header button {
   border-radius: 999px;
   border: 1px solid #d1d5db;
+  background: #f9fafb;
   padding: .2rem .6rem;
-  background: #fff;
   cursor: pointer;
 }
 
+#kal2-month-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Monatsgrid */
 .kal2-grid {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: .75rem;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  font-size: .85rem;
+  table-layout: fixed;
+  font-size: .8rem;
 }
 
 .kal2-grid th,
 .kal2-grid td {
   text-align: center;
-  padding: .35rem .25rem;
-  border-bottom: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
+  padding: .25rem;
+  border: 1px solid #e5e7eb;
 }
 
-.kal2-grid th:last-child,
-.kal2-grid td:last-child {
-  border-right: none;
+.kal2-grid th {
+  background: #f3f4f6;
+  font-weight: 600;
 }
 
-.kal2-grid tr:last-child td {
-  border-bottom: none;
-}
-
-.kal2-day {
-  min-height: 2.3rem;
-  cursor: pointer;
+.kal2-day-cell {
+  min-height: 40px;
   position: relative;
+  cursor: pointer;
 }
 
-.kal2-day.disabled {
-  color: #d1d5db;
-  cursor: default;
+.kal2-day-cell span.kal2-day-number {
+  display: block;
 }
 
-.kal2-day.has-events::after {
-  content: "";
-  width: .35rem;
-  height: .35rem;
-  border-radius: 999px;
-  background: #2563eb;
-  position: absolute;
-  bottom: .25rem;
-  left: 50%;
-  transform: translateX(-50%);
+/* Tage ohne diesen Monat leicht ausgegraut */
+.kal2-day-cell.disabled {
+  color: #9ca3af;
 }
 
-.kal2-day.selected {
+/* Tag mit Reha-Terminen */
+.kal2-day-cell.has-events {
   background: #eff6ff;
   font-weight: 600;
 }
 
-.kalender2-right {
-  background: #fff;
-  border-radius: .75rem;
-  padding: .75rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  min-height: 220px;
+/* Heute */
+.kal2-day-cell.today {
+  border: 2px solid #2563eb;
 }
 
-#kal2-day-title {
+/* Detailbereich rechts */
+.kalender2-right h2 {
   margin-top: 0;
-  margin-bottom: .4rem;
+  font-size: 1.1rem;
+}
+
+#kal2-day-events {
+  font-size: .9rem;
+  margin-top: .5rem;
 }
 
 .kal2-events-empty {
-  font-size: .9rem;
   color: #6b7280;
 }
 
-.kal2-event {
-  border-radius: .6rem;
-  border: 1px solid #e5e7eb;
-  padding: .4rem .6rem;
+.kal2-event-item {
   margin-bottom: .35rem;
-  font-size: .85rem;
 }
 
 .kal2-event-time {
   font-weight: 600;
-  margin-bottom: .1rem;
+  margin-right: .3rem;
+}
+
+.kal2-event-title {
+  font-weight: 500;
 }
 
 .kal2-event-location {
-  font-size: .8rem;
+  font-size: .85rem;
   color: #6b7280;
+}
+
+/* Bulletlist-Ansicht für Kalender 2.0 */
+.kalender2-list {
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: .75rem;
+  padding: .75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+#kal2-pdf-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+#kal2-pdf-list li {
+  margin-bottom: .35rem;
+  font-size: .9rem;
+}
+
+#kal2-pdf-list li .kal2-list-date {
+  font-weight: 600;
+  margin-right: .3rem;
+}
+
+#kal2-pdf-list li .kal2-list-time {
+  font-weight: 500;
+  margin-right: .3rem;
+}
+
+#kal2-pdf-list li .kal2-list-location {
+  color: #6b7280;
+  font-size: .85rem;
 }
