@@ -1,16 +1,15 @@
 (() => {
   // ===== Konstanten =====
-  const START = 8;
-  const END   = 17;
-  const DAYS  = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+  const START = 8, END = 17; // Stunden inkl.
+  const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
   // ===== State =====
-  let store     = loadStore();
-  let user      = window.currentUserName || "Gast";
+  let store = loadStore();
+  let user  = window.currentUserName || "Gast";
   let weekStart = mondayOf(new Date());
 
   // ===== DOM Helpers =====
-  const $          = (id) => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
   const header     = () => $("header");
   const hours      = () => $("hours");
   const daysC      = () => $("days");
@@ -20,75 +19,55 @@
   const dlgList    = () => $("dlgList");
 
   // ===== Init =====
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", readyOrWait);
+  readyOrWait();
 
-  function init() {
-    if (!header() || !hours() || !daysC()) {
+  function readyOrWait() {
+    const ok = header() && hours() && daysC();
+    if (ok) {
+      bindOnce();
+      setTimeout(render, 200);
+    } else {
       const t = setInterval(() => {
         if (header() && hours() && daysC()) {
           clearInterval(t);
           bindOnce();
-          render();
+          setTimeout(render, 200);
         }
       }, 120);
-    } else {
-      bindOnce();
-      render();
     }
   }
 
   function bindOnce() {
-    $("prevBtn")?.addEventListener("click", () => {
-      weekStart = addDays(weekStart, -7);
-      render();
-    });
+    $("prevBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart, -7); render(); });
+    $("nextBtn")?.addEventListener("click", () => { weekStart = addDays(weekStart,  7); render(); });
+    $("todayBtn")?.addEventListener("click", () => { weekStart = mondayOf(new Date()); render(); });
 
-    $("nextBtn")?.addEventListener("click", () => {
-      weekStart = addDays(weekStart, 7);
-      render();
-    });
-
-    $("todayBtn")?.addEventListener("click", () => {
-      weekStart = mondayOf(new Date());
-      render();
-    });
-
-    $("bookBtn")?.addEventListener("click", bookViaDialog);
+    $("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
 
     // PDF-Import
-    const pdfBtn   = $("importPdfBtn");
-    const pdfInput = $("importPdfInput");
-    if (pdfBtn && pdfInput) {
-      pdfBtn.addEventListener("click", () => pdfInput.click());
-      pdfInput.addEventListener("change", onPdfChosen);
-    }
-
-    // CSV-Import
-    const csvBtn   = $("importCsvBtn");
-    const csvInput = $("importCsvInput");
-    if (csvBtn && csvInput) {
-      csvBtn.addEventListener("click", () => csvInput.click());
-      csvInput.addEventListener("change", onCsvChosen);
-    } else {
-      console.warn("CSV-Buttons wurden nicht gefunden.");
+    const importBtn   = $("importPdfBtn");
+    const importInput = $("importPdfInput");
+    if (importBtn && importInput) {
+      importBtn.addEventListener("click", () => importInput.click());
+      importInput.addEventListener("change", onPdfChosen);
     }
   }
 
   // ===== Render =====
-  function render() {
+  function render(){
     header().innerHTML = "";
-    header().append(cell("time", "Zeit"));
+    header().append(cell("time","Zeit"));
 
     const days = [...Array(7)].map((_, i) => addDays(weekStart, i));
-    days.forEach((d) => {
+    days.forEach(d => {
       const label = `${DAYS[(d.getDay()+6)%7]} ${d.getDate()}.${d.getMonth()+1}.`;
       header().append(cell("cell", label));
     });
-
-    rangeLabel().textContent = `${fmt(days[0])} – ${fmt(days[6])}`;
+    rangeLabel() && (rangeLabel().textContent = `${fmt(days[0])} – ${fmt(days[6])}`);
 
     hours().innerHTML = "";
     for (let h = START; h <= END; h++) {
@@ -97,37 +76,34 @@
 
     daysC().innerHTML = "";
     const today = new Date();
-
-    days.forEach((d) => {
+    days.forEach(d => {
       const tag = iso(d);
-      const col = div("col" + (sameDate(d,today) ? " today" : ""));
-
-      for (let h=START; h<=END; h++) {
+      const col = div("col" + (sameDate(d, today) ? " today" : ""));
+      for (let h = START; h <= END; h++) {
         const slot = `${pad(h)}:00`;
-        const who = (store[tag] || {})[slot];
-        const cls = who ? (who===user ? "own" : "booked") : "free";
-        const el  = div(`slot ${cls}`, who ? (who===user ? "Mein Termin" : "Belegt") : "");
-
+        const who  = (store[tag] || {})[slot];
+        const cls  = who ? (who === user ? "own" : "booked") : "free";
+        const el   = div(`slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
-
         col.append(el);
       }
       daysC().append(col);
     });
   }
 
-  // ===== Slot-Klick =====
-  function onSlotClick(e) {
+  // ===== Klick-Logik =====
+  function onSlotClick(e){
     const tag  = e.currentTarget.dataset.date;
     const slot = e.currentTarget.dataset.slot;
-    const who  = (store[tag] || {})[slot];
+    const who  = (store[tag]||{})[slot];
 
     if (!who) {
       if (!user) return alert("Bitte anmelden, um Termine zu buchen.");
-      if (confirm(`Termin buchen: ${tag} um ${slot}?`)) {
+      if (confirm(`Möchtest du ${tag} um ${slot} buchen?`)) {
         book(tag, slot, user);
+        alert(`Termin eingetragen: ${tag} ${slot}`);
         render();
       }
       return;
@@ -135,310 +111,317 @@
 
     if (who === user) {
       const rest = daysBetween(new Date(), new Date(tag));
-      if (rest < 3) return alert("Verschieben/Absagen nur 3 Tage vorher möglich.");
+      if (rest < 3) { alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
 
-      const a = prompt("'v' verschieben, 'a' löschen, 'x' exportieren:");
-      if (a==="a") { unbook(tag,slot); render(); }
-      else if (a==="v") {
-        unbook(tag,slot);
-        pickFreeSlot((ntag,nslot)=>{ if(ntag) book(ntag,nslot,user); render(); });
+      const a = prompt("Eigener Termin: 'v' verschieben, 'a' absagen, 'x' exportieren:");
+      if (a === "a") {
+        unbook(tag, slot);
+        alert("Termin abgesagt.");
+        render();
+      } else if (a === "v") {
+        unbook(tag, slot);
+        pickFreeSlot((ntag, nslot) => {
+          if (ntag) { book(ntag, nslot, user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); }
+          else { alert("Verschieben abgebrochen. Alter Termin wurde entfernt."); }
+          render();
+        });
+      } else if (a === "x") {
+        exportSingleEventICS(tag, slot, user);
+      } else if (a !== null) {
+        alert("Ungültige Eingabe.");
       }
-      else if (a==="x") exportSingleEventICS(tag,slot,user);
       return;
     }
 
-    alert("Bereits belegt.");
+    alert("Dieser Slot ist bereits belegt.");
   }
 
   // ===== Dialoge =====
-  function pickFreeSlot(cb) {
-    const list = freeSlotsThisWeek();
-    if (!list.length) return alert("Diese Woche keine freien Slots.");
-
-    dlgList().innerHTML="";
-    dlgTitle().textContent="Freien Slot wählen";
-
-    list.forEach(([tag,slot])=>{
-      const row=div("item");
-      row.append(div("",`${tag} ${slot}`));
-      const b=document.createElement("button");
-      b.textContent="OK";
-      b.onclick=()=>{ dlg().close(); cb(tag,slot); };
+  function pickFreeSlot(cb){
+    const items = freeSlotsThisWeek();
+    if (items.length === 0) { alert("Keine freien Termine verfügbar (diese Woche)."); return; }
+    dlgTitle().textContent = "Freien Termin auswählen";
+    dlgList().innerHTML = "";
+    for (const [tag,slot] of items) {
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
+      const b = document.createElement("button");
+      b.textContent = "Auswählen";
+      b.onclick = () => { dlg().close(); cb(tag,slot); };
       row.append(b);
       dlgList().append(row);
-    });
-
+    }
     dlg().showModal();
   }
 
-  function bookViaDialog(){
-    if (!user) return alert("Bitte anmelden.");
-    pickFreeSlot((tag,slot)=>{ book(tag,slot,user); render(); });
+  function bookPicked(tag,slot){
+    book(tag,slot,user);
+    alert(`Termin eingetragen: ${tag} ${slot}`);
+    render();
   }
 
   function showMine(){
     const mine = mySlots();
-    if (!mine.length) return alert("Keine eigenen Termine.");
-
-    dlgList().innerHTML="";
-    dlgTitle().textContent="Eigene Termine";
-
-    mine.forEach(([t,s]) => dlgList().append(div("item", `${t} ${s}`)));
-    dlg().showModal();
+    if (mine.length === 0) { alert("Keine Termine gefunden."); return; }
+    alert(mine.map(([t,s]) => `${t} ${s}`).join("\n"));
   }
 
   function moveOrCancel(){
-    const mine=mySlots();
-    if (!mine.length) return alert("Keine Termine.");
-
-    dlgList().innerHTML="";
-    dlgTitle().textContent="Eigene Termine";
-
-    mine.forEach(([tag,slot])=>{
-      const row=div("item");
-      row.append(div("",`${tag} ${slot}`));
-
-      const b=document.createElement("button");
-      b.textContent="OK";
-      b.onclick=()=>{
+    const mine = mySlots();
+    if (mine.length === 0) { alert("Keine Termine gefunden."); return; }
+    dlgTitle().textContent = "Eigene Termine";
+    dlgList().innerHTML = "";
+    for (const [tag,slot] of mine) {
+      const row = div("item");
+      row.append(div("", `${tag} ${slot}`));
+      const b = document.createElement("button");
+      b.textContent = "Wählen";
+      b.onclick = () => {
         dlg().close();
         const rest = daysBetween(new Date(), new Date(tag));
-        if (rest<3) return alert("Nur 3 Tage vorher möglich.");
-
-        const a = prompt("'v'=verschieben, 'a'=löschen, 'x'=export:");
-        if(a==="a"){ unbook(tag,slot); render(); }
-        else if(a==="v"){
+        if (rest < 3) { alert("Verschieben/Absagen nur 3 Tage vor dem Termin möglich."); return; }
+        const a = prompt("Tippe 'v' zum Verschieben, 'a' zum Absagen, 'x' für Export:");
+        if (a === "a") { unbook(tag,slot); alert("Termin abgesagt."); render(); }
+        else if (a === "v") {
           unbook(tag,slot);
-          pickFreeSlot((ntag,nslot)=>{ if(ntag) book(ntag,nslot,user); render(); });
+          pickFreeSlot((ntag,nslot) => { if (ntag) { book(ntag,nslot,user); alert(`Termin verschoben auf: ${ntag} ${nslot}`); } render(); });
+        } else if (a === "x") {
+          exportSingleEventICS(tag, slot, user);
+        } else if (a !== null) {
+          alert("Ungültige Eingabe.");
         }
-        else if(a==="x") exportSingleEventICS(tag,slot,user);
       };
       row.append(b);
       dlgList().append(row);
-    });
+    }
     dlg().showModal();
   }
 
   // ===== Speicher =====
-  function loadStore(){
-    try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); }
-    catch { return {}; }
-  }
+  function loadStore(){ try { return JSON.parse(localStorage.getItem("kal_data")||"{}"); } catch { return {}; } }
   function saveStore(){ localStorage.setItem("kal_data", JSON.stringify(store)); }
-
-  function book(tag,slot,u){ (store[tag] ||= {})[slot] = u; saveStore(); }
+  function book(tag,slot,name){ (store[tag] ||= {})[slot] = name; saveStore(); }
   function unbook(tag,slot){
-    if(store[tag]){
+    if (store[tag]) {
       delete store[tag][slot];
-      if(!Object.keys(store[tag]).length) delete store[tag];
+      if (Object.keys(store[tag]).length === 0) delete store[tag];
       saveStore();
     }
   }
 
+  // ===== Queries =====
   function mySlots(){
-    const out=[];
-    Object.entries(store).forEach(([tag,slots])=>{
-      Object.entries(slots).forEach(([slot,name])=>{
-        if(name===user) out.push([tag,slot]);
-      });
+    const out = [];
+    Object.entries(store).forEach(([tag,slots]) => {
+      Object.entries(slots).forEach(([slot,name]) => { if (name === user) out.push([tag,slot]); });
     });
-    return out.sort();
+    out.sort((a,b) => a[0].localeCompare(b[0]) || a[1].localeCompare(b[1]));
+    return out;
   }
 
   function freeSlotsThisWeek(){
-    const out=[];
-    for(let i=0;i<7;i++){
-      const d=addDays(weekStart,i), tag=iso(d);
-      for(let h=START;h<=END;h++){
-        const slot=`${pad(h)}:00`;
-        if(!store[tag] || !store[tag][slot]) out.push([tag,slot]);
+    const out = [];
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(weekStart, i), tag = iso(d);
+      for (let h = START; h <= END; h++) {
+        const slot = `${pad(h)}:00`;
+        if (!store[tag] || !store[tag][slot]) out.push([tag,slot]);
       }
     }
     return out;
   }
 
-  // ===== ICS =====
+  // ===== ICS Export =====
   function exportAllMyEventsICS(){
-    const mine=mySlots();
-    if(!mine.length) return alert("Keine Termine.");
+    const mine = mySlots();
+    if (mine.length === 0) { alert("Keine eigenen Termine zum Exportieren."); return; }
 
-    const events=mine.map(([t,s])=>buildICSEvent(t,s,user));
-    const ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\n"+events.join("")+"END:VCALENDAR\r\n";
-    downloadICS("termine.ics",ics);
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Reha App//Kalender//DE",
+      "CALSCALE:GREGORIAN",
+    ];
+    const uidBase = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    mine.forEach(([tag, slot], i) => {
+      const { dtStart, dtEnd } = toICSTimes(tag, slot, 60);
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:${uidBase}-${i}@reha-app.local`,
+        `DTSTAMP:${toICSDateTime(new Date())}`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:Reha-Termin (${slot})`,
+        `DESCRIPTION:Gebucht über Reha-App`,
+        "END:VEVENT"
+      );
+    });
+
+    lines.push("END:VCALENDAR");
+    downloadText(lines.join("\r\n"), "reha-termine.ics", "text/calendar");
   }
 
-  function exportSingleEventICS(tag,slot,u){
-    const ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\n"+
-      buildICSEvent(tag,slot,u)+"END:VCALENDAR\r\n";
-    downloadICS(`termin_${tag}_${slot}.ics`,ics);
+  function exportSingleEventICS(tag, slot, who){
+    const { dtStart, dtEnd } = toICSTimes(tag, slot, 60);
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Reha App//Kalender//DE",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@reha-app.local`,
+      `DTSTAMP:${toICSDateTime(new Date())}`,
+      `DTSTART:${dtStart}`,
+      `DTEND:${dtEnd}`,
+      `SUMMARY:Reha-Termin (${slot})`,
+      `DESCRIPTION:Gebucht von ${who}`,
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ];
+    downloadText(lines.join("\r\n"), `termin-${tag}-${slot.replace(":","")}.ics`, "text/calendar");
   }
 
-  function buildICSEvent(tag,slot,u){
-    const start=new Date(`${tag}T${slot}:00`);
-    const end=new Date(start.getTime()+3600000);
-    return (
-      "BEGIN:VEVENT\r\n"+
-      `UID:${tag}-${slot}@kal\r\n`+
-      `DTSTAMP:${formatICSDate(new Date())}\r\n`+
-      `DTSTART:${formatICSDate(start)}\r\n`+
-      `DTEND:${formatICSDate(end)}\r\n`+
-      `SUMMARY:Termin (${slot})\r\n`+
-      "END:VEVENT\r\n"
-    );
+  function toICSTimes(tag, slot, minutes){
+    const start = new Date(`${tag}T${slot}:00`);
+    const end   = new Date(start.getTime() + minutes*60000);
+    return { dtStart: toICSDateTime(start), dtEnd: toICSDateTime(end) };
   }
 
-  function formatICSDate(d){
-    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  function toICSDateTime(d){
+    const z = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+    return z.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   }
 
-  function downloadICS(name,data){
-    const blob=new Blob([data],{type:"text/calendar"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url; a.download=name;
+  function downloadText(txt, filename, mime){
+    const blob = new Blob([txt], { type: mime || "text/plain" });
+    const url  = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
     document.body.appendChild(a);
-    a.click(); a.remove();
+    a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   }
 
-  // ===== PDF Import =====
-  async function onPdfChosen(evt){
-    const file=evt.target.files?.[0];
-    if(!file) return;
+  // ===== PDF-Import =====
+  async function onPdfChosen(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
 
-    try{
-      const buf=await file.arrayBuffer();
-      const termine=await parsePdfToAppointments(buf);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const termine = await parsePdfToAppointments(arrayBuffer);
+
+      if (!termine.length) {
+        alert("In der PDF wurden keine Termine erkannt.");
+        return;
+      }
+
       termine.forEach(addAppointmentToCalendar);
       render();
-      alert(`${termine.length} PDF-Termine importiert.`);
+
+      alert(`${termine.length} Termine aus der PDF importiert.`);
+    } catch (err) {
+      console.error("PDF-Import fehlgeschlagen:", err);
+      alert("PDF konnte nicht gelesen werden.");
+    } finally {
+      evt.target.value = "";
     }
-    catch(e){ alert("PDF konnte nicht gelesen werden."); }
-    evt.target.value="";
   }
 
-  async function parsePdfToAppointments(arrayBuffer){
-    if(!window.pdfjsLib) return [];
-
-    const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
-    let full="";
-
-    for(let p=1;p<=pdf.numPages;p++){
-      const page=await pdf.getPage(p);
-      const txt=await page.getTextContent();
-      full+=txt.items.map(i=>i.str).join(" ")+"\n";
+  async function parsePdfToAppointments(arrayBuffer) {
+    if (!window.pdfjsLib) {
+      console.error("pdfjsLib ist nicht geladen.");
+      return [];
     }
 
-    full=full
-      .replace(/(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+(\d{2}\.\d{2}\.\d{4})/g,"\n$1 $2")
-      .replace(/(\d{2}:\d{2}\s*-\s*\d{2}:\d{2})/g,"\n$1");
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
 
-    const lines=full.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const strings = content.items.map((item) => item.str);
+      fullText += strings.join(" ") + "\n";
+    }
 
-    const reDate=/^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+(\d{2}\.\d{2}\.\d{4})/;
-    const reAppt=/^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s+(.+)$/;
+    const lines = fullText
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
 
-    let current=null;
-    const out=[];
+    const termine = [];
+    let currentDateIso = null;
 
-    for(const line of lines){
-      const mDate=line.match(reDate);
-      if(mDate){
-        current=deDateToIso(mDate[2]);
+    const reDate =
+      /^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+(\d{2}\.\d{2}\.\d{4})/;
+
+    const reAppt =
+      /^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s+(.+)$/;
+
+    for (const line of lines) {
+      const mDate = line.match(reDate);
+      if (mDate) {
+        const [, , dateStr] = mDate;
+        currentDateIso = deDateToIso(dateStr);
         continue;
       }
 
-      const m=line.match(reAppt);
-      if(m && current){
-        const [_,s,e,title]=m;
-        const start=new Date(`${current}T${s}:00`);
-        const end  =new Date(`${current}T${e}:00`);
-        out.push({title,start,end});
+      const mAppt = line.match(reAppt);
+      if (mAppt && currentDateIso) {
+        const [, startStr, endStr, title] = mAppt;
+
+        const start = new Date(`${currentDateIso}T${startStr}:00`);
+        const end   = new Date(`${currentDateIso}T${endStr}:00`);
+
+        termine.push({
+          title: title.trim(),
+          start,
+          end,
+        });
       }
     }
-    return out;
+
+    return termine;
   }
 
-  function deDateToIso(ddmmyyyy){
-    const [dd,mm,yyyy]=ddmmyyyy.split(".");
+  function deDateToIso(ddmmyyyy) {
+    const [dd, mm, yyyy] = ddmmyyyy.split(".");
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  function addAppointmentToCalendar(appt){
-    let hour=appt.start.getHours();
-    const min=appt.start.getMinutes();
-    if(min>=30 && hour<END) hour++;
+  function addAppointmentToCalendar(appt) {
+    let hour = appt.start.getHours();
+    const minute = appt.start.getMinutes();
 
-    if(hour<START || hour>END) return;
-
-    const tag=iso(appt.start);
-    const slot=`${pad(hour)}:00`;
-    if(store[tag]?.[slot]) return;
-
-    book(tag,slot,user);
-  }
-
-  // ===== CSV Import =====
-  async function onCsvChosen(evt){
-    const file=evt.target.files?.[0];
-    if(!file) return;
-
-    try{
-      const text = await file.text();
-      const termine = parseCsvAppointments(text);
-      termine.forEach(addCsvAppointmentToCalendar);
-      render();
-      alert(`${termine.length} CSV-Termine importiert.`);
+    if (minute >= 30 && hour < END) {
+      hour += 1;
     }
-    catch(e){ alert("CSV konnte nicht gelesen werden."); }
-    evt.target.value="";
-  }
 
-  function parseCsvAppointments(text){
-    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-    const out=[];
-
-    for(let i=1;i<lines.length;i++){
-      const line=lines[i];
-      const parts=line.split(",");
-      if(parts.length<3) continue;
-
-      const datum=parts[0];
-      const zeit =parts[1];
-      const beschr=parts.slice(2).join(",");
-
-      const isoDate=deDateToIso(datum);
-      const start=new Date(`${isoDate}T${zeit}:00`);
-
-      out.push({title:beschr,start});
+    if (hour < START || hour > END) {
+      console.warn("Termin liegt außerhalb der Kalenderzeit:", appt);
+      return;
     }
-    return out;
-  }
+    const tag  = iso(appt.start);
+    const slot = `${pad(hour)}:00`;
 
-  function addCsvAppointmentToCalendar(appt){
-    let hour=appt.start.getHours();
-    const min=appt.start.getMinutes();
-    if(min>=30 && hour<END) hour++;
+    if (store[tag] && store[tag][slot]) {
+      console.warn("Slot bereits belegt, übersprungen:", tag, slot);
+      return;
+    }
 
-    if(hour<START||hour>END) return;
-
-    const tag=iso(appt.start);
-    const slot=`${pad(hour)}:00`;
-
-    if(store[tag]?.[slot]) return;
-
-    book(tag,slot,user);
+    book(tag, slot, user);
   }
 
   // ===== Utils =====
-  function mondayOf(d){ const x=new Date(d); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
-  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function mondayOf(d){ const x = new Date(d); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
+  function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
   function iso(d){ return d.toISOString().slice(0,10); }
   function pad(n){ return String(n).padStart(2,"0"); }
-  function sameDate(a,b){ return a.getDate()===b.getDate() && a.getMonth()===b.getMonth() && a.getFullYear()===b.getFullYear(); }
+  function sameDate(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
   function fmt(d){ return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`; }
-  function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
-  function div(c,t=""){ const n=document.createElement("div"); n.className=c; n.textContent=t; return n; }
-  function cell(c,t){ const n=document.createElement("div"); n.className=c==="time"?"cell time":"cell"; n.textContent=t; return n; }
-
+  function daysBetween(a,b){ const A = new Date(a.getFullYear(),a.getMonth(),a.getDate()); const B = new Date(b.getFullYear(),b.getMonth(),b.getDate()); return Math.round((B-A)/86400000); }
+  function div(cls,txt=""){ const n=document.createElement("div"); if(cls) n.className=cls; if(txt) n.textContent=txt; return n; }
+  function cell(cls,txt){ const n=document.createElement("div"); n.className = cls==="time" ? "cell time" : "cell"; n.textContent=txt; return n; }
 })();
