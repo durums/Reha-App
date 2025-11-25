@@ -1,33 +1,41 @@
 window.PDFImport = {
 
   async parse(file) {
-    const text = await file.text();   // Bei echten PDFs später pdf.js nutzen
-    const lines = text.split("\n");
+    const txt = await file.text();
+    const lines = txt.split(/\r?\n/);
 
-    let events = [];
-
-    const dateRegex = /(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+[–-]\s+(\d{2}\.\d{2}\.\d{4})/;
-    const entryRegex = /(\d{2}:\d{2})–(\d{2}:\d{2})\s+(.*?)\s+–\s+(.*?)\s+–\s+(.*)/;
-
+    const events = [];
     let currentDate = null;
 
-    for (const line of lines) {
-      const d = dateRegex.exec(line);
-      if (d) {
-        const realDate = d[2].split(".").reverse().join("-");
-        currentDate = realDate;
+    const dateRegex = /^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\s+–\s+(\d{2}\.\d{2}\.\d{4})$/;
+
+    const entryRegex = /^•\s*(\d{2}:\d{2})–(\d{2}:\d{2})\s+(.*?)\s+–\s+(.*?)\s+–\s+(.*)$/;
+
+    for (let raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+
+      // --- DATUM ERKENNEN ---
+      let m = dateRegex.exec(line);
+      if (m) {
+        const [_, wtag, dateStr] = m;
+        const iso = dateStr.split(".").reverse().join("-");
+        currentDate = iso;
         continue;
       }
 
-      const e = entryRegex.exec(line);
+      // --- TERMINZEILE ERKENNEN ---
+      let e = entryRegex.exec(line);
       if (e && currentDate) {
+        const [_, start, end, title, room, person] = e;
+
         events.push({
           date: currentDate,
-          start: e[1],
-          end: e[2],
-          title: e[3],
-          room: e[4],
-          person: e[5]
+          start: start,
+          end: end,
+          title: title.trim(),
+          room: room.trim(),
+          person: person.trim()
         });
       }
     }
@@ -47,11 +55,13 @@ window.PDFImport = {
   },
 
   importToCalendar(events, store, user) {
-    let imported = 0, conflicts = 0;
+    let imported = 0;
+    let conflicts = 0;
 
     for (const ev of events) {
-      const slot = ev.start;
       store[ev.date] ??= {};
+
+      const slot = ev.start;
 
       if (!store[ev.date][slot]) {
         store[ev.date][slot] = user;
