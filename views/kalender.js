@@ -1,4 +1,46 @@
 (() => {
+
+  async function ensurePDFImport() {
+    // Wenn bereits alles geladen ist, sofort zurück
+    if (typeof window.PDFImport !== 'undefined') return;
+    
+    console.log('Lade PDF.js Bibliotheken...');
+    
+    // Prüfe und lade pdf.min.js falls nicht vorhanden
+    if (typeof window.pdfjsLib === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.j';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('pdf.min.js konnte nicht geladen werden (evtl. Adblocker?)'));
+        document.head.appendChild(script);
+      });
+    }
+    
+    // Lade pdf.worker.min.js (wird benötigt)
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('pdf.worker.min.js konnte nicht geladen werden'));
+      document.head.appendChild(script);
+    });
+    
+    console.log('Lade PDF-Import Modul...');
+    
+    // Lade nun pdf-import.js
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'pdf-import.js'; // Pfad prüfen: Muss im gleichen Ordner wie kalender.js liegen!
+      script.onload = () => {
+        console.log('PDF-Import Modul geladen');
+        resolve();
+      };
+      script.onerror = () => reject(new Error('pdf-import.js konnte nicht geladen werden'));
+      document.head.appendChild(script);
+    });
+  }
+
   // ===== Konstanten =====
   const START = 8, END = 17; // Stunden inkl.
   const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
@@ -67,7 +109,9 @@
       try {
         preview.innerHTML = '<div>Lade PDF...</div>';
         modal.showModal();
-        
+      
+        await ensurePDFImport();
+      
         // Parse PDF
         const events = await PDFImport.parse(file);
         preview.innerHTML = PDFImport.generatePreview(events);
