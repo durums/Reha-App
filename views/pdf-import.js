@@ -34,29 +34,60 @@
   }
 
   // Extrahiert Termine und Übungen aus dem Text
-  function extractEvents(text) {
-    const events = [];
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+function extractEvents(text) {
+  const events = [];
+  const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  
+  let currentDate = null;
+  
+  lines.forEach(line => {
+    // 1. Suche nach Datum + Wochentag (z.B. "30.06.2025 Montag")
+    const dateLineMatch = line.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+\w+/);
+    if (dateLineMatch) {
+      const day = dateLineMatch[1];
+      const month = dateLineMatch[2];
+      const year = dateLineMatch[3];
+      currentDate = `${year}-${pad(month)}-${pad(day)}`;
+      return; // Nächste Zeile
+    }
     
-    let currentDate = null;
-    
-    lines.forEach(line => {
-      // Versuche ein Datum zu finden
-      const dateMatch = findDate(line);
-      if (dateMatch) {
-        currentDate = dateMatch;
-      }
+    // 2. Suche nach Uhrzeit-Bereich (z.B. "09:00-09:30")
+    const timeRangeMatch = line.match(/\b(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})\b/);
+    if (timeRangeMatch && currentDate) {
+      const startTime = `${timeRangeMatch[1]}:${timeRangeMatch[2]}`;
+      // Beschreibung ist alles nach dem Zeitbereich
+      const description = line.substring(line.indexOf(timeRangeMatch[0]) + timeRangeMatch[0].length).trim();
       
-      // Versuche eine Uhrzeit + Beschreibung zu finden
-      const timeMatch = findTimeAndEvent(line, currentDate);
-      if (timeMatch && currentDate) {
-        events.push(timeMatch);
+      if (description.length > 3) {
+        events.push({
+          date: currentDate,
+          time: startTime + ":00", // Nur Startzeit nehmen
+          title: description.split(' ').slice(0, 6).join(' '), // Erste 6 Wörter
+          description: description,
+          duration: 60 // Standard 1 Stunde
+        });
       }
-    });
+      return;
+    }
     
-    return events;
-  }
-
+    // 3. Fallback: Einzelne Uhrzeit (falls vorhanden)
+    const singleTimeMatch = line.match(/\b(\d{1,2}):(\d{2})\b/);
+    if (singleTimeMatch && currentDate && line.length > 10) {
+      const description = line.substring(line.indexOf(singleTimeMatch[0]) + singleTimeMatch[0].length).trim();
+      if (description.length > 3) {
+        events.push({
+          date: currentDate,
+          time: singleTimeMatch[0] + ":00",
+          title: description.split(' ').slice(0, 6).join(' '),
+          description: description,
+          duration: 60
+        });
+      }
+    }
+  });
+  
+  return events;
+}
   // Sucht nach Datum im String
   function findDate(line) {
     for (const pattern of DATE_PATTERNS) {
