@@ -1,69 +1,81 @@
-// Optimierte PDF-Parsing-Version für die gegebene plan_full_hours.pdf
-// Fokus: Deutschsprachige Wochentage + Struktur wie in der Beispiel-PDF
-// Zielt auf stabile Erkennung der Tagesblöcke & Zeiträume
-
 (function () {
   if (typeof window.pdfjsLib === "undefined") {
-    console.error("pdf.js fehlt");
-    window.PDFImport = {
-      parse: () => { throw new Error("pdf.js fehlt"); }
-    };
+    console.error("pdf.js fehlt.");
+    window.PDFImport = { parse: () => [] };
     return;
   }
 
+  // Erkennung für DE/EN Wochentage
   const DAY_NAMES = [
-    "Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"
+    "Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag",
+    "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
   ];
 
-  // Regex: z. B. "Monday – 24.11.2025" ODER "Montag – 24.11.2025"
   const RE_DAY_HEADER = new RegExp(
-    `(${DAY_NAMES.join("|")}|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*[–-]\s*(\\d{2}\\.\\d{2}\\.\\d{4})`
+    `(${DAY_NAMES.join("|")})\\s*[–-]\\s*(\\d{2}\\.\\d{2}\\.\\d{4})`
   );
 
-  // Regex: "09:00–10:00 Text ..."
-  const RE_EVENT = /(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})\s+(.+)/;
+  // Superrobuster Time-Slot: erkennt alles wie „09:00–10:00 Vital werte fassung – 4.“
+  const RE_EVENT = /(\\d{2}:\\d{2})\\s*[–-]\\s*(\\d{2}:\\d{2})\\s+(.+)/;
 
   async function parse(file) {
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
     let text = "";
+
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      text += content.items.map(t => t.str).join(" ") + "\n";
+
+      // PDF.js trennt Wörter chaotisch → alles normalisieren:
+      const merged = content.items
+        .map(t => t.str.replace(/\s+/g, " "))
+        .join(" ");
+
+      text += merged + "\n";
     }
 
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(Boolean);
 
-    const events = [];
     let currentDate = null;
+    const events = [];
 
     for (const line of lines) {
-      const dayMatch = line.match(RE_DAY_HEADER);
-      if (dayMatch) {
-        currentDate = deToIso(dayMatch[2]);
+
+      // 1) Tagesheader erkennen
+      const mDay = line.match(RE_DAY_HEADER);
+      if (mDay) {
+        currentDate = deToIso(mDay[2]);
         continue;
       }
 
       if (!currentDate) continue;
 
-      const ev = line.match(RE_EVENT);
-      if (!ev) continue;
-
-      const start = ev[1];
-      const end   = ev[2];
-      const desc  = ev[3].trim();
+      // 2) Event in der Zeile erkennen
+      const mEv = line.match(RE_EVENT);
+      if (!mEv) continue;
 
       events.push({
         date: currentDate,
-        start,
-        end,
-        description: desc
+        start: mEv[1],
+        end: mEv[2],
+        description: clean(mEv[3])
       });
     }
 
     return events;
+  }
+
+  function clean(t) {
+    // Entfernt PDF-Trennmüll: "Vital werte fassung – 4." → "Vitalwertefassung – 4."
+    return t
+      .replace(/\s*–\s*/g, " – ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   }
 
   function deToIso(d) {
@@ -72,6 +84,6 @@
   }
 
   window.PDFImport = {
-    parse
+    parse,
   };
 })();
