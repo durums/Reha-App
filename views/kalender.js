@@ -46,7 +46,6 @@
     $("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
-
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
 
     // PDF-Import
