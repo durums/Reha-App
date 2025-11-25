@@ -1,0 +1,42 @@
+<div class="kalender-page">
+  <h1>Kalender</h1>
+
+  <div class="kalender-tabs">
+    <button class="kalender-tab-btn active" data-tab="basic">Kalender 1.0</button>
+    <button class="kalender-tab-btn" data-tab="reha">Kalender 2.0 – Rehaplan</button>
+  </div>
+
+  <!-- Falls du schon einen alten Kalender hattest, kannst du den hier einbauen -->
+  <section id="kalender-basic" class="kalender-tab active">
+    <p>Hier kannst du deinen bisherigen Kalender / Tagesplan anzeigen.</p>
+  </section>
+
+  <!-- Neuer Kalender 2.0 -->
+  <section id="kalender-reha" class="kalender-tab">
+    <div class="kalender2-layout">
+      <div class="kalender2-left">
+        <div class="kalender2-header">
+          <button id="kal2-prev-month" type="button">‹</button>
+          <div id="kal2-month-label"></div>
+          <button id="kal2-next-month" type="button">›</button>
+        </div>
+
+        <table class="kal2-grid">
+          <thead>
+            <tr>
+              <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
+            </tr>
+          </thead>
+          <tbody id="kal2-body"></tbody>
+        </table>
+      </div>
+
+      <div class="kalender2-right">
+        <h2 id="kal2-day-title">Tag auswählen</h2>
+        <div id="kal2-day-events" class="kal2-events-empty">
+          Bitte einen Tag im Kalender anklicken, um die Reha-Termine zu sehen.
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

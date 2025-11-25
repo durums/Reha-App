@@ -1,0 +1,149 @@
+.kalender-page {
+  padding: 1rem;
+}
+
+.kalender-tabs {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+.kalender-tab-btn {
+  padding: .4rem .9rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: .9rem;
+}
+
+.kalender-tab-btn.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.kalender-tab {
+  display: none;
+}
+
+.kalender-tab.active {
+  display: block;
+}
+
+.kalender2-layout {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.kalender2-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .5rem;
+}
+
+#kal2-month-label {
+  font-weight: 600;
+}
+
+.kalender2-header button {
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: .2rem .6rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.kal2-grid {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: .75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  font-size: .85rem;
+}
+
+.kal2-grid th,
+.kal2-grid td {
+  text-align: center;
+  padding: .35rem .25rem;
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.kal2-grid th:last-child,
+.kal2-grid td:last-child {
+  border-right: none;
+}
+
+.kal2-grid tr:last-child td {
+  border-bottom: none;
+}
+
+.kal2-day {
+  min-height: 2.3rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.kal2-day.disabled {
+  color: #d1d5db;
+  cursor: default;
+}
+
+.kal2-day.has-events::after {
+  content: "";
+  width: .35rem;
+  height: .35rem;
+  border-radius: 999px;
+  background: #2563eb;
+  position: absolute;
+  bottom: .25rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.kal2-day.selected {
+  background: #eff6ff;
+  font-weight: 600;
+}
+
+.kalender2-right {
+  background: #fff;
+  border-radius: .75rem;
+  padding: .75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  min-height: 220px;
+}
+
+#kal2-day-title {
+  margin-top: 0;
+  margin-bottom: .4rem;
+}
+
+.kal2-events-empty {
+  font-size: .9rem;
+  color: #6b7280;
+}
+
+.kal2-event {
+  border-radius: .6rem;
+  border: 1px solid #e5e7eb;
+  padding: .4rem .6rem;
+  margin-bottom: .35rem;
+  font-size: .85rem;
+}
+
+.kal2-event-time {
+  font-weight: 600;
+  margin-bottom: .1rem;
+}
+
+.kal2-event-location {
+  font-size: .8rem;
+  color: #6b7280;
+}
