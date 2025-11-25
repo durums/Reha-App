@@ -52,6 +52,40 @@
 
     // ICS-Export Button (muss in kalender.html existieren)
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
+    $("pdfImportBtn")?.addEventListener("click", () => {
+      $("pdfFileInput").click();
+    });
+    
+    $("pdfFileInput")?.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const modal = $("pdfImportModal");
+      const preview = $("pdfPreview");
+      const confirmBtn = $("pdfConfirmBtn");
+      
+      try {
+        preview.innerHTML = '<div>Lade PDF...</div>';
+        modal.showModal();
+        
+        // Parse PDF
+        const events = await PDFImport.parse(file);
+        preview.innerHTML = PDFImport.generatePreview(events);
+        
+        // Bestätigungs-Button
+        confirmBtn.onclick = () => {
+          const result = PDFImport.importToCalendar(events, store, user);
+          saveStore();
+          modal.close();
+          alert(`Importiert: ${result.imported} Termine\nKonflikte: ${result.conflicts}`);
+          render();
+        };
+        
+      } catch (error) {
+        preview.innerHTML = `<div class="pdf-error">Fehler: ${error.message}</div>`;
+        confirmBtn.style.display = 'none';
+      }
+    });
   }
 
   // ===== Render =====
