@@ -88,7 +88,7 @@
         const slot = `${pad(h)}:00`;
         const who  = (store[tag] || {})[slot];
         const cls  = who ? (who === user ? "own" : "booked") : "free";
-        const el   = div(`slot ${cls}`, who ? (who === user ? "Mein Termin" : "Belegt") : "");
+        const el   = div(`slot ${cls}`, who ? who : "");
         el.dataset.date = tag;
         el.dataset.slot = slot;
         el.onclick = onSlotClick;
