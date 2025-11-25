@@ -1,72 +1,63 @@
 (function () {
-  if (typeof window.pdfjsLib === "undefined") {
-    console.error("pdf.js fehlt");
+  if (!window.pdfjsLib) {
+    console.error("pdf.js fehlt.");
     window.PDFImport = { parse: () => [] };
     return;
   }
 
-  const DAY_NAMES = [
-    "Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag",
-    "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
-  ];
-
-  // Tageszeile: Monday – 24.11.2025
-  const RE_DAY_HEADER = new RegExp(
-    `(${DAY_NAMES.join("|")})\\s*[–-]\\s*(\\d{2}\\.\\d{2}\\.\\d{4})`
-  );
-
-  // Event-Zeile: 09:00–10:00 Text
-  const RE_EVENT = /(\\d{2}:\\d{2})\\s*[–-]\\s*(\\d{2}:\\d{2})\\s+(.+)/;
+  // Format in PDF:
+  // Datum,Zeit,Beschreibung
+  // 24.11.2025,09:00,10:00 Lymphdrainage – 4. Etage – Frau Herrmann
 
   async function parse(file) {
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
-    let text = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
+    let lines = [];
 
-      // PDF liefert schon sauberen Text
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
       const merged = content.items.map(t => t.str).join(" ");
-      text += merged + "\n";
+      lines.push(...merged.split(/[\r\n]+/));
     }
 
-    const lines = text.split(/\\r?\\n/).map(l => l.trim()).filter(Boolean);
+    const events = [];
 
-    let events = [];
-    let currentDate = null;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line || line.startsWith("Datum")) continue;
 
-    for (const line of lines) {
+      const parts = line.split(",");
+      if (parts.length < 3) continue;
 
-      // Tageszeile?
-      const d = line.match(RE_DAY_HEADER);
-      if (d) {
-        currentDate = deToIso(d[2]);
-        continue;
-      }
+      const datum = parts[0].trim();
+      const start = parts[1].trim();
+      const rest = parts.slice(2).join(",").trim();
 
-      if (!currentDate) continue;
+      // rest beginnt z. B. mit "10:00 Vitalwerterfassung – 4. Etage – Frau Bick"
+      const m = rest.match(/^(\d{2}:\d{2})\s+(.*)$/);
+      if (!m) continue;
 
-      // Eventzeile?
-      const ev = line.match(RE_EVENT);
-      if (ev) {
-        events.push({
-          date: currentDate,
-          start: ev[1],
-          end: ev[2],
-          description: ev[3].trim()
-        });
-      }
+      const end   = m[1];
+      const descr = m[2];
+
+      events.push({
+        date: deToIso(datum),
+        start,
+        end,
+        description: descr
+      });
     }
 
     return events;
   }
 
-  function deToIso(ddmmyyyy) {
-    const [dd, mm, yyyy] = ddmmyyyy.split(".");
+  function deToIso(d) {
+    const [dd, mm, yyyy] = d.split(".");
     return `${yyyy}-${mm}-${dd}`;
   }
 
   window.PDFImport = { parse };
+
 })();
