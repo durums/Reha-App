@@ -1,9 +1,10 @@
 <h2 class="rp-title">📅 Kalender</h2>
 
-<!-- PDF.js für Client-Side Parsing -->
+<!-- 🔧 KORRIGIERT: Nur pdf.js laden, pdf-import.js wird dynamisch in kalender.js geladen -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
-<script src="pdf-import.js"></script> 
+<!-- WICHTIG: Entfernt, denn kalender.js lädt es dynamisch -->
+<!-- <script src="pdf-import.js"></script> --> 
 
 <!-- views/kalender.html -->
 <div class="toolbar">
@@ -47,7 +48,7 @@
     <h3 id="pdfImportTitle">PDF-Therapieplan importieren</h3>
     <div id="pdfPreview" class="list"></div>
     <div class="dlg-actions">
-      <button type="button" id="pdfConfirmBtn" style="background:#10B981;color:white;border-color:#059669">Importieren</button>
+      <button type="button" id="pdfConfirmBtn" style="background:#10B981;color:white;border-color:#059669;display:none;">Importieren</button>
       <button value="cancel">Abbrechen</button>
     </div>
   </form>

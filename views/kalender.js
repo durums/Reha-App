@@ -10,7 +10,7 @@
     if (typeof window.pdfjsLib === 'undefined') {
       await new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.j';
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
         script.onload = resolve;
         script.onerror = () => reject(new Error('pdf.min.js konnte nicht geladen werden (evtl. Adblocker?)'));
         document.head.appendChild(script);
