@@ -322,9 +322,10 @@
     
     try {
       // 1. Prüfen, ob PDFImport-Modul geladen ist
-      if (typeof window.PDFImport === 'undefined') {
+      if (!window.PDFImport) {
         await loadPdfImportModule();
-      }
+    }
+
       
       // 2. Modal vorbereiten
       preview.innerHTML = '<div>⏳ Lade PDF-Import-Modul...</div>';
