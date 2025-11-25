@@ -1,5 +1,5 @@
 document.getElementById("menu-kontaktieren")?.addEventListener("click", () => {
-  location.hash = "#kontakt";
+  location.hash = "kontakt";
 });
 
 // Wenn die Seite Kontakt angezeigt wird, Panel sichtbar machen
