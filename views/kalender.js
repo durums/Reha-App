@@ -55,6 +55,15 @@
       importBtn.addEventListener("click", () => importInput.click());
       importInput.addEventListener("change", onPdfChosen);
     }
+    // CSV-Import
+    const csvBtn   = $("importCsvBtn");
+    const csvInput = $("importCsvInput");
+    
+    if (csvBtn && csvInput) {
+      csvBtn.addEventListener("click", () => csvInput.click());
+      csvInput.addEventListener("change", onCsvChosen);
+    }
+
   }
 
   // ===== Render =====
