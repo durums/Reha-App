@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat</title>
-
-    <link rel="stylesheet" href="chat.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontaktieren</title>
+  <link rel="stylesheet" href="kontakt.css" />
 </head>
-
 <body>
 
-<header class="chat-header">
-    <h1>Chat</h1>
-</header>
+  <div class="kontakt-container">
+    <h1>Kontaktieren</h1>
 
-<main class="chat-container">
+    <p>Wenn du Hilfe brauchst oder Fragen hast, kannst du direkt über den Chat unten rechts Kontakt aufnehmen.</p>
 
-    <div class="chat-select-section">
-        <label for="contactSelect">Kontakt wählen:</label>
-        <select id="contactSelect">
-            <option value="fahrer">Fahrer</option>
-            <option value="therapeut">Therapeut</option>
-            <option value="personal">Personalabteilung</option>
-        </select>
-    </div>
+    <h2>So funktioniert der Chat:</h2>
+    <ol>
+      <li>Klicke unten rechts auf die blaue Sprechblase 💬.</li>
+      <li>Wähle die passende Abteilung:<br>
+        – <strong>Fahrer</strong><br>
+        – <strong>Personalabteilung</strong><br>
+        – <strong>Therapeuten</strong>
+      </li>
+      <li>Der Chat startet automatisch mit der richtigen Abteilung.</li>
+    </ol>
 
-    <div id="messagesContainer" class="messages"></div>
+    <button id="openChatBtn" class="kontakt-btn">Chat jetzt öffnen</button>
+  </div>
 
-    <div class="input-row">
-        <input id="messageInput" type="text" placeholder="Nachricht schreiben…" />
-        <button id="sendBtn">Senden</button>
-    </div>
+  <!-- Dein Lime-Chat-Widget -->
+  <script type="text/javascript" async 
+    src="https://userlike-cdn-widgets.s3-eu-west-1.amazonaws.com/XXXXXX.js"></script>
 
-</main>
-
-<!-- Wichtig: Firebase zuerst, Chat danach -->
-<script type="module" src="../app.js"></script>
-<script type="module" src="chat.js"></script>
+  <!-- Kontaktseite JavaScript -->
+  <script src="kontakt.js"></script>
 
 </body>
 </html>
