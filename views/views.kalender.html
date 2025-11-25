@@ -12,31 +12,38 @@
   </section>
 
   <!-- Neuer Kalender 2.0 -->
-  <section id="kalender-reha" class="kalender-tab">
-    <div class="kalender2-layout">
-      <div class="kalender2-left">
-        <div class="kalender2-header">
-          <button id="kal2-prev-month" type="button">‹</button>
-          <div id="kal2-month-label"></div>
-          <button id="kal2-next-month" type="button">›</button>
-        </div>
-
-        <table class="kal2-grid">
-          <thead>
-            <tr>
-              <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
-            </tr>
-          </thead>
-          <tbody id="kal2-body"></tbody>
-        </table>
+ <!-- Neuer Kalender 2.0 -->
+<section id="kalender-reha" class="kalender-tab">
+  <!-- Layout für Kalender-Raster (nur im alten Modus sichtbar) -->
+  <div class="kalender2-layout">
+    <div class="kalender2-left">
+      <div class="kalender2-header">
+        <button id="kal2-prev-month" type="button">‹</button>
+        <div id="kal2-month-label"></div>
+        <button id="kal2-next-month" type="button">›</button>
       </div>
 
-      <div class="kalender2-right">
-        <h2 id="kal2-day-title">Tag auswählen</h2>
-        <div id="kal2-day-events" class="kal2-events-empty">
-          Bitte einen Tag im Kalender anklicken, um die Reha-Termine zu sehen.
-        </div>
+      <table class="kal2-grid">
+        <thead>
+          <tr>
+            <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
+          </tr>
+        </thead>
+        <tbody id="kal2-body"></tbody>
+      </table>
+    </div>
+
+    <div class="kalender2-right">
+      <h2 id="kal2-day-title">Tag auswählen</h2>
+      <div id="kal2-day-events" class="kal2-events-empty">
+        Bitte einen Tag im Kalender anklicken, um die Reha-Termine zu sehen.
       </div>
     </div>
-  </section>
-</div>
+  </div>
+
+  <!-- ✨ Listenansicht für Kalender 2.0 (PDF / Rehaplan) -->
+  <div id="kalender-reha-list" class="kalender2-list" style="display:none;">
+    <h2>Rehaplan – kompakte Übersicht</h2>
+    <ul id="kal2-pdf-list"></ul>
+  </div>
+</section>
