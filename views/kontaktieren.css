@@ -1,25 +1,85 @@
-.kontakt-section {
-  padding: 1.2rem;
-  line-height: 1.5;
+.view-kontakt {
+  padding-bottom: 2rem;
 }
 
-.kontakt-section h2 {
-  margin-bottom: 0.5rem;
+/* Hero-Box */
+.kt-hero {
+  display: grid;
+  gap: .7rem;
+  padding: 1rem;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(43,144,217,.08), rgba(43,144,217,0));
+  box-shadow: var(--shadow, 0 4px 16px rgba(0,0,0,.06));
+  margin: .25rem 0 1rem;
 }
 
-.kontakt-section ol {
-  margin: 0.5rem 0 1rem 1.2rem;
+.kt-hero-title {
+  margin: 0 0 .15rem;
+  font-weight: 800;
+  font-size: 1.1rem;
 }
 
-.kontakt-btn {
-  padding: 0.6rem 1rem;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
+.kt-hero-sub {
+  margin: 0;
+  color: var(--muted, #6b7280);
+  font-size: .95rem;
+  line-height: 1.45;
+}
+
+/* Box */
+.kt-box {
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px;
+  padding: 1rem;
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow, 0 4px 16px rgba(0,0,0,.06));
+  margin-bottom: 1.25rem;
+}
+
+.kt-box-title {
+  margin: 0 0 .3rem;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.kt-box-text {
+  margin: 0 0 .75rem;
+  color: var(--muted, #6b7280);
+}
+
+/* Button */
+.kt-btn {
+  padding: .65rem 1rem;
+  background: var(--primary, #2b90d9);
+  color: #fff;
+  border-radius: 12px;
+  border: 0;
   cursor: pointer;
+  font-weight: 700;
+  box-shadow: var(--shadow, 0 6px 24px rgba(0,0,0,.06));
 }
 
-.kontakt-btn:hover {
-  filter: brightness(0.92);
+.kt-btn:hover {
+  filter: brightness(.92);
+}
+
+/* Hinweis-Box */
+.kt-hint {
+  margin-top: 1rem;
+  border: 1px dashed var(--primary-weak, #dff1fb);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  padding: .9rem 1rem;
+}
+
+.kt-hint h3 {
+  margin: 0 0 .25rem;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.kt-hint p {
+  margin: 0;
+  color: var(--muted, #6b7280);
 }
