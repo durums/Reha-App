@@ -14,14 +14,9 @@
     <button id="moveBtn">Verschieben / Absagen</button>
     <button id="exportBtn">Kalender-Export</button>
 
-    <!-- NEU: PDF-Import-Button + verstecktes File-Input -->
-    <button id="importPdfBtn">Plan (PDF) importieren</button>
-    <input
-      id="importPdfInput"
-      type="file"
-      accept="application/pdf"
-      style="display:none"
-    />
+    <!-- 🔧 KORRIGIERT: IDs angepasst -->
+    <button id="pdfImportBtn">Plan (PDF) importieren</button>
+    <input id="pdfFileInput" type="file" accept=".pdf" style="display:none">
   </div>
 </div>
 
@@ -33,6 +28,18 @@
     <div id="days"></div>
   </div>
 </div>
+
+<!-- 🔧 KORRIGIERT: Modal nach dem Kalender (bessere Struktur) -->
+<dialog id="pdfImportModal">
+  <form method="dialog">
+    <h3 id="pdfImportTitle">PDF-Therapieplan importieren</h3>
+    <div id="pdfPreview" class="list"></div>
+    <div class="dlg-actions">
+      <button type="button" id="pdfConfirmBtn" style="background:#10B981;color:white;border-color:#059669;display:none;">Importieren</button>
+      <button value="cancel">Abbrechen</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog id="dialog">
   <form method="dialog">

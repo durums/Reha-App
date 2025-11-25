@@ -14,7 +14,6 @@
   const hours      = () => $("hours");
   const daysC      = () => $("days");
   const rangeLabel = () => $("rangeLabel");
-  const userPill   = () => $("userPill");
   const dlg        = () => $("dialog");
   const dlgTitle   = () => $("dlgTitle");
   const dlgList    = () => $("dlgList");
@@ -49,16 +48,14 @@
     $("bookBtn")?.addEventListener("click", () => pickFreeSlot(bookPicked));
     $("mineBtn")?.addEventListener("click", showMine);
     $("moveBtn")?.addEventListener("click", moveOrCancel);
-
-    // ICS-Export Button (muss in kalender.html existieren)
     $("exportBtn")?.addEventListener("click", exportAllMyEventsICS);
 
-    // NEU: PDF-Import-Button + Input
-    const importBtn   = $("importPdfBtn");
-    const importInput = $("importPdfInput");
-    if (importBtn && importInput) {
-      importBtn.addEventListener("click", () => importInput.click());
-      importInput.addEventListener("change", onPdfChosen);
+    // 🔧 KORRIGIERT: PDF-Import Button Event-Handler
+    const pdfBtn = $("pdfImportBtn");
+    const pdfInput = $("pdfFileInput");
+    if (pdfBtn && pdfInput) {
+      pdfBtn.addEventListener("click", () => pdfInput.click());
+      pdfInput.addEventListener("change", onPdfChosen);
     }
   }
 
@@ -314,91 +311,82 @@
     URL.revokeObjectURL(url);
   }
 
-  // ===== PDF-Import =====
+  // ===== PDF-Import (KORRIGIERT) =====
   async function onPdfChosen(evt) {
     const file = evt.target.files && evt.target.files[0];
     if (!file) return;
 
+    const modal = $("pdfImportModal");
+    const preview = $("pdfPreview");
+    const confirmBtn = $("pdfConfirmBtn");
+    
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const termine = await parsePdfToAppointments(arrayBuffer);
-
-      if (!termine.length) {
-        alert("In der PDF wurden keine Termine erkannt.");
+      // 1. Prüfen, ob PDFImport-Modul geladen ist
+      if (typeof window.PDFImport === 'undefined') {
+        await loadPdfImportModule();
+      }
+      
+      // 2. Modal vorbereiten
+      preview.innerHTML = '<div>⏳ Lade PDF-Import-Modul...</div>';
+      confirmBtn.style.display = 'none';
+      modal.showModal();
+      
+      // 3. PDF parsen
+      preview.innerHTML = '<div>📄 Parse PDF...</div>';
+      const events = await window.PDFImport.parse(file);
+      
+      if (events.length === 0) {
+        preview.innerHTML = '<div class="pdf-error">⚠️ Keine Termine im PDF gefunden.</div>';
         return;
       }
-
-      termine.forEach(addAppointmentToCalendar);
-      render();
-
-      alert(`${termine.length} Termine aus der PDF importiert.`);
-    } catch (err) {
-      console.error("PDF-Import fehlgeschlagen:", err);
-      alert("PDF konnte nicht gelesen werden.");
+      
+      // 4. Vorschau anzeigen
+      preview.innerHTML = window.PDFImport.generatePreview(events);
+      confirmBtn.style.display = 'inline-block';
+      
+      // 5. Import-Logik
+      confirmBtn.onclick = () => {
+        const result = window.PDFImport.importToCalendar(events, store, user);
+        saveStore();
+        modal.close();
+        alert(`✅ Import erfolgreich!\n\nImportiert: ${result.imported} Termine\n⚠️ Übersprungen: ${result.conflicts} Konflikte`);
+        render();
+      };
+      
+    } catch (error) {
+      console.error('❌ PDF-Import Fehler:', error);
+      preview.innerHTML = `<div class="pdf-error"><strong>Fehler:</strong> ${error.message}</div>`;
+      confirmBtn.style.display = 'none';
     } finally {
-      evt.target.value = "";
+      evt.target.value = ""; // Input zurücksetzen
     }
   }
 
-  async function parsePdfToAppointments(arrayBuffer) {
-    if (!window.pdfjsLib) {
-      console.error("pdfjsLib ist nicht geladen.");
-      return [];
-    }
-
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = "";
-
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const content = await page.getTextContent();
-      const strings = content.items.map((item) => item.str);
-      fullText += strings.join(" ") + "\n";
-    }
-
-    // Beispiel-Zeilen:
-    // 2025-01-10 08:30 - 09:00: Gymnastik Gruppe A
-    const lines = fullText.split(/\r?\n/);
-    const termine = [];
-
-    const regex =
-      /(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})\s*[:\-]\s*(.+)$/;
-
-    for (const line of lines) {
-      const m = line.match(regex);
-      if (!m) continue;
-
-      const [_, dateStr, startStr, endStr, title] = m;
-
-      const start = new Date(`${dateStr}T${startStr}:00`);
-      const end   = new Date(`${dateStr}T${endStr}:00`);
-
-      termine.push({
-        title: title.trim(),
-        start,
-        end,
-      });
-    }
-
-    return termine;
-  }
-
-  function addAppointmentToCalendar(appt) {
-    const hour = appt.start.getHours();
-    if (hour < START || hour > END) {
-      console.warn("Termin liegt außerhalb der Kalenderzeit:", appt);
-      return;
-    }
-    const tag  = iso(appt.start);
-    const slot = `${pad(hour)}:00`;
-
-    // Slot schon belegt? -> überspringen
-    if (store[tag] && store[tag][slot]) {
-      console.warn("Slot bereits belegt, übersprungen:", tag, slot);
-      return;
-    }
-
-    book(tag, slot, user);
+  // Hilfsfunktion: Lädt pdf-import.js dynamisch
+  function loadPdfImportModule() {
+    return new Promise((resolve, reject) => {
+      // Falls bereits geladen
+      if (typeof window.PDFImport !== 'undefined') {
+        resolve();
+        return;
+      }
+      
+      console.log('📦 Lade PDFImport-Modul...');
+      const script = document.createElement('script');
+      script.src = '../pdf-import.js'; // ← WICHTIG: Pfad an Ihre Struktur anpassen!
+      
+      script.onload = () => {
+        if (typeof window.PDFImport === 'undefined') {
+          reject(new Error('PDFImport-Modul hat sich nicht registriert'));
+        } else {
+          console.log('✅ PDFImport-Modul geladen');
+          resolve();
+        }
+      };
+      
+      script.onerror = () => reject(new Error('❌ pdf-import.js nicht gefunden unter ./pdf-import.js - Pfad prüfen!'));
+      document.head.appendChild(script);
+    });
   }
 
   // ===== Utils =====
