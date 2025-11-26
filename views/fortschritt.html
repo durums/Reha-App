@@ -3,86 +3,79 @@
     <div class="rp-head-left">
       <div class="rp-actions">
         <button id="nbDownloadBtn" class="btn btn-primary" type="button">
-          ⬇️ Nachbehandlungsplan
+          📄 Nachbehandlungsplan
         </button>
       </div>
+
       <h2 class="rp-title">📈 Fortschritt</h2>
       <p class="rp-sub">
         Wähle oben die Zeit deiner Nachbehandlung. Darunter siehst du, was aktuell für
         <strong>Bewegungsumfang</strong>, <strong>Belastung</strong> und <strong>Behandlung</strong> gilt.
       </p>
     </div>
-
-    <!-- KPI-Panel (bleibt – optional nutzbar) -->
-    <aside class="card-dark rp-kpi" aria-labelledby="kpi-head">
-      <h3 id="kpi-head">KPI – Übersicht</h3>
-      <div class="kpi-row" aria-label="Beweglichkeit">
-        <div class="kpi-label">
-          Beweglichkeit – <strong id="kpi-mobility-val">75%</strong>
-        </div>
-        <div class="kpi-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">
-          <span id="kpi-mobility-bar" style="width:75%"></span>
-        </div>
-      </div>
-      <div class="kpi-donuts" aria-label="Kraft und Ausdauer">
-        <figure class="donut" aria-label="Kraft 25%">
-          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
-            <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
-            <circle cx="60" cy="60" r="48" class="donut-val" data-percent="25"></circle>
-          </svg>
-          <div class="donut-center"><span class="donut-num">25</span><span class="donut-unit">%</span></div>
-          <figcaption>Kraft</figcaption>
-        </figure>
-        <figure class="donut" aria-label="Ausdauer 62%">
-          <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
-            <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
-            <circle cx="60" cy="60" r="48" class="donut-val" data-percent="62"></circle>
-          </svg>
-          <div class="donut-center"><span class="donut-num">62</span><span class="donut-unit">%</span></div>
-          <figcaption>Ausdauer</figcaption>
-        </figure>
-      </div>
-      <div class="kpi-row" aria-label="Schmerzreduktion">
-        <div class="kpi-label">
-          Schmerzreduktion – <strong id="kpi-pain-val">85%</strong>
-        </div>
-        <div class="kpi-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85">
-          <span id="kpi-pain-bar" style="width:85%"></span>
-        </div>
-      </div>
-    </aside>
   </header>
 
-  <!-- Timeline + Slider -->
+  <!-- Timeline -->
   <article class="card rp-timeline rp-timeline--full" aria-labelledby="tl-head">
     <div class="nt-head">
       <span id="tl-head" class="nt-title">Nachbehandlungs-Timeline</span>
       <div class="nt-info">
-        Oben siehst du die Phasen deiner Reha. Der blaue Balken markiert deinen bisherigen Weg.
-        Mit dem Schieberegler wählst du eine Phase aus – die Inhalte unten passen sich an.
+        Oben siehst du die Phasen deiner Reha. Mit dem Schieberegler wählst du eine Phase aus –
+        die Inhalte unten passen sich an.
       </div>
     </div>
 
     <div class="nt-scale">
-      <!-- Phase-Labels (werden per JS positioniert) -->
-      <ul id="ntMilestones" class="nt-milestones" aria-label="Meilensteine"></ul>
+      <ul id="ntMilestones" class="nt-milestones"></ul>
 
-      <!-- Zahlenstrahl -->
       <div class="nt-rail">
         <div id="ntProgress" class="nt-progress"></div>
         <div id="ntBumps" class="nt-bumps"></div>
       </div>
 
-      <!-- Slider -->
-      <input id="ntSlider" class="nt-slider" type="range" min="0" max="6" step="1" value="0" aria-label="Phase wählen" />
+      <input id="ntSlider" class="nt-slider" type="range" min="0" max="6" step="1" value="0"/>
 
-      <!-- Aktuelle Phase -->
       <div id="ntPin" class="nt-pin" aria-live="polite">
-        <div class="dot" aria-hidden="true"></div>
+        <div class="dot"></div>
         <span id="ntPhaseLabel">–</span>
       </div>
     </div>
   </article>
+
+  <!-- KPIs übersichtlich unten -->
+  <aside class="card-dark rp-kpi" aria-labelledby="kpi-head">
+    <h3 id="kpi-head">KPI – Übersicht</h3>
+
+    <div class="kpi-row">
+      <div class="kpi-label">Beweglichkeit – <strong id="kpi-mobility-val">75%</strong></div>
+      <div class="kpi-bar"><span id="kpi-mobility-bar"></span></div>
+    </div>
+
+    <div class="kpi-donuts">
+      <figure class="donut">
+        <svg class="donut-svg" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
+          <circle cx="60" cy="60" r="48" class="donut-val" data-percent="25"></circle>
+        </svg>
+        <div class="donut-center"><span class="donut-num">25</span>%</div>
+        <figcaption>Kraft</figcaption>
+      </figure>
+
+      <figure class="donut">
+        <svg class="donut-svg" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="48" class="donut-bg"></circle>
+          <circle cx="60" cy="60" r="48" class="donut-val" data-percent="62"></circle>
+        </svg>
+        <div class="donut-center"><span class="donut-num">62</span>%</div>
+        <figcaption>Ausdauer</figcaption>
+      </figure>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-label">Schmerzreduktion – <strong id="kpi-pain-val">85%</strong></div>
+      <div class="kpi-bar"><span id="kpi-pain-bar"></span></div>
+    </div>
+  </aside>
 
   <!-- Dynamische Inhalte -->
   <div class="rp-info">
@@ -102,24 +95,5 @@
     </article>
   </div>
 </section>
-<dialog id="nbConsentDialog" class="nb-consent">
-  <form method="dialog" class="nb-consent__inner">
-    <h3>Einwilligung zum Download</h3>
-    <p>
-      Mit Klick auf <strong>Einverstanden</strong> stimmst du zu, dass der
-      <em>Nachbehandlungsplan</em> (lokale Projektdatei) heruntergeladen und in
-      einem neuen Tab angezeigt wird.
-    </p>
 
-    <div class="nb-consent__actions">
-      <button value="cancel" class="btn btn-ghost">Abbrechen</button>
-      <button value="ok" class="btn btn-primary">Einverstanden</button>
-    </div>
-
-    <p class="nb-consent__hint">
-      Hinweis: Du kannst die geöffnete Seite anschließend über den Browser als PDF drucken.
-    </p>
-  </form>
-</dialog>
 <script src="fortschritt.js"></script>
-
